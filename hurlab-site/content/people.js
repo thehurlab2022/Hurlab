@@ -136,7 +136,8 @@ window.PEOPLE = {
    "mail": "1263048@kist.re.kr",
    "name": "Subeen Park",
    "since": "2026–",
-   "where": "KU-KIST Graduate School of Converging Science and Technology, Korea University"
+   "where": "KU-KIST Graduate School of Converging Science and Technology, Korea University",
+   "photo": "images/subeen-park.jpg"
   }
  ],
  "updated": "2026-09-04"
