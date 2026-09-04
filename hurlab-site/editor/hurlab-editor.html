@@ -1,0 +1,626 @@
+<title>HUR Lab Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,300;6..72,400&display=swap">
+
+<style>
+  :root {
+    color-scheme: dark;
+    --bg:      #141A24;
+    --surface: #1D2530;
+    --sunk:    #10161E;
+    --ink:     #EEF2F6;
+    --ink-2:   #B2BCC7;
+    --ink-3:   #8D97A3;
+    --rule:    #2B3542;
+    --mech:    #6FB2E8;
+    --therm:   #F0955F;
+    --elec:    #B79BE8;
+    --green:   #6FCF97;
+    --accent:  var(--therm);
+    --sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --serif: "Newsreader", Georgia, "Times New Roman", serif;
+    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--ink); font-family: var(--sans);
+    font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .bar { position: sticky; top: 0; z-index: 10; background: var(--bg); border-bottom: 1px solid var(--rule); }
+  .bar-top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding: 14px 0 10px; }
+  .brand { font-family: var(--serif); font-size: 1.24rem; font-weight: 400; margin: 0; margin-right: auto; letter-spacing: -0.01em; }
+  .brand span { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); margin-left: 10px; vertical-align: 2px; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 4px; padding-bottom: 10px; }
+  .tab {
+    font: inherit; font-size: 0.84rem; color: var(--ink-3);
+    background: transparent; border: 0; border-bottom: 2px solid transparent;
+    padding: 7px 13px; cursor: pointer; transition: color .15s, border-color .15s;
+  }
+  .tab:hover { color: var(--ink-2); }
+  .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+  .tab .c { font-family: var(--mono); font-size: 0.68rem; color: var(--ink-3); margin-left: 7px; }
+
+  #q { font: inherit; font-size: 0.88rem; color: var(--ink); background: var(--sunk);
+       border: 1px solid var(--rule); border-radius: 3px; padding: 7px 11px; flex: 0 1 230px; min-width: 160px; }
+  #q::placeholder { color: var(--ink-3); }
+  .btn { font: inherit; font-size: 0.82rem; color: var(--ink-2); background: var(--surface);
+         border: 1px solid var(--rule); border-radius: 3px; padding: 7px 13px; cursor: pointer;
+         transition: color .15s, border-color .15s, background .15s; }
+  .btn:hover { color: var(--ink); border-color: var(--ink-3); }
+  .btn.primary { color: var(--bg); background: var(--accent); border-color: var(--accent); font-weight: 600; }
+  .btn.primary:hover { color: var(--bg); filter: brightness(1.08); }
+  .btn.ghost { background: transparent; }
+  .btn.danger:hover { color: #FF8B7A; border-color: #FF8B7A; }
+  .btn.sm { font-size: 0.74rem; padding: 5px 10px; }
+
+  .state { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.06em; color: var(--ink-3);
+           white-space: nowrap; display: inline-flex; align-items: center; gap: 7px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-3); }
+  .state.ok .dot { background: var(--green); }
+  .state.busy .dot { background: var(--therm); }
+  .state.error .dot { background: #FF6B57; }
+
+  .notice { margin: 22px 0 0; padding: 15px 18px; border: 1px solid var(--rule);
+            border-left: 3px solid var(--therm); background: var(--surface);
+            border-radius: 2px; font-size: 0.9rem; color: var(--ink-2); }
+  .notice b { color: var(--ink); }
+
+  .group { margin-top: 38px; }
+  .group-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px;
+                border-bottom: 1px solid var(--rule); padding-bottom: 10px; }
+  .group-head h2 { font-family: var(--serif); font-weight: 400; font-size: 1.32rem; margin: 0; line-height: 1.2; }
+  .group-head h3 { font-family: var(--mono); font-size: 0.95rem; font-weight: 500; margin: 0;
+                   letter-spacing: 0.05em; font-variant-numeric: tabular-nums; }
+  .group-head .n { font-family: var(--mono); font-size: 0.7rem; color: var(--ink-3);
+                   font-variant-numeric: tabular-nums; margin-right: auto; }
+
+  .row { border-bottom: 1px solid var(--rule); }
+  .row-head { display: grid; grid-template-columns: 1fr auto; gap: 10px 14px; align-items: center;
+              padding: 12px 0; cursor: pointer; }
+  .row-head:hover .r-title { color: var(--accent); }
+  .r-title { font-family: var(--serif); font-size: 1.02rem; line-height: 1.3; transition: color .15s; }
+  .r-sub { font-family: var(--mono); font-size: 0.69rem; color: var(--ink-3); margin-top: 3px;
+           font-variant-numeric: tabular-nums; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .r-side { display: flex; align-items: center; gap: 10px; }
+  .chev { font-family: var(--mono); font-size: 0.7rem; color: var(--ink-3); width: 14px; text-align: center; }
+
+  .badge { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase;
+           padding: 3px 9px; border-radius: 2px; border: 1px solid; white-space: nowrap; }
+  .b-accepted, .b-thermal   { color: var(--therm); border-color: var(--therm); }
+  .b-revision               { color: var(--therm); border-color: var(--therm); }
+  .b-submitted, .b-energy   { color: var(--elec);  border-color: var(--elec); }
+  .b-preparation, .b-none   { color: var(--ink-3); border-color: var(--rule); }
+  .b-corr                   { color: var(--accent); border-color: var(--accent); }
+  .b-transducers            { color: var(--mech);  border-color: var(--mech); }
+  .b-done                   { color: var(--ink-3); border-color: var(--rule); }
+
+  .form { display: grid; gap: 12px; padding: 4px 0 22px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .form .full { grid-column: 1 / -1; }
+  .field { display: grid; gap: 5px; }
+  .field label { font-family: var(--mono); font-size: 0.63rem; letter-spacing: 0.12em;
+                 text-transform: uppercase; color: var(--ink-3); }
+  .field input, .field textarea, .field select {
+    font: inherit; font-size: 0.9rem; color: var(--ink); background: var(--sunk);
+    border: 1px solid var(--rule); border-radius: 3px; padding: 8px 11px; width: 100%;
+  }
+  .field textarea { resize: vertical; min-height: 66px; line-height: 1.5; }
+  .field .hint { font-size: 0.74rem; color: var(--ink-3); }
+  .check { display: flex; align-items: center; gap: 9px; font-size: 0.88rem; color: var(--ink-2); }
+  .check input { width: auto; }
+  .form-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding-top: 2px; }
+  .spacer { margin-left: auto; }
+
+  .sub { grid-column: 1 / -1; border-top: 1px solid var(--rule); padding-top: 14px; display: grid; gap: 8px; }
+  .sub-head { display: flex; align-items: baseline; gap: 10px; }
+  .sub-head h4 { font-family: var(--mono); font-size: 0.63rem; letter-spacing: 0.12em;
+                 text-transform: uppercase; color: var(--ink-3); font-weight: 400; margin: 0; margin-right: auto; }
+  .subrow { display: grid; gap: 8px; grid-template-columns: 1fr 1fr auto; align-items: center;
+            padding: 7px 0; border-top: 1px solid var(--rule); }
+  .subrow input, .subrow select { font: inherit; font-size: 0.84rem; color: var(--ink); background: var(--sunk);
+            border: 1px solid var(--rule); border-radius: 3px; padding: 6px 9px; width: 100%; }
+  .subrow .x { justify-self: end; }
+
+  .empty { padding: 30px 0; color: var(--ink-3); font-family: var(--mono); font-size: 0.8rem; }
+
+  #exportPanel[hidden] { display: none; }
+  #exportPanel { margin-top: 22px; padding: 18px; background: var(--surface); border: 1px solid var(--rule);
+                 border-radius: 3px; display: grid; gap: 12px; }
+  #exportPanel p { margin: 0; font-size: 0.88rem; color: var(--ink-2); }
+  #exportCode { font-family: var(--mono); font-size: 0.73rem; line-height: 1.5; color: var(--ink-2);
+                background: var(--sunk); border: 1px solid var(--rule); border-radius: 3px;
+                padding: 12px; width: 100%; min-height: 200px; resize: vertical; }
+
+  footer { margin-top: 60px; border-top: 1px solid var(--rule); padding: 20px 0 60px;
+           font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.06em; color: var(--ink-3);
+           display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between; }
+
+  @media (max-width: 680px) {
+    .form { grid-template-columns: minmax(0, 1fr); }
+    .subrow { grid-template-columns: 1fr; }
+    .brand { width: 100%; }
+  }
+</style>
+
+<div class="bar">
+  <div class="wrap">
+    <div class="bar-top">
+      <h1 class="brand">HUR Lab <span>Editor</span></h1>
+      <input id="q" type="search" placeholder="Filter…" aria-label="Filter">
+      <button class="btn" id="exportBtn" type="button">Export</button>
+      <span class="state" id="state"><span class="dot"></span><span id="stateText">Connecting…</span></span>
+    </div>
+    <div class="tabs" id="tabs" role="tablist"></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div id="banner"></div>
+
+  <div id="exportPanel" hidden>
+    <p id="exportNote"></p>
+    <textarea id="exportCode" readonly spellcheck="false"></textarea>
+    <div class="form-actions">
+      <button class="btn primary" id="selectCode" type="button">Copy</button>
+      <button class="btn" id="downloadAll" type="button">Download all content (JSON)</button>
+      <button class="btn ghost spacer" id="closeExport" type="button">Close</button>
+    </div>
+  </div>
+
+  <div id="view"></div>
+
+  <footer>
+    <span>HUR Lab · internal editor</span>
+    <span id="updated"></span>
+  </footer>
+</main>
+
+<script>
+/* ============================ setup ============================ */
+const TABS = [
+  ["publications", "Publications"],
+  ["people",       "People"],
+  ["projects",     "Projects"],
+  ["news",         "News"],
+  ["research",     "Research"],
+];
+const STATUSES = [["preparation","In preparation"],["submitted","Submitted"],["revision","In revision"],["accepted","Accepted"]];
+const TRACKS   = [["thermal","Thermal"],["energy","Energy"],["transducers","Transducers"],["none","Fellowship / other"]];
+const GROUPS   = ["Post-doctoral researcher","Integrated Ph.D. programme","M.S. programme"];
+
+let db = null, downloads = null;
+let docs = {};                 // name -> document body
+let tab = "publications";
+let openRow = null;
+let filter = "";
+let dirty = new Set();
+let saveTimer = null;
+let lastSaved = {};
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const uid = () => "x" + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const isCorr = (a) => /S\.\s?Hur\s*\*/.test(a || "");
+const today = () => new Date().toISOString().slice(0,10);
+
+function setState(kind, text) { $("state").className = "state " + kind; $("stateText").textContent = text; }
+
+/* ============================ saving ============================ */
+function touch(name) {
+  docs[name].updated = today();
+  dirty.add(name);
+  if (!db) { setState("error", "Not saving — offline"); return; }
+  setState("busy", "Saving…");
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(flush, 700);
+}
+async function flush() {
+  if (!db || !dirty.size) return;
+  const names = [...dirty]; dirty.clear();
+  try {
+    for (const n of names) {
+      const body = JSON.parse(JSON.stringify(docs[n]));
+      await db.doc("site/" + n).set(body);
+      lastSaved[n] = JSON.stringify(body);
+    }
+    setState("ok", "Saved " + new Date().toTimeString().slice(0,5));
+  } catch (e) {
+    names.forEach((n) => dirty.add(n));
+    setState("error", "Save failed — " + (e && e.code ? e.code : "unknown"));
+  }
+}
+
+/* ============================ field helpers ============================ */
+function f(label, id, key, value, o) {
+  o = o || {};
+  const cls = "field" + (o.full ? " full" : "");
+  const hint = o.hint ? '<span class="hint">' + esc(o.hint) + "</span>" : "";
+  const a = 'data-id="' + id + '" data-key="' + key + '"';
+  let ctl;
+  if (o.area) ctl = "<textarea " + a + " rows=\"3\">" + esc(value) + "</textarea>";
+  else if (o.select) ctl = "<select " + a + ">" + o.select.map((s) =>
+      '<option value="' + s[0] + '"' + (s[0] === value ? " selected" : "") + ">" + s[1] + "</option>").join("") + "</select>";
+  else ctl = "<input " + a + (o.type ? ' type="' + o.type + '"' : "") + ' value="' + esc(value) + '">';
+  return '<div class="' + cls + '"><label>' + esc(label) + "</label>" + ctl + hint + "</div>";
+}
+function check(label, id, key, value) {
+  return '<div class="field"><label>&nbsp;</label><label class="check"><input type="checkbox" data-id="' + id +
+         '" data-key="' + key + '"' + (value ? " checked" : "") + "> " + esc(label) + "</label></div>";
+}
+function actions(id, delLabel) {
+  return '<div class="form-actions"><button class="btn danger" data-del="' + id + '" type="button">' +
+         esc(delLabel || "Delete") + '</button>' +
+         '<button class="btn ghost spacer" data-toggle="' + id + '" type="button">Close</button></div>';
+}
+function rowShell(id, title, sub, badges, formHtml) {
+  const open = openRow === id;
+  return '<div class="row">' +
+    '<div class="row-head" data-toggle="' + id + '"><div>' +
+      '<div class="r-title">' + (esc(title) || "<em>Untitled</em>") + "</div>" +
+      (sub ? '<div class="r-sub">' + sub + "</div>" : "") +
+    '</div><div class="r-side">' + (badges || "") +
+    '<span class="chev">' + (open ? "&#9662;" : "&#9656;") + "</span></div></div>" +
+    (open ? '<div class="form">' + formHtml() + "</div>" : "") + "</div>";
+}
+function groupHead(titleHtml, count, addLabel, addAttr) {
+  return '<div class="group-head">' + titleHtml + '<span class="n">' + count + "</span>" +
+    (addLabel ? '<button class="btn sm" ' + addAttr + ' type="button">' + esc(addLabel) + "</button>" : "") + "</div>";
+}
+const hit = (s) => !filter || String(s).toLowerCase().includes(filter);
+
+/* ============================ finders ============================ */
+function find(id) {
+  for (const name of Object.keys(docs)) {
+    const d = docs[name];
+    for (const key of ["papers","pipeline","members","alumni","projects","stories","programmes"]) {
+      if (!Array.isArray(d[key])) continue;
+      const x = d[key].find((i) => i.id === id);
+      if (x) return { item: x, name, list: d[key] };
+      for (const parent of d[key]) {
+        for (const sub of ["items","grants","works"]) {
+          if (!Array.isArray(parent[sub])) continue;
+          const y = parent[sub].find((i) => i.id === id);
+          if (y) return { item: y, name, list: parent[sub] };
+        }
+      }
+    }
+  }
+  return null;
+}
+
+/* ============================ views ============================ */
+function viewPublications() {
+  const d = docs.publications;
+  const years = [...new Set(d.papers.map((p) => p.year))]
+    .sort((a, b) => String(b).localeCompare(String(a), undefined, { numeric: true }));
+  let h = '<section class="group">' +
+    groupHead("<h2>In press &amp; under review</h2>", d.pipeline.length + " items", "+ Add", 'data-add="pipe"');
+  h += d.pipeline.length ? d.pipeline.map((it) => {
+    const label = (STATUSES.find((s) => s[0] === it.status) || ["", it.status])[1];
+    return rowShell(it.id, it.title, "", '<span class="badge b-' + esc(it.status) + '">' + esc(label) + "</span>", () =>
+      f("Title", it.id, "title", it.title, { full: true, area: true }) +
+      f("Status", it.id, "status", it.status, { select: STATUSES }) +
+      '<div class="field"><label>When it is published</label><button class="btn" data-promote="' + it.id +
+        '" type="button">Move to Published →</button><span class="hint">Creates an entry under this year.</span></div>' +
+      actions(it.id));
+  }).join("") : '<p class="empty">Nothing under review.</p>';
+  h += "</section>";
+
+  const shown = d.papers.filter((p) => hit(p.title + " " + p.authors + " " + p.journal));
+  h += '<section class="group">' + groupHead("<h2>Published</h2>",
+    (filter ? shown.length + " of " : "") + d.papers.length + " papers", "+ Add year", 'data-add="year"') + "</section>";
+  for (const y of years) {
+    const rows = shown.filter((p) => p.year === y);
+    if (!rows.length) continue;
+    h += '<section class="group">' + groupHead("<h3>" + esc(y) + "</h3>", rows.length,
+      "+ Add paper", 'data-add="paper" data-arg="' + esc(y) + '"');
+    h += rows.map((p) => rowShell(p.id, p.title,
+      esc(p.journal || "—") + (p.detail ? " · " + esc(p.detail) : ""),
+      isCorr(p.authors) ? '<span class="badge b-corr">Corresponding</span>' : "", () =>
+      f("Title", p.id, "title", p.title, { full: true, area: true }) +
+      f("Authors", p.id, "authors", p.authors, { full: true, area: true,
+        hint: "¹ equal contribution, * corresponding author. S. Hur is bolded automatically." }) +
+      f("Journal", p.id, "journal", p.journal) +
+      f("Volume, pages", p.id, "detail", p.detail, { hint: "e.g. 45, 3, 117851" }) +
+      f("Year", p.id, "year", p.year) + actions(p.id, "Delete paper"))).join("");
+    h += "</section>";
+  }
+  return h;
+}
+
+function viewPeople() {
+  const d = docs.people;
+  let h = "";
+  for (const g of GROUPS) {
+    const rows = d.members.filter((m) => m.group === g && hit(m.name + " " + m.where));
+    h += '<section class="group">' + groupHead("<h2>" + esc(g) + "</h2>", rows.length,
+      "+ Add", 'data-add="member" data-arg="' + esc(g) + '"');
+    h += rows.length ? rows.map((m) => rowShell(m.id, m.name,
+      esc(m.since) + " · " + esc(m.where), "", () =>
+      f("Name", m.id, "name", m.name) +
+      f("Since", m.id, "since", m.since, { hint: "e.g. 2026–" }) +
+      f("University · department", m.id, "where", m.where, { full: true }) +
+      f("Co-advisor", m.id, "co", m.co, { full: true, hint: "Leave blank if none" }) +
+      f("Email", m.id, "mail", m.mail) +
+      f("Group", m.id, "group", m.group, { select: GROUPS.map((x) => [x, x]) }) +
+      '<div class="field"><label>When they graduate</label><button class="btn" data-graduate="' + m.id +
+        '" type="button">Move to Alumni →</button></div>' +
+      actions(m.id))).join("") : '<p class="empty">Nobody here.</p>';
+    h += "</section>";
+  }
+  const al = d.alumni.filter((a) => hit(a.name + " " + a.now));
+  h += '<section class="group">' + groupHead("<h2>Alumni</h2>", al.length, "+ Add", 'data-add="alum"');
+  h += al.map((a) => rowShell(a.id, a.name, esc(a.term) + (a.now ? " · now at " + esc(a.now) : ""), "", () =>
+    f("Name", a.id, "name", a.name) +
+    f("Term", a.id, "term", a.term, { hint: "e.g. M.S. · 2024–2026" }) +
+    f("Now at", a.id, "now", a.now, { full: true, hint: "Leave blank if unknown" }) +
+    actions(a.id))).join("");
+  return h + "</section>";
+}
+
+function viewProjects() {
+  const d = docs.projects;
+  const live = d.projects.filter((p) => !p.done && hit(p.title + " " + p.funder));
+  const past = d.projects.filter((p) => p.done && hit(p.title + " " + p.funder));
+  const row = (p) => rowShell(p.id, p.title,
+    esc(p.funder) + " · " + esc(p.start) + " → " + esc(p.end),
+    '<span class="badge b-' + esc(p.track) + '">' +
+      esc((TRACKS.find((t) => t[0] === p.track) || ["", p.track])[1]) + "</span>", () =>
+    f("Title", p.id, "title", p.title, { full: true, area: true }) +
+    f("Funder", p.id, "funder", p.funder, { full: true }) +
+    f("Start", p.id, "start", p.start, { type: "month" }) +
+    f("End", p.id, "end", p.end, { type: "month" }) +
+    f("Programme", p.id, "track", p.track, { select: TRACKS }) +
+    check("Finished", p.id, "done", p.done) +
+    actions(p.id));
+  let h = '<section class="group">' + groupHead("<h2>Active</h2>", live.length, "+ Add project", 'data-add="project"');
+  h += live.length ? live.map(row).join("") : '<p class="empty">None.</p>';
+  h += "</section>";
+  h += '<section class="group">' + groupHead("<h2>Completed</h2>", past.length) +
+       (past.length ? past.map(row).join("") : '<p class="empty">None.</p>') + "</section>";
+  h += '<p class="empty">Bar positions on the site are calculated from the start and end months — you never have to work them out.</p>';
+  return h;
+}
+
+function viewNews() {
+  const d = docs.news;
+  let h = '<section class="group">' + groupHead("<h2>Stories</h2>",
+    d.stories.length + " stories · " + d.stories.reduce((a, s) => a + s.items.length, 0) + " articles",
+    "+ Add story", 'data-add="story"') + "</section>";
+  for (const s of d.stories) {
+    if (!hit(s.headline + " " + s.when + " " + s.items.map((i) => i.outlet + i.title).join(" "))) continue;
+    h += '<section class="group">' + rowShell(s.id, s.headline, esc(s.when) + " · " + s.items.length + " outlets",
+      '<span class="badge b-' + (s.tag === "Thermal" ? "thermal" : "energy") + '">' + esc(s.tag) + "</span>", () =>
+      f("Headline", s.id, "headline", s.headline, { full: true, area: true }) +
+      f("When", s.id, "when", s.when, { hint: "e.g. 2026 · April" }) +
+      f("Programme tag", s.id, "tag", s.tag, { select: [["Thermal","Thermal"],["Energy","Energy"],["Transducers","Transducers"]] }) +
+      f("Summary", s.id, "blurb", s.blurb, { full: true, area: true }) +
+      f("Paper behind it", s.id, "source", s.source, { full: true, hint: "e.g. Advanced Materials 2025, 37, 2419264" }) +
+      '<div class="sub"><div class="sub-head"><h4>Coverage — ' + s.items.length + ' articles</h4>' +
+        '<button class="btn sm" data-add="article" data-arg="' + s.id + '" type="button">+ Add article</button></div>' +
+        s.items.map((it) =>
+          '<div class="subrow">' +
+            '<input data-id="' + it.id + '" data-key="outlet" value="' + esc(it.outlet) + '" placeholder="Outlet">' +
+            '<input data-id="' + it.id + '" data-key="title" value="' + esc(it.title) + '" placeholder="Headline">' +
+            '<input data-id="' + it.id + '" data-key="url" value="' + esc(it.url) + '" placeholder="https://">' +
+            '<button class="btn sm danger x" data-del="' + it.id + '" type="button">✕</button>' +
+          "</div>").join("") +
+      "</div>" + actions(s.id, "Delete story")) + "</section>";
+  }
+  return h;
+}
+
+function viewResearch() {
+  const d = docs.research;
+  let h = "";
+  for (const p of d.programmes) {
+    h += '<section class="group">' + rowShell(p.id, p.title, esc(p.coupling),
+      "", () =>
+      f("Title", p.id, "title", p.title) +
+      f("Coupling", p.id, "coupling", p.coupling, { hint: "e.g. Field → Entropy" }) +
+      f("Opening paragraph", p.id, "lead", p.lead, { full: true, area: true }) +
+      f("Second paragraph", p.id, "body", p.body, { full: true, area: true }) +
+      '<div class="sub"><div class="sub-head"><h4>Funded work</h4>' +
+        '<button class="btn sm" data-add="grant" data-arg="' + p.id + '" type="button">+ Add</button></div>' +
+        p.grants.map((g) =>
+          '<div class="subrow">' +
+            '<input data-id="' + g.id + '" data-key="title" value="' + esc(g.title) + '" placeholder="Project">' +
+            '<input data-id="' + g.id + '" data-key="meta" value="' + esc(g.meta) + '" placeholder="NRF · 2026–2031">' +
+            '<button class="btn sm danger x" data-del="' + g.id + '" type="button">✕</button>' +
+          "</div>").join("") + "</div>" +
+      '<div class="sub"><div class="sub-head"><h4>Representative work</h4>' +
+        '<button class="btn sm" data-add="work" data-arg="' + p.id + '" type="button">+ Add</button></div>' +
+        p.works.map((w) =>
+          '<div class="subrow">' +
+            '<input data-id="' + w.id + '" data-key="title" value="' + esc(w.title) + '" placeholder="Paper title">' +
+            '<input data-id="' + w.id + '" data-key="venue" value="' + esc(w.venue) + '" placeholder="Journal">' +
+            '<input data-id="' + w.id + '" data-key="detail" value="' + esc(w.detail) + '" placeholder="2025, 145, 111410">' +
+            '<button class="btn sm danger x" data-del="' + w.id + '" type="button">✕</button>' +
+          "</div>").join("") + "</div>" +
+      '<div class="form-actions"><button class="btn ghost spacer" data-toggle="' + p.id + '" type="button">Close</button></div>'
+    ) + "</section>";
+  }
+  return h + '<p class="empty">Figures are images — ask Claude to swap those.</p>';
+}
+
+const VIEWS = { publications: viewPublications, people: viewPeople, projects: viewProjects, news: viewNews, research: viewResearch };
+
+function counts(name) {
+  const d = docs[name]; if (!d) return "";
+  if (name === "publications") return d.papers.length;
+  if (name === "people") return d.members.length;
+  if (name === "projects") return d.projects.length;
+  if (name === "news") return d.stories.length;
+  if (name === "research") return d.programmes.length;
+  return "";
+}
+
+function render() {
+  $("tabs").innerHTML = TABS.map(([k, label]) =>
+    '<button class="tab" role="tab" data-tab="' + k + '" aria-selected="' + (k === tab) + '">' +
+    esc(label) + '<span class="c">' + counts(k) + "</span></button>").join("");
+  $("view").innerHTML = docs[tab] ? VIEWS[tab]() : '<p class="empty">Loading…</p>';
+  const u = docs[tab] && docs[tab].updated;
+  $("updated").textContent = u ? "Updated " + u : "";
+}
+
+/* ============================ interaction ============================ */
+document.addEventListener("input", (e) => {
+  const el = e.target;
+  if (el.id === "q") { filter = el.value.trim().toLowerCase(); render(); return; }
+  if (!el.dataset || !el.dataset.id || !el.dataset.key) return;
+  const found = find(el.dataset.id); if (!found) return;
+  found.item[el.dataset.key] = el.type === "checkbox" ? el.checked : el.value;
+  touch(found.name);
+  if (el.dataset.key === "title" || el.dataset.key === "name" || el.dataset.key === "headline") {
+    const row = el.closest(".row");
+    const t = row && row.querySelector(".r-title");
+    if (t && el.closest(".form") && !el.closest(".sub")) t.textContent = el.value || "Untitled";
+  }
+});
+
+document.addEventListener("change", (e) => {
+  const el = e.target;
+  if (el.tagName !== "SELECT" || !el.dataset.id) return;
+  const found = find(el.dataset.id); if (!found) return;
+  found.item[el.dataset.key] = el.value;
+  touch(found.name); render();
+});
+
+document.addEventListener("click", (e) => {
+  const t = e.target.closest("[data-tab],[data-toggle],[data-del],[data-add],[data-promote],[data-graduate]");
+  if (!t) return;
+  const ds = t.dataset;
+
+  if (ds.tab) { tab = ds.tab; openRow = null; render(); window.scrollTo(0, 0); return; }
+  if (ds.toggle) { openRow = openRow === ds.toggle ? null : ds.toggle; render(); return; }
+
+  if (ds.del) {
+    const found = find(ds.del); if (!found) return;
+    if (!confirm("Delete “" + (found.item.title || found.item.name || found.item.headline || "this entry") + "”?")) return;
+    found.list.splice(found.list.indexOf(found.item), 1);
+    if (openRow === ds.del) openRow = null;
+    touch(found.name); render(); return;
+  }
+
+  if (ds.promote) {
+    const it = docs.publications.pipeline.find((p) => p.id === ds.promote); if (!it) return;
+    const id = uid();
+    docs.publications.papers.unshift({ id, year: String(new Date().getFullYear()), authors: "", title: it.title, journal: "", detail: "" });
+    docs.publications.pipeline.splice(docs.publications.pipeline.indexOf(it), 1);
+    openRow = id; touch("publications"); render(); return;
+  }
+
+  if (ds.graduate) {
+    const m = docs.people.members.find((x) => x.id === ds.graduate); if (!m) return;
+    const id = uid();
+    const level = m.group.indexOf("M.S.") === 0 ? "M.S." : m.group.indexOf("Post") === 0 ? "Post-doctoral fellow" : "Ph.D.";
+    docs.people.alumni.unshift({ id, name: m.name, term: level + " · " + (m.since || "").replace(/–$/, "–" + new Date().getFullYear()), now: "" });
+    docs.people.members.splice(docs.people.members.indexOf(m), 1);
+    openRow = id; touch("people"); render(); return;
+  }
+
+  if (ds.add) {
+    const id = uid();
+    if (ds.add === "pipe")      { docs.publications.pipeline.unshift({ id, title: "", status: "submitted" }); touch("publications"); }
+    else if (ds.add === "paper"){ docs.publications.papers.unshift({ id, year: ds.arg, authors: "", title: "", journal: "", detail: "" }); touch("publications"); }
+    else if (ds.add === "year") { const y = prompt("Year (e.g. 2027)"); if (!y) return;
+                                  docs.publications.papers.unshift({ id, year: y.trim(), authors: "", title: "", journal: "", detail: "" }); touch("publications"); }
+    else if (ds.add === "member"){ docs.people.members.push({ id, group: ds.arg, name: "", since: new Date().getFullYear() + "–", where: "", co: "", mail: "" }); touch("people"); }
+    else if (ds.add === "alum") { docs.people.alumni.unshift({ id, name: "", term: "", now: "" }); touch("people"); }
+    else if (ds.add === "project"){ docs.projects.projects.unshift({ id, title: "", funder: "", start: "", end: "", track: "thermal", done: false }); touch("projects"); }
+    else if (ds.add === "story"){ docs.news.stories.unshift({ id, when: "", headline: "", blurb: "", tag: "Energy", source: "", items: [] }); touch("news"); }
+    else if (ds.add === "article"){ const s = docs.news.stories.find((x) => x.id === ds.arg); if (!s) return;
+                                  s.items.push({ id, url: "", outlet: "", title: "", video: false }); touch("news"); render(); return; }
+    else if (ds.add === "grant"){ const p = docs.research.programmes.find((x) => x.id === ds.arg); if (!p) return;
+                                  p.grants.push({ id, title: "", meta: "", done: false }); touch("research"); render(); return; }
+    else if (ds.add === "work") { const p = docs.research.programmes.find((x) => x.id === ds.arg); if (!p) return;
+                                  p.works.push({ id, title: "", venue: "", detail: "" }); touch("research"); render(); return; }
+    openRow = id; render();
+    setTimeout(() => { const el = document.querySelector('[data-id="' + id + '"]'); if (el) el.focus(); }, 0);
+  }
+});
+
+/* ============================ export ============================ */
+const GLOBALS = { publications: "PUBLICATIONS", people: "PEOPLE",
+                  projects: "PROJECTS", news: "NEWS", research: "RESEARCH" };
+
+function contentFile(name) {
+  return "/* " + name + " \u2014 edited in the HUR Lab Editor, or by hand right here.\n" +
+         "   Change a value, save, commit. The page reads this file. */\n" +
+         "window." + GLOBALS[name] + " = " + JSON.stringify(docs[name], null, 1) + ";\n";
+}
+
+$("exportBtn").addEventListener("click", () => {
+  $("exportNote").innerHTML =
+    "<b>This is the whole of <code>content/" + tab + ".js</code>.</b> " +
+    "Copy it, open that file in your GitHub repository, click the pencil, select everything, " +
+    "paste, and Commit. The site updates in about a minute \u2014 the HTML is never touched.";
+  $("exportCode").value = contentFile(tab);
+  $("exportCode").hidden = false;
+  $("exportPanel").hidden = false;
+  $("exportPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+$("closeExport").addEventListener("click", () => { $("exportPanel").hidden = true; });
+$("selectCode").addEventListener("click", () => {
+  const el = $("exportCode"); el.focus(); el.select();
+  try { document.execCommand("copy"); $("selectCode").textContent = "Copied";
+        setTimeout(() => { $("selectCode").textContent = "Copy"; }, 1500); } catch (_) {}
+});
+
+/* ============================ boot ============================ */
+function banner(html) { $("banner").innerHTML = '<div class="notice">' + html + "</div>"; }
+
+(async function boot() {
+  render();
+  try { db = await claude.use("db"); } catch (_) { db = null; }
+  try { downloads = await claude.use("downloads"); } catch (_) { downloads = null; }
+
+  if (!downloads) $("downloadAll").hidden = true;
+  else $("downloadAll").addEventListener("click", async () => {
+    try { await downloads.save({ filename: "hurlab-content.json", data: JSON.stringify(docs, null, 1) }); }
+    catch (err) { if (err && err.code !== "declined") alert("Download failed: " + err.code); }
+  });
+
+  if (!db) {
+    setState("error", "Not connected");
+    banner("<b>This view can&#8217;t reach the store.</b> Open the editor from your own artifact list. " +
+           "Nothing typed here is being saved right now.");
+    return;
+  }
+
+  const names = TABS.map((t) => t[0]);
+  try {
+    for (const n of names) {
+      const snap = await db.doc("site/" + n).get();
+      docs[n] = snap.exists ? snap.data() : { updated: "" };
+      lastSaved[n] = JSON.stringify(docs[n]);
+    }
+    setState("ok", "Loaded");
+  } catch (e) {
+    setState("error", "Load failed — " + (e && e.code ? e.code : "unknown"));
+  }
+  // fill in any shape the store did not have yet
+  docs.publications = Object.assign({ yearNotes: {}, papers: [], pipeline: [] }, docs.publications);
+  docs.people       = Object.assign({ members: [], alumni: [] }, docs.people);
+  docs.projects     = Object.assign({ projects: [] }, docs.projects);
+  docs.news         = Object.assign({ stories: [] }, docs.news);
+  docs.research     = Object.assign({ programmes: [] }, docs.research);
+  render();
+
+  for (const n of names) {
+    db.doc("site/" + n).onSnapshot((snap) => {
+      if (!snap.exists) return;
+      const incoming = JSON.stringify(snap.data());
+      if (incoming === lastSaved[n]) return;
+      const a = document.activeElement;
+      if (a && a.dataset && a.dataset.id) return;      // don't yank the field being typed in
+      docs[n] = snap.data(); lastSaved[n] = incoming;
+      if (n === tab) render();
+    }, () => setState("error", "Live sync stopped — reload"));
+  }
+})();
+</script>
