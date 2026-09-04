@@ -1,5 +1,4 @@
-/* people — edited in the HUR Lab Editor, or by hand right here.
-   Change a value, save, commit. The page reads this file. */
+/* people — the text of the site. Edit here or in the Site editor. */
 window.PEOPLE = {
  "alumni": [
   {
@@ -138,6 +137,15 @@ window.PEOPLE = {
    "name": "Subeen Park",
    "since": "2026–",
    "where": "KU-KIST Graduate School of Converging Science and Technology, Korea University"
+  },
+  {
+   "id": "xmtmydc7y484n",
+   "group": "Post-doctoral researcher",
+   "name": "바보 홍길동",
+   "since": "2026–",
+   "where": "",
+   "co": "",
+   "mail": ""
   }
  ],
  "updated": "2026-09-04"
