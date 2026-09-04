@@ -355,6 +355,16 @@
                 background: var(--bg); border: 1px solid var(--rule); border-radius: 3px;
                 padding: 12px; width: 100%; min-height: 150px; resize: vertical; }
 
+  .photo-row { display: flex; gap: 16px; align-items: flex-start; }
+  .photo-prev { flex: 0 0 92px; width: 92px; height: 92px; border-radius: 3px; overflow: hidden;
+                background: var(--chip-bg); border: 1px solid var(--rule);
+                display: grid; place-items: center; }
+  .photo-prev img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo-prev .ini { font-family: var(--mono); font-size: 1.4rem; color: var(--ink-3); letter-spacing: 0.04em; }
+  .photo-ctl { flex: 1 1 auto; min-width: 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .photo-ctl .hint { flex: 1 0 100%; margin: 0; }
+  .photo-ctl .photo-path { flex: 1 0 100%; }
+
   footer { margin-top: 60px; border-top: 1px solid var(--rule); padding: 20px 0 60px;
            font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.06em; color: var(--ink-3);
            display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between; }
@@ -449,6 +459,12 @@ var docs = {
 var tab = "publications", openRow = null, filter = "";
 var dirty = {};
 
+/* ── safety catch ─────────────────────────────────────────────────────────
+   If the content/ files did not load, every tab would look empty — and
+   generating a file from that would WIPE the site. So: refuse to work.   */
+var MISSING = [];
+for (var _g in GLOBALS) if (!window[GLOBALS[_g]]) MISSING.push(_g);
+
 var $ = function (id) { return document.getElementById(id); };
 var esc = function (s) {
   return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;")
@@ -517,6 +533,83 @@ function find(id) {
   return null;
 }
 
+/* ── portraits ────────────────────────────────────────────────────────────
+   The picture itself cannot be committed from this page — there is no
+   server here. So we do the fiddly half: crop it square, shrink it, name
+   it correctly, and hand you a file to drop into images/ on GitHub.     */
+var PHOTO_DIR = "images/";
+var PHOTO_PX  = 480;
+var PHOTOS = {};          /* id -> { file, url } for photos picked this session */
+
+function slug(name, id) {
+  var s = String(name || "").replace(/,.*$/, "").normalize ?
+          String(name || "").replace(/,.*$/, "").normalize("NFKD") :
+          String(name || "").replace(/,.*$/, "");
+  s = s.replace(/[^\x20-\x7E]/g, "").trim().toLowerCase()
+       .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  return (s || "member-" + id) + ".jpg";
+}
+function initials(name) {
+  var p = String(name || "").replace(/,.*$/, "").trim().split(/\s+/);
+  return ((p[0] ? p[0][0] : "") + (p.length > 1 ? p[p.length - 1][0] : "")).toUpperCase();
+}
+function photoField(m) {
+  var picked = PHOTOS[m.id];
+  var src = picked ? picked.url : (m.photo || "");
+  var prev = src
+    ? '<img src="' + esc(src) + '" alt="">'
+    : '<span class="ini">' + esc(initials(m.name)) + "</span>";
+  var dl = picked
+    ? '<button class="btn sm primary" data-dl="' + m.id + '" type="button">⤓ ' + esc(picked.file.name) + "</button>"
+    : "";
+  var note = picked
+    ? "Ready. Download it, then upload it into <code>" + esc(FOLDER + PHOTO_DIR) +
+      "</code> on GitHub. (" + Math.round(picked.file.size / 1024) + " KB)"
+    : (m.photo ? "Using <code>" + esc(m.photo) + "</code>." : "No photo — initials are shown instead.");
+  return '<div class="field full"><label>Photo</label><div class="photo-row">' +
+    '<div class="photo-prev">' + prev + "</div>" +
+    '<div class="photo-ctl">' +
+      '<label class="btn sm" for="ph-' + m.id + '">Choose a photo…</label>' +
+      '<input id="ph-' + m.id + '" type="file" accept="image/*" data-photo="' + m.id + '" hidden>' +
+      dl +
+      '<div class="hint">' + note + "</div>" +
+      '<input class="photo-path" data-id="' + m.id + '" data-key="photo" value="' + esc(m.photo || "") +
+        '" placeholder="' + esc(PHOTO_DIR) + 'name.jpg">' +
+    "</div></div></div>";
+}
+function makePhoto(id, file) {
+  var found = find(id); if (!found) return;
+  var img = new Image();
+  img.onload = function () {
+    var c = document.createElement("canvas");
+    c.width = c.height = PHOTO_PX;
+    var x = c.getContext("2d");
+    var s = Math.min(img.width, img.height);
+    x.drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, PHOTO_PX, PHOTO_PX);
+    URL.revokeObjectURL(img.src);
+    var name = slug(found.item.name, id);
+    c.toBlob(function (b) {
+      if (!b) { alert("Could not read that image."); return; }
+      var out;
+      try { out = new File([b], name, { type: "image/jpeg" }); }
+      catch (_) { out = b; out.name = name; }
+      if (PHOTOS[id]) URL.revokeObjectURL(PHOTOS[id].url);
+      PHOTOS[id] = { file: out, url: URL.createObjectURL(out) };
+      found.item.photo = PHOTO_DIR + name;
+      touch("people"); openRow = id; render();
+    }, "image/jpeg", 0.85);
+  };
+  img.onerror = function () { alert("That file is not an image this browser can read."); };
+  img.src = URL.createObjectURL(file);
+}
+document.addEventListener("change", function (e) {
+  var el = e.target;
+  if (!el.dataset || !el.dataset.photo) return;
+  var file = el.files && el.files[0];
+  el.value = "";
+  if (file) makePhoto(el.dataset.photo, file);
+});
+
 /* ── views ───────────────────────────────────────────────────────────── */
 function viewPublications() {
   var d = docs.publications;
@@ -576,7 +669,7 @@ function viewPeople() {
           f("Co-advisor", m.id, "co", m.co, { full: true, hint: "Leave blank if none" }) +
           f("Email", m.id, "mail", m.mail) +
           f("Group", m.id, "group", m.group, { select: GROUPS.map(function (x) { return [x, x]; }) }) +
-          f("Photo file", m.id, "photo", m.photo || "", { hint: "e.g. images/hong.jpg — leave blank for initials" }) +
+          photoField(m) +
           '<div class="field"><label>When they graduate</label><button class="btn" data-graduate="' +
             m.id + '" type="button">Move to Alumni →</button></div>' + actions(m.id);
       });
@@ -692,7 +785,27 @@ function counts(n) {
   return d.programmes.length;
 }
 
+function halt() {
+  document.querySelector(".intro").innerHTML =
+    '<b style="color:#FF8B7A">This page cannot find the site’s content.</b><br><br>' +
+    "It could not load: <code>content/" + MISSING.join(".js</code>, <code>content/") + ".js</code><br><br>" +
+    "Every tab would look empty, and pressing <b>Get the code</b> would produce a file that " +
+    "<b>erases that whole section of the site</b>. So the buttons are switched off.<br><br>" +
+    "<b>Almost always the cause is that <code>edit.html</code> is in the wrong folder.</b> " +
+    "It has to sit right next to <code>index.html</code> and the <code>content/</code> folder — " +
+    "in <code>" + esc(FOLDER || "the site root") + "</code>. Move it there and reload this page.";
+  document.querySelector(".intro").style.borderLeftColor = "#FF8B7A";
+  $("exportBtn").disabled = true;
+  $("xlsDown").disabled = true;
+  $("xlsUpLabel").style.opacity = ".4";
+  $("xlsUpLabel").style.pointerEvents = "none";
+  $("q").disabled = true;
+  $("view").innerHTML = "";
+  $("tabs").innerHTML = "";
+}
+
 function render() {
+  if (MISSING.length) return halt();
   $("tabs").innerHTML = TABS.map(function (t) {
     return '<button class="tab" role="tab" data-tab="' + t[0] + '" aria-selected="' + (t[0] === tab) + '">' +
       esc(t[1]) + '<span class="c">' + counts(t[0]) + "</span>" +
@@ -723,9 +836,17 @@ document.addEventListener("change", function (e) {
   found.item[el.dataset.key] = el.value; touch(found.name); render();
 });
 document.addEventListener("click", function (e) {
-  var t = e.target.closest("[data-tab],[data-toggle],[data-del],[data-add],[data-promote],[data-graduate]");
+  var t = e.target.closest("[data-tab],[data-toggle],[data-del],[data-add],[data-promote],[data-graduate],[data-dl]");
   if (!t) return;
   var ds = t.dataset;
+  if (ds.dl) {
+    e.stopPropagation();
+    var ph = PHOTOS[ds.dl]; if (!ph) return;
+    var a = document.createElement("a");
+    a.href = ph.url; a.download = ph.file.name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    return;
+  }
   if (ds.tab) { tab = ds.tab; openRow = null; render(); window.scrollTo(0, 0); return; }
   if (ds.toggle) { openRow = openRow === ds.toggle ? null : ds.toggle; render(); return; }
   if (ds.del) {
@@ -791,9 +912,22 @@ function contentFile(name) {
          "window." + GLOBALS[name] + " = " + JSON.stringify(copy, null, 1) + ";\n";
 }
 $("exportBtn").addEventListener("click", function () {
+  if (MISSING.length) return;
+  if (counts(tab) === 0 && !confirm(
+      "The " + tab + " tab is empty.\n\nThe file this makes would remove everything in that " +
+      "section of the site. Are you sure that is what you want?")) return;
   var path = FOLDER + "content/" + tab + ".js";
+  var pend = [];
+  for (var _p in PHOTOS) pend.push(PHOTOS[_p].file.name);
   $("exportNote").innerHTML = "<b>This is the whole of <code>" + esc(path) + "</code>.</b> " +
-    "Copy it, open the file on GitHub, click the pencil, select everything, paste, and Commit.";
+    "Copy it, open the file on GitHub, click the pencil, select everything, paste, and Commit." +
+    (tab === "people" && pend.length
+      ? '<br><br><b style="color:var(--accent)">Do not forget the ' + pend.length + " photo" +
+        (pend.length > 1 ? "s" : "") + ".</b> Download " + (pend.length > 1 ? "them" : "it") +
+        " with the ⤓ button on each person, then upload " + (pend.length > 1 ? "them" : "it") +
+        " into <code>" + esc(FOLDER + PHOTO_DIR) + "</code> on GitHub — the text file alone will " +
+        "show a broken picture. (" + esc(pend.join(", ")) + ")"
+      : "");
   $("exportCode").value = contentFile(tab);
   $("ghLink").href = "https://github.com/" + REPO + "/edit/" + BRANCH + "/" + path;
   $("exportPanel").hidden = false;
