@@ -72,7 +72,7 @@ window.PEOPLE = {
    "id": "m4",
    "mail": "223515@kist.re.kr",
    "name": "Minwoo Lee",
-   "since": "2024–",
+   "since": "2023–",
    "where": "Korea University · Materials Science and Engineering"
   },
   {
@@ -136,7 +136,8 @@ window.PEOPLE = {
    "mail": "1263048@kist.re.kr",
    "name": "Subeen Park",
    "since": "2026–",
-   "where": "KU-KIST Graduate School of Converging Science and Technology, Korea University"
+   "where": "KU-KIST Graduate School of Converging Science and Technology, Korea University",
+   "photo": "images/subeen-park.jpg"
   }
  ],
  "updated": "2026-09-07"
