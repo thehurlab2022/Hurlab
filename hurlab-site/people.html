@@ -272,7 +272,7 @@
   .pi {
     border-top: 2px solid var(--accent);
     padding-top: 26px;
-    display: grid; grid-template-columns: 200px 1.05fr 1fr; gap: 36px;
+    display: grid; grid-template-columns: 270px 1.05fr 1fr; gap: 36px;
     align-items: start;
   }
   .pi-photo { display: grid; gap: 10px; }
@@ -320,6 +320,9 @@
     border: 1px solid var(--rule); border-radius: 2px;
   }
   .pi .portrait .mono { font-size: 3rem; }
+  /* the PI's photo is shown whole — no square crop, no cut-off shoulders */
+  .portrait.natural { aspect-ratio: auto; background: var(--chip-bg); }
+  .portrait.natural img { height: auto; object-fit: contain; }
 
   .group { margin-top: 60px; }
   .group-head {
@@ -382,12 +385,12 @@
   }
 
   @media (max-width: 860px) {
-    .pi { grid-template-columns: 160px 1fr; }
+    .pi { grid-template-columns: 210px 1fr; }
     .pi .cols { grid-column: 1 / -1; }
   }
   @media (max-width: 560px) {
     .pi { grid-template-columns: 1fr; gap: 26px; }
-    .pi-photo { max-width: 180px; }
+    .pi-photo { max-width: 230px; }
     .a-now { margin-left: 0; flex-basis: 100%; }
   }
 </style>
@@ -406,8 +409,8 @@
 
   <section class="pi">
     <div class="pi-photo">
-      <div class="portrait empty" style="--tint: var(--therm-fill); --tone: var(--therm)">
-        <span class="mono">SH</span>
+      <div class="portrait natural">
+        <img src="images/sunghoon-hur.jpg" alt="Sunghoon Hur" width="560" height="779">
       </div>
     </div>
     <div>
