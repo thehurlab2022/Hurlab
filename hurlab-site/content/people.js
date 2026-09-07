@@ -140,5 +140,5 @@ window.PEOPLE = {
    "photo": "images/subeen-park.jpg"
   }
  ],
- "updated": "2026-09-04"
+ "updated": "2026-09-07"
 };
