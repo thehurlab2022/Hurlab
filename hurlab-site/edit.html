@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Site editor — HUR Lab</title>
+<meta name="description" content="Edit the text of the HUR Lab site and generate the file to commit.">
+<style>
+  :root { color-scheme: dark; }
+  html, body { margin: 0; padding: 0; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&display=swap">
+
+<style>
+  :root {
+    color-scheme: dark;
+
+    --bg:        #0B1017;
+    --surface:   #131A23;
+    --ink:       #EEF2F6;
+    --ink-2:     #A7B2BD;
+    --ink-3:     #78838F;
+    --rule:      #222C38;
+
+    --mech:      #6FB2E8;
+    --therm:     #F0955F;
+    --elec:      #B79BE8;
+    --accent:    var(--therm);
+
+    --mech-fill: rgba(111, 178, 232, 0.13);
+    --therm-fill:rgba(240, 149, 95, 0.13);
+    --elec-fill: rgba(183, 155, 232, 0.13);
+    --chip-bg:   #171F29;
+
+    --sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --serif: "Newsreader", Georgia, "Times New Roman", serif;
+    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+    --maxw: 1000px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 28px; }
+
+  a { color: inherit; }
+  a:focus-visible, button:focus-visible, input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .masthead { border-bottom: 1px solid var(--rule); }
+  .masthead .wrap {
+    display: flex; flex-wrap: wrap; align-items: baseline;
+    gap: 12px 28px; padding-top: 24px; padding-bottom: 24px;
+  }
+  .wordmark {
+    font-family: var(--serif); font-size: 1.4rem; font-weight: 500;
+    letter-spacing: -0.01em; text-decoration: none; margin-right: auto;
+    display: inline-flex; align-items: center; gap: 11px;
+  }
+  .logo-mark { height: 26px; width: auto; display: block; }
+  .wordmark span {
+    font-family: var(--mono); font-size: 0.62rem; font-weight: 400;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-3); margin-left: 10px; vertical-align: 2px;
+  }
+  nav { display: flex; flex-wrap: wrap; gap: 22px; }
+  nav a {
+    font-size: 0.86rem; text-decoration: none; color: var(--ink-2);
+    padding-bottom: 2px; border-bottom: 1px solid transparent;
+    transition: color .15s ease, border-color .15s ease;
+  }
+  nav a:hover { color: var(--ink); border-bottom-color: var(--accent); }
+  nav a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); }
+
+  .pagehead { padding: 72px 0 40px; display: grid; gap: 20px; max-width: 46rem; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--ink-3); margin: 0;
+  }
+  h1 {
+    font-family: var(--serif); font-weight: 300;
+    font-size: clamp(2rem, 4.6vw, 2.9rem); line-height: 1.1;
+    letter-spacing: -0.02em; margin: 0; text-wrap: balance;
+  }
+  .lede { margin: 0; color: var(--ink-2); max-width: 40rem; font-size: 1.05rem; }
+
+  .section-label {
+    font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--ink-3); margin: 0 0 20px;
+  }
+
+  footer {
+    margin-top: 64px; border-top: 1px solid var(--rule);
+    padding: 22px 0 56px; font-family: var(--mono); font-size: 0.7rem;
+    letter-spacing: 0.08em; color: var(--ink-3);
+    display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+  /* ================= shared dark band =================
+     Used by the home hero and by every interior page header.
+     Literal colours, so the band holds in either theme.        */
+
+  .hero, .pagehero {
+    --h-ink:   #F2F5F8;
+    --h-ink-2: rgba(226, 233, 240, 0.72);
+    --h-ink-3: rgba(226, 233, 240, 0.46);
+    --h-line:  rgba(226, 233, 240, 0.14);
+    --h-mech:  #6FB2E8;
+    --h-therm: #F0955F;
+    --h-elec:  #B79BE8;
+    --band-a:  #0A0E14;
+    --band-b:  #10161F;
+    --band-c:  #0B1017;
+
+    position: relative;
+    color: var(--h-ink);
+    background:
+      radial-gradient(760px 520px at 50% 42%, rgba(111, 178, 232, 0.13), transparent 68%),
+      radial-gradient(620px 460px at 16% 88%, rgba(240, 149, 95, 0.10), transparent 70%),
+      radial-gradient(620px 460px at 86% 20%, rgba(183, 155, 232, 0.11), transparent 70%),
+      linear-gradient(176deg, var(--band-a) 0%, var(--band-b) 52%, var(--band-c) 100%);
+    overflow: hidden;
+    border-bottom: 1px solid rgba(226, 233, 240, 0.09);
+  }
+  .hero::before, .pagehero::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(to right, rgba(226, 233, 240, 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(226, 233, 240, 0.045) 1px, transparent 1px);
+    background-size: 46px 46px;
+    mask-image: radial-gradient(120% 90% at 50% 40%, #000 30%, transparent 78%);
+    -webkit-mask-image: radial-gradient(120% 90% at 50% 40%, #000 30%, transparent 78%);
+    pointer-events: none;
+  }
+  .hero > *, .pagehero > * { position: relative; }
+
+  /* interior page headers */
+  .pagehero .pagehead {
+    max-width: 46rem; margin: 0 auto;
+    padding-top: 82px; padding-bottom: 78px;
+    justify-items: center; text-align: center;
+  }
+  .pagehero .eyebrow { color: var(--h-ink-3); letter-spacing: 0.2em; }
+  .pagehero h1 {
+    color: var(--h-ink);
+    font-size: clamp(2.3rem, 5.4vw, 3.4rem);
+  }
+  .pagehero .lede { color: var(--h-ink-2); text-wrap: balance; }
+  .pagehero .legend { justify-content: center; color: var(--h-ink-3); }
+  .pagehero .legend b { color: var(--h-ink); }
+  .pagehero .legend .mk { color: var(--h-therm); }
+  .pagehero a { color: var(--h-therm); }
+
+  /* ================= Heckmann diagram ================= */
+
+  .heckmann-band { padding: 26px 0 34px; display: grid; justify-items: center; gap: 22px; }
+  .heckmann { width: 100%; max-width: 700px; height: auto; display: block; }
+  .heck-cap {
+    font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--h-ink-3); text-align: center;
+    margin: 0; text-wrap: balance;
+  }
+
+  .hk-edge    { stroke: rgba(226, 233, 240, 0.16); stroke-width: 1.2; fill: none; }
+  .hk-edge-in { stroke: rgba(226, 233, 240, 0.11); stroke-width: 1; fill: none; }
+  .hk-node    { fill: #0C1119; stroke-width: 1.5; }
+  .n-mech     { stroke: var(--h-mech); }
+  .n-therm    { stroke: var(--h-therm); }
+  .n-elec     { stroke: var(--h-elec); }
+  .hk-inner   { fill: #0C1119; stroke: rgba(226, 233, 240, 0.34); stroke-width: 1.2; }
+
+  .hk-direct { stroke: rgba(226, 233, 240, 0.40); stroke-width: 1.3; fill: none; }
+  .a-mech    { stroke: var(--h-mech);  stroke-width: 1.4; fill: none; opacity: 0.85; }
+  .a-therm   { stroke: var(--h-therm); stroke-width: 1.4; fill: none; opacity: 0.85; }
+  .a-elec    { stroke: var(--h-elec);  stroke-width: 1.4; fill: none; opacity: 0.85; }
+
+  .hk-domain {
+    font-family: var(--mono); font-size: 13px; letter-spacing: 0.16em;
+    text-transform: uppercase; font-weight: 500;
+  }
+  .hk-var { font-family: var(--sans); font-size: 13px; font-weight: 500; fill: var(--h-ink); }
+  .hk-var-in { font-family: var(--sans); font-size: 11.5px; fill: rgba(226, 233, 240, 0.82); }
+  .hk-label {
+    font-family: var(--sans); font-size: 11px; font-weight: 500;
+    fill: rgba(226, 233, 240, 0.78);
+  }
+  .hk-label.lead { fill: var(--h-ink); }
+
+  .heckmann g { animation: hk-in .8s cubic-bezier(.2,.7,.3,1) both; }
+  .heckmann g:nth-of-type(2) { animation-delay: .08s; }
+  .heckmann g:nth-of-type(3) { animation-delay: .16s; }
+  .heckmann g:nth-of-type(4) { animation-delay: .26s; }
+  .heckmann g:nth-of-type(5) { animation-delay: .34s; }
+  @keyframes hk-in { from { opacity: 0; } to { opacity: 1; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .heckmann g { animation: none; }
+  }
+  @media (max-width: 560px) {
+    .pagehero .pagehead { padding-top: 56px; padding-bottom: 54px; }
+  }
+
+  /* ---------- interior pages sit a shade lighter than the home page ----------
+     The home page is the only one with .hero; every other page has .pagehero. */
+  :root:has(.pagehero) {
+    --bg:      #141A24;
+    --surface: #1D2530;
+    --ink-2:   #B2BCC7;
+    --ink-3:   #8D97A3;
+    --rule:    #2B3542;
+    --chip-bg: #202834;
+  }
+  :root:has(.pagehero) .pagehero {
+    --band-a: #10161E;
+    --band-b: #182031;
+    --band-c: #141A24;
+  }
+
+  /* ---------- the mark, revealed left to right from the H ---------- */
+  .hero-logo {
+    width: min(230px, 52vw); height: auto; display: block;
+    margin: 0 auto 4px;
+    clip-path: inset(0 100% 0 0);
+    animation: logo-wipe 1.15s cubic-bezier(.22,.72,.24,1) .15s forwards;
+  }
+  @keyframes logo-wipe {
+    from { clip-path: inset(0 100% 0 0); }
+    to   { clip-path: inset(0 -2% 0 0); }
+  }
+  .hero-top > *:not(.hero-logo) { animation: hero-in .7s ease .95s both; }
+  @keyframes hero-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-logo { clip-path: none; animation: none; }
+    .hero-top > *:not(.hero-logo) { animation: none; }
+  }
+</style>
+
+<style>
+  .bar { position: sticky; top: 0; z-index: 10; background: var(--bg); border-bottom: 1px solid var(--rule); }
+  .bar-top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding: 16px 0 10px; }
+  .brand { font-family: var(--serif); font-size: 1.3rem; font-weight: 400; margin: 0; margin-right: auto; letter-spacing: -0.01em; }
+  .brand span { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); margin-left: 10px; vertical-align: 2px; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 4px; padding-bottom: 10px; }
+  .tab { font: inherit; font-size: 0.84rem; color: var(--ink-3); background: transparent;
+         border: 0; border-bottom: 2px solid transparent; padding: 7px 13px; cursor: pointer;
+         transition: color .15s, border-color .15s; }
+  .tab:hover { color: var(--ink-2); }
+  .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+  .tab .c { font-family: var(--mono); font-size: 0.68rem; color: var(--ink-3); margin-left: 7px; }
+  .tab .dirty { color: var(--accent); margin-left: 6px; }
+
+  #q { font: inherit; font-size: 0.88rem; color: var(--ink); background: var(--surface);
+       border: 1px solid var(--rule); border-radius: 3px; padding: 7px 11px; flex: 0 1 220px; min-width: 150px; }
+  #q::placeholder { color: var(--ink-3); }
+  .btn { font: inherit; font-size: 0.82rem; color: var(--ink-2); background: var(--surface);
+         border: 1px solid var(--rule); border-radius: 3px; padding: 7px 13px; cursor: pointer;
+         transition: color .15s, border-color .15s, background .15s; text-decoration: none;
+         display: inline-block; }
+  .btn:hover { color: var(--ink); border-color: var(--ink-3); }
+  .btn.primary { color: #10161E; background: var(--accent); border-color: var(--accent); font-weight: 600; }
+  .btn.primary:hover { color: #10161E; filter: brightness(1.08); }
+  .btn.ghost { background: transparent; }
+  .btn.danger:hover { color: #FF8B7A; border-color: #FF8B7A; }
+  .btn.sm { font-size: 0.74rem; padding: 5px 10px; }
+  .spacer { margin-left: auto; }
+
+  .intro { margin: 26px 0 0; padding: 18px 20px; border: 1px solid var(--rule);
+           border-left: 3px solid var(--accent); background: var(--surface);
+           border-radius: 2px; font-size: 0.92rem; color: var(--ink-2); }
+  .intro b { color: var(--ink); }
+  .intro ol { margin: 10px 0 0; padding-left: 20px; display: grid; gap: 5px; }
+
+  .group { margin-top: 38px; }
+  .group-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px;
+                border-bottom: 1px solid var(--rule); padding-bottom: 10px; }
+  .group-head h2 { font-family: var(--serif); font-weight: 400; font-size: 1.32rem; margin: 0; line-height: 1.2; }
+  .group-head h3 { font-family: var(--mono); font-size: 0.95rem; font-weight: 500; margin: 0;
+                   letter-spacing: 0.05em; font-variant-numeric: tabular-nums; }
+  .group-head .n { font-family: var(--mono); font-size: 0.7rem; color: var(--ink-3);
+                   font-variant-numeric: tabular-nums; margin-right: auto; }
+
+  .row { border-bottom: 1px solid var(--rule); }
+  .row-head { display: grid; grid-template-columns: 1fr auto; gap: 10px 14px; align-items: center;
+              padding: 12px 0; cursor: pointer; }
+  .row-head:hover .r-title { color: var(--accent); }
+  .r-title { font-family: var(--serif); font-size: 1.02rem; line-height: 1.3; transition: color .15s; }
+  .r-sub { font-family: var(--mono); font-size: 0.69rem; color: var(--ink-3); margin-top: 3px;
+           font-variant-numeric: tabular-nums; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .r-side { display: flex; align-items: center; gap: 10px; }
+  .chev { font-family: var(--mono); font-size: 0.7rem; color: var(--ink-3); width: 14px; text-align: center; }
+
+  .badge { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase;
+           padding: 3px 9px; border-radius: 2px; border: 1px solid; white-space: nowrap; }
+  .b-accepted, .b-thermal { color: var(--therm); border-color: var(--therm); }
+  .b-revision             { color: var(--therm); border-color: var(--therm); }
+  .b-submitted, .b-energy { color: var(--elec);  border-color: var(--elec); }
+  .b-preparation, .b-none { color: var(--ink-3); border-color: var(--rule); }
+  .b-corr                 { color: var(--accent); border-color: var(--accent); }
+  .b-transducers          { color: var(--mech);  border-color: var(--mech); }
+
+  .form { display: grid; gap: 12px; padding: 4px 0 22px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .form .full { grid-column: 1 / -1; }
+  .field { display: grid; gap: 5px; }
+  .field label { font-family: var(--mono); font-size: 0.63rem; letter-spacing: 0.12em;
+                 text-transform: uppercase; color: var(--ink-3); }
+  .field input, .field textarea, .field select {
+    font: inherit; font-size: 0.9rem; color: var(--ink); background: var(--surface);
+    border: 1px solid var(--rule); border-radius: 3px; padding: 8px 11px; width: 100%;
+  }
+  .field textarea { resize: vertical; min-height: 66px; line-height: 1.5; }
+  .field .hint { font-size: 0.74rem; color: var(--ink-3); }
+  .check { display: flex; align-items: center; gap: 9px; font-size: 0.88rem; color: var(--ink-2); }
+  .check input { width: auto; }
+  .form-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding-top: 2px; }
+
+  .sub { grid-column: 1 / -1; border-top: 1px solid var(--rule); padding-top: 14px; display: grid; gap: 8px; }
+  .sub-head { display: flex; align-items: baseline; gap: 10px; }
+  .sub-head h4 { font-family: var(--mono); font-size: 0.63rem; letter-spacing: 0.12em;
+                 text-transform: uppercase; color: var(--ink-3); font-weight: 400; margin: 0; margin-right: auto; }
+  .subrow { display: grid; gap: 8px; grid-template-columns: 1fr 1fr auto; align-items: center;
+            padding: 7px 0; border-top: 1px solid var(--rule); }
+  .subrow input { font: inherit; font-size: 0.84rem; color: var(--ink); background: var(--surface);
+            border: 1px solid var(--rule); border-radius: 3px; padding: 6px 9px; width: 100%; }
+  .subrow .x { justify-self: end; }
+
+  .empty { padding: 30px 0; color: var(--ink-3); font-family: var(--mono); font-size: 0.8rem; }
+
+  #exportPanel[hidden] { display: none; }
+  #exportPanel { position: sticky; bottom: 0; margin-top: 30px; padding: 18px;
+                 background: var(--surface); border: 1px solid var(--accent);
+                 border-radius: 3px; display: grid; gap: 12px; }
+  #exportPanel p { margin: 0; font-size: 0.9rem; color: var(--ink-2); }
+  #exportPanel p b { color: var(--ink); }
+  #exportCode { font-family: var(--mono); font-size: 0.73rem; line-height: 1.5; color: var(--ink-2);
+                background: var(--bg); border: 1px solid var(--rule); border-radius: 3px;
+                padding: 12px; width: 100%; min-height: 150px; resize: vertical; }
+
+  .photo-row { display: flex; gap: 16px; align-items: flex-start; }
+  .photo-prev { flex: 0 0 92px; width: 92px; height: 92px; border-radius: 3px; overflow: hidden;
+                background: var(--chip-bg); border: 1px solid var(--rule);
+                display: grid; place-items: center; }
+  .photo-prev img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo-prev .ini { font-family: var(--mono); font-size: 1.4rem; color: var(--ink-3); letter-spacing: 0.04em; }
+  .photo-ctl { flex: 1 1 auto; min-width: 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .photo-ctl .hint { flex: 1 0 100%; margin: 0; }
+  .photo-ctl .photo-path { flex: 1 0 100%; }
+
+  footer { margin-top: 60px; border-top: 1px solid var(--rule); padding: 20px 0 60px;
+           font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.06em; color: var(--ink-3);
+           display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between; }
+
+  @media (max-width: 680px) {
+    .form { grid-template-columns: minmax(0, 1fr); }
+    .subrow { grid-template-columns: 1fr; }
+    .brand { width: 100%; }
+  }
+</style>
+
+<script src="content/research.js"></script>
+<script src="content/people.js"></script>
+<script src="content/publications.js"></script>
+<script src="content/projects.js"></script>
+<script src="content/news.js"></script>
+</head>
+<body>
+<div class="bar"><div class="wrap">
+    <div class="bar-top">
+      <h1 class="brand">Site editor <span>HUR Lab</span></h1>
+      <input id="q" type="search" placeholder="Filter…" aria-label="Filter">
+      <button class="btn primary" id="exportBtn" type="button">Get the code</button>
+      <button class="btn" id="xlsDown" type="button">Excel ↓</button>
+      <label class="btn" for="xlsUp" id="xlsUpLabel">Excel ↑</label>
+      <input id="xlsUp" type="file" accept=".csv,.xlsx,.xls" hidden>
+      <a class="btn" href="index.html">← Back to site</a>
+    </div>
+    <div class="tabs" id="tabs" role="tablist"></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="intro">
+    <b>Nothing here saves by itself.</b> Edit with the forms, press <b>Get the code</b>,
+    and paste the result into the matching file on GitHub.
+    <ol>
+      <li>Change what you need on this page</li>
+      <li><b>Get the code</b> → <b>Copy</b></li>
+      <li><b>Open on GitHub</b> → pencil icon → select all → paste → <b>Commit changes</b></li>
+      <li>Wait a minute, then hard-refresh the site (Ctrl/Cmd + Shift + R)</li>
+    </ol>
+    <p style="margin:12px 0 0"><b>Prefer a spreadsheet?</b> <b>Excel ↓</b> saves this tab as a
+    <code>.csv</code> you can open in Excel. Edit it there, save, then <b>Excel ↑</b> reads it back
+    in — keep the header row and the <code>id</code> column untouched, and leave <code>id</code>
+    blank on any row you add. Then carry on from step 2.</p>
+  </div>
+
+  <div id="view"></div>
+
+  <div id="exportPanel" hidden>
+    <p id="exportNote"></p>
+    <textarea id="exportCode" readonly spellcheck="false"></textarea>
+    <div class="form-actions">
+      <button class="btn primary" id="copyCode" type="button">Copy</button>
+      <a class="btn" id="ghLink" target="_blank" rel="noopener">Open on GitHub →</a>
+      <button class="btn ghost spacer" id="closeExport" type="button">Close</button>
+    </div>
+  </div>
+
+  <footer>
+    <span>HUR Lab · this page only generates text — it cannot change the site on its own</span>
+    <span id="repo"></span>
+  </footer>
+</main>
+
+<script>
+/* ─── where the files live ────────────────────────────────────────────────
+   If you move the site to the top of the repository, set FOLDER to "".
+   If the repository is renamed, change REPO.                              */
+var REPO   = "thehurlab2022/Hurlab";
+var BRANCH = "main";
+var FOLDER = "hurlab-site/";
+/* ───────────────────────────────────────────────────────────────────────── */
+
+var TABS = [["publications","Publications"],["people","People"],["projects","Projects"],
+            ["news","News"],["research","Research"]];
+var GLOBALS = { publications: "PUBLICATIONS", people: "PEOPLE", projects: "PROJECTS",
+                news: "NEWS", research: "RESEARCH" };
+var STATUSES = [["preparation","In preparation"],["submitted","Submitted"],
+                ["revision","In revision"],["accepted","Accepted"]];
+var TRACKS = [["thermal","Thermal"],["energy","Energy"],["transducers","Transducers"],["none","Fellowship / other"]];
+var GROUPS = ["Post-doctoral researcher","Integrated Ph.D. programme","M.S. programme"];
+
+var docs = {
+  publications: window.PUBLICATIONS || { papers: [], pipeline: [], yearNotes: {} },
+  people:       window.PEOPLE       || { members: [], alumni: [] },
+  projects:     window.PROJECTS     || { projects: [], axisStart: 2020, axisEnd: 2032 },
+  news:         window.NEWS         || { stories: [] },
+  research:     window.RESEARCH     || { programmes: [] }
+};
+var tab = "publications", openRow = null, filter = "";
+var dirty = {};
+
+/* ── safety catch ─────────────────────────────────────────────────────────
+   If the content/ files did not load, every tab would look empty — and
+   generating a file from that would WIPE the site. So: refuse to work.   */
+var MISSING = [];
+for (var _g in GLOBALS) if (!window[GLOBALS[_g]]) MISSING.push(_g);
+
+var $ = function (id) { return document.getElementById(id); };
+var esc = function (s) {
+  return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+};
+var uid = function () { return "x" + Date.now().toString(36) + Math.random().toString(36).slice(2,6); };
+var isCorr = function (a) { return /S\.\s?Hur\s*\*/.test(a || ""); };
+var hit = function (s) { return !filter || String(s).toLowerCase().indexOf(filter) >= 0; };
+function touch(name) { dirty[name] = true; }
+
+/* ── field helpers ───────────────────────────────────────────────────── */
+function f(label, id, key, value, o) {
+  o = o || {};
+  var cls = "field" + (o.full ? " full" : "");
+  var hint = o.hint ? '<span class="hint">' + esc(o.hint) + "</span>" : "";
+  var a = 'data-id="' + id + '" data-key="' + key + '"';
+  var ctl;
+  if (o.area) ctl = "<textarea " + a + " rows=\"3\">" + esc(value) + "</textarea>";
+  else if (o.select) ctl = "<select " + a + ">" + o.select.map(function (s) {
+      return '<option value="' + s[0] + '"' + (s[0] === value ? " selected" : "") + ">" + s[1] + "</option>";
+    }).join("") + "</select>";
+  else ctl = "<input " + a + (o.type ? ' type="' + o.type + '"' : "") + ' value="' + esc(value) + '">';
+  return '<div class="' + cls + '"><label>' + esc(label) + "</label>" + ctl + hint + "</div>";
+}
+function check(label, id, key, value) {
+  return '<div class="field"><label>&nbsp;</label><label class="check"><input type="checkbox" data-id="' +
+    id + '" data-key="' + key + '"' + (value ? " checked" : "") + "> " + esc(label) + "</label></div>";
+}
+function actions(id, delLabel) {
+  return '<div class="form-actions"><button class="btn danger" data-del="' + id + '" type="button">' +
+    esc(delLabel || "Delete") + '</button><button class="btn ghost spacer" data-toggle="' + id +
+    '" type="button">Close</button></div>';
+}
+function rowShell(id, title, sub, badges, form) {
+  var open = openRow === id;
+  return '<div class="row"><div class="row-head" data-toggle="' + id + '"><div>' +
+    '<div class="r-title">' + (esc(title) || "<em>Untitled</em>") + "</div>" +
+    (sub ? '<div class="r-sub">' + sub + "</div>" : "") +
+    '</div><div class="r-side">' + (badges || "") + '<span class="chev">' +
+    (open ? "&#9662;" : "&#9656;") + "</span></div></div>" +
+    (open ? '<div class="form">' + form() + "</div>" : "") + "</div>";
+}
+function groupHead(t, count, addLabel, addAttr) {
+  return '<div class="group-head">' + t + '<span class="n">' + count + "</span>" +
+    (addLabel ? '<button class="btn sm" ' + addAttr + ' type="button">' + esc(addLabel) + "</button>" : "") + "</div>";
+}
+function find(id) {
+  for (var name in docs) {
+    var d = docs[name];
+    var keys = ["papers","pipeline","members","alumni","projects","stories","programmes"];
+    for (var i = 0; i < keys.length; i++) {
+      var list = d[keys[i]];
+      if (!Array.isArray(list)) continue;
+      for (var j = 0; j < list.length; j++) {
+        if (list[j].id === id) return { item: list[j], name: name, list: list };
+        var subs = ["items","grants","works"];
+        for (var k = 0; k < subs.length; k++) {
+          var sl = list[j][subs[k]];
+          if (!Array.isArray(sl)) continue;
+          for (var m = 0; m < sl.length; m++)
+            if (sl[m].id === id) return { item: sl[m], name: name, list: sl };
+        }
+      }
+    }
+  }
+  return null;
+}
+
+/* ── portraits ────────────────────────────────────────────────────────────
+   The picture itself cannot be committed from this page — there is no
+   server here. So we do the fiddly half: crop it square, shrink it, name
+   it correctly, and hand you a file to drop into images/ on GitHub.     */
+var PHOTO_DIR = "images/";
+var PHOTO_PX  = 480;
+var PHOTOS = {};          /* id -> { file, url } for photos picked this session */
+
+function slug(name, id) {
+  var s = String(name || "").replace(/,.*$/, "").normalize ?
+          String(name || "").replace(/,.*$/, "").normalize("NFKD") :
+          String(name || "").replace(/,.*$/, "");
+  s = s.replace(/[^\x20-\x7E]/g, "").trim().toLowerCase()
+       .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  return (s || "member-" + id) + ".jpg";
+}
+function initials(name) {
+  var p = String(name || "").replace(/,.*$/, "").trim().split(/\s+/);
+  return ((p[0] ? p[0][0] : "") + (p.length > 1 ? p[p.length - 1][0] : "")).toUpperCase();
+}
+function photoField(m) {
+  var picked = PHOTOS[m.id];
+  var src = picked ? picked.url : (m.photo || "");
+  var prev = src
+    ? '<img src="' + esc(src) + '" alt="">'
+    : '<span class="ini">' + esc(initials(m.name)) + "</span>";
+  var dl = picked
+    ? '<button class="btn sm primary" data-dl="' + m.id + '" type="button">⤓ ' + esc(picked.file.name) + "</button>"
+    : "";
+  var note = picked
+    ? "Ready. Download it, then upload it into <code>" + esc(FOLDER + PHOTO_DIR) +
+      "</code> on GitHub. (" + Math.round(picked.file.size / 1024) + " KB)"
+    : (m.photo ? "Using <code>" + esc(m.photo) + "</code>." : "No photo — initials are shown instead.");
+  return '<div class="field full"><label>Photo</label><div class="photo-row">' +
+    '<div class="photo-prev">' + prev + "</div>" +
+    '<div class="photo-ctl">' +
+      '<label class="btn sm" for="ph-' + m.id + '">Choose a photo…</label>' +
+      '<input id="ph-' + m.id + '" type="file" accept="image/*" data-photo="' + m.id + '" hidden>' +
+      dl +
+      '<div class="hint">' + note + "</div>" +
+      '<input class="photo-path" data-id="' + m.id + '" data-key="photo" value="' + esc(m.photo || "") +
+        '" placeholder="' + esc(PHOTO_DIR) + 'name.jpg">' +
+    "</div></div></div>";
+}
+function makePhoto(id, file) {
+  var found = find(id); if (!found) return;
+  var img = new Image();
+  img.onload = function () {
+    var c = document.createElement("canvas");
+    c.width = c.height = PHOTO_PX;
+    var x = c.getContext("2d");
+    var s = Math.min(img.width, img.height);
+    x.drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, PHOTO_PX, PHOTO_PX);
+    URL.revokeObjectURL(img.src);
+    var name = slug(found.item.name, id);
+    c.toBlob(function (b) {
+      if (!b) { alert("Could not read that image."); return; }
+      var out;
+      try { out = new File([b], name, { type: "image/jpeg" }); }
+      catch (_) { out = b; out.name = name; }
+      if (PHOTOS[id]) URL.revokeObjectURL(PHOTOS[id].url);
+      PHOTOS[id] = { file: out, url: URL.createObjectURL(out) };
+      found.item.photo = PHOTO_DIR + name;
+      touch("people"); openRow = id; render();
+    }, "image/jpeg", 0.85);
+  };
+  img.onerror = function () { alert("That file is not an image this browser can read."); };
+  img.src = URL.createObjectURL(file);
+}
+document.addEventListener("change", function (e) {
+  var el = e.target;
+  if (!el.dataset || !el.dataset.photo) return;
+  var file = el.files && el.files[0];
+  el.value = "";
+  if (file) makePhoto(el.dataset.photo, file);
+});
+
+/* ── views ───────────────────────────────────────────────────────────── */
+function viewPublications() {
+  var d = docs.publications;
+  var years = [];
+  d.papers.forEach(function (p) { if (years.indexOf(p.year) < 0) years.push(p.year); });
+  years.sort(function (a, b) { return String(b).localeCompare(String(a), undefined, { numeric: true }); });
+
+  var h = '<section class="group">' + groupHead("<h2>In press &amp; under review</h2>",
+    d.pipeline.length + " items", "+ Add", 'data-add="pipe"');
+  h += d.pipeline.length ? d.pipeline.map(function (it) {
+    var label = (STATUSES.filter(function (s) { return s[0] === it.status; })[0] || ["", it.status])[1];
+    return rowShell(it.id, it.title, "", '<span class="badge b-' + esc(it.status) + '">' + esc(label) + "</span>",
+      function () {
+        return f("Title", it.id, "title", it.title, { full: true, area: true }) +
+          f("Status", it.id, "status", it.status, { select: STATUSES }) +
+          '<div class="field"><label>When it is published</label><button class="btn" data-promote="' +
+            it.id + '" type="button">Move to Published →</button></div>' + actions(it.id);
+      });
+  }).join("") : '<p class="empty">Nothing under review.</p>';
+  h += "</section>";
+
+  var shown = d.papers.filter(function (p) { return hit(p.title + " " + p.authors + " " + p.journal); });
+  h += '<section class="group">' + groupHead("<h2>Published</h2>",
+    (filter ? shown.length + " of " : "") + d.papers.length + " papers",
+    "+ Add year", 'data-add="year"') + "</section>";
+  years.forEach(function (y) {
+    var rows = shown.filter(function (p) { return p.year === y; });
+    if (!rows.length) return;
+    h += '<section class="group">' + groupHead("<h3>" + esc(y) + "</h3>", rows.length,
+      "+ Add paper", 'data-add="paper" data-arg="' + esc(y) + '"');
+    h += rows.map(function (p) {
+      return rowShell(p.id, p.title, esc(p.journal || "—") + (p.detail ? " · " + esc(p.detail) : ""),
+        isCorr(p.authors) ? '<span class="badge b-corr">Corresponding</span>' : "", function () {
+        return f("Title", p.id, "title", p.title, { full: true, area: true }) +
+          f("Authors", p.id, "authors", p.authors, { full: true, area: true,
+            hint: "¹ equal contribution, * corresponding author. S. Hur is bolded automatically." }) +
+          f("Journal", p.id, "journal", p.journal) +
+          f("Volume, pages", p.id, "detail", p.detail, { hint: "e.g. 45, 3, 117851" }) +
+          f("Year", p.id, "year", p.year) + actions(p.id, "Delete paper");
+      });
+    }).join("") + "</section>";
+  });
+  return h;
+}
+
+function viewPeople() {
+  var d = docs.people, h = "";
+  GROUPS.forEach(function (g) {
+    var rows = d.members.filter(function (m) { return m.group === g && hit(m.name + " " + m.where); });
+    h += '<section class="group">' + groupHead("<h2>" + esc(g) + "</h2>", rows.length,
+      "+ Add", 'data-add="member" data-arg="' + esc(g) + '"');
+    h += rows.length ? rows.map(function (m) {
+      return rowShell(m.id, m.name, esc(m.since) + " · " + esc(m.where), "", function () {
+        return f("Name", m.id, "name", m.name) +
+          f("Since", m.id, "since", m.since, { hint: "e.g. 2027–" }) +
+          f("University · department", m.id, "where", m.where, { full: true }) +
+          f("Co-advisor", m.id, "co", m.co, { full: true, hint: "Leave blank if none" }) +
+          f("Email", m.id, "mail", m.mail) +
+          f("Group", m.id, "group", m.group, { select: GROUPS.map(function (x) { return [x, x]; }) }) +
+          photoField(m) +
+          '<div class="field"><label>When they graduate</label><button class="btn" data-graduate="' +
+            m.id + '" type="button">Move to Alumni →</button></div>' + actions(m.id);
+      });
+    }).join("") : '<p class="empty">Nobody here.</p>';
+    h += "</section>";
+  });
+  var al = d.alumni.filter(function (a) { return hit(a.name + " " + a.now); });
+  h += '<section class="group">' + groupHead("<h2>Alumni</h2>", al.length, "+ Add", 'data-add="alum"');
+  h += al.map(function (a) {
+    return rowShell(a.id, a.name, esc(a.term) + (a.now ? " · now at " + esc(a.now) : ""), "", function () {
+      return f("Name", a.id, "name", a.name) +
+        f("Term", a.id, "term", a.term, { hint: "e.g. M.S. · 2024–2026" }) +
+        f("Now at", a.id, "now", a.now, { full: true }) + actions(a.id);
+    });
+  }).join("");
+  return h + "</section>";
+}
+
+function viewProjects() {
+  var d = docs.projects;
+  var row = function (p) {
+    return rowShell(p.id, p.title, esc(p.funder) + " · " + esc(p.start) + " → " + esc(p.end),
+      '<span class="badge b-' + esc(p.track) + '">' +
+      esc((TRACKS.filter(function (t) { return t[0] === p.track; })[0] || ["", p.track])[1]) + "</span>",
+      function () {
+        return f("Title", p.id, "title", p.title, { full: true, area: true }) +
+          f("Funder", p.id, "funder", p.funder, { full: true }) +
+          f("Start", p.id, "start", p.start, { type: "month" }) +
+          f("End", p.id, "end", p.end, { type: "month" }) +
+          f("Programme", p.id, "track", p.track, { select: TRACKS }) +
+          check("Finished", p.id, "done", p.done) + actions(p.id);
+      });
+  };
+  var live = d.projects.filter(function (p) { return !p.done && hit(p.title + " " + p.funder); });
+  var past = d.projects.filter(function (p) { return p.done && hit(p.title + " " + p.funder); });
+  return '<section class="group">' + groupHead("<h2>Active</h2>", live.length, "+ Add project", 'data-add="project"') +
+    (live.length ? live.map(row).join("") : '<p class="empty">None.</p>') + "</section>" +
+    '<section class="group">' + groupHead("<h2>Completed</h2>", past.length) +
+    (past.length ? past.map(row).join("") : '<p class="empty">None.</p>') + "</section>" +
+    '<p class="empty">Bar positions and the Today line are worked out from the months — you never calculate them.</p>';
+}
+
+function viewNews() {
+  var d = docs.news;
+  var h = '<section class="group">' + groupHead("<h2>Stories</h2>",
+    d.stories.length + " stories · " + d.stories.reduce(function (a, s) { return a + s.items.length; }, 0) + " articles",
+    "+ Add story", 'data-add="story"') + "</section>";
+  d.stories.forEach(function (s) {
+    if (!hit(s.headline + " " + s.when + " " + s.items.map(function (i) { return i.outlet + i.title; }).join(" "))) return;
+    h += '<section class="group">' + rowShell(s.id, s.headline,
+      esc(s.when) + " · " + s.items.length + " outlets",
+      '<span class="badge b-' + (s.tag === "Thermal" ? "thermal" : "energy") + '">' + esc(s.tag) + "</span>",
+      function () {
+        return f("Headline", s.id, "headline", s.headline, { full: true, area: true }) +
+          f("When", s.id, "when", s.when, { hint: "e.g. 2027 · March" }) +
+          f("Programme tag", s.id, "tag", s.tag, { select: [["Thermal","Thermal"],["Energy","Energy"],["Transducers","Transducers"]] }) +
+          f("Summary", s.id, "blurb", s.blurb, { full: true, area: true }) +
+          f("Paper behind it", s.id, "source", s.source, { full: true }) +
+          '<div class="sub"><div class="sub-head"><h4>Coverage — ' + s.items.length + ' articles</h4>' +
+          '<button class="btn sm" data-add="article" data-arg="' + s.id + '" type="button">+ Add article</button></div>' +
+          s.items.map(function (it) {
+            return '<div class="subrow">' +
+              '<input data-id="' + it.id + '" data-key="outlet" value="' + esc(it.outlet) + '" placeholder="Outlet">' +
+              '<input data-id="' + it.id + '" data-key="title" value="' + esc(it.title) + '" placeholder="Headline">' +
+              '<input data-id="' + it.id + '" data-key="url" value="' + esc(it.url) + '" placeholder="https://">' +
+              '<button class="btn sm danger x" data-del="' + it.id + '" type="button">✕</button></div>';
+          }).join("") + "</div>" + actions(s.id, "Delete story");
+      }) + "</section>";
+  });
+  return h;
+}
+
+function viewResearch() {
+  var d = docs.research, h = "";
+  d.programmes.forEach(function (p) {
+    h += '<section class="group">' + rowShell(p.id, p.title, esc(p.coupling), "", function () {
+      return f("Title", p.id, "title", p.title) +
+        f("Coupling", p.id, "coupling", p.coupling, { hint: "e.g. Field → Entropy" }) +
+        f("Opening paragraph", p.id, "lead", p.lead, { full: true, area: true }) +
+        f("Second paragraph", p.id, "body", p.body, { full: true, area: true }) +
+        '<div class="sub"><div class="sub-head"><h4>Funded work</h4>' +
+        '<button class="btn sm" data-add="grant" data-arg="' + p.id + '" type="button">+ Add</button></div>' +
+        p.grants.map(function (g) {
+          return '<div class="subrow">' +
+            '<input data-id="' + g.id + '" data-key="title" value="' + esc(g.title) + '" placeholder="Project">' +
+            '<input data-id="' + g.id + '" data-key="meta" value="' + esc(g.meta) + '" placeholder="NRF · 2026–2031">' +
+            '<button class="btn sm danger x" data-del="' + g.id + '" type="button">✕</button></div>';
+        }).join("") + "</div>" +
+        '<div class="sub"><div class="sub-head"><h4>Representative work</h4>' +
+        '<button class="btn sm" data-add="work" data-arg="' + p.id + '" type="button">+ Add</button></div>' +
+        p.works.map(function (w) {
+          return '<div class="subrow">' +
+            '<input data-id="' + w.id + '" data-key="title" value="' + esc(w.title) + '" placeholder="Paper title">' +
+            '<input data-id="' + w.id + '" data-key="venue" value="' + esc(w.venue) + '" placeholder="Journal">' +
+            '<input data-id="' + w.id + '" data-key="detail" value="' + esc(w.detail) + '" placeholder="2025, 145, 111410">' +
+            '<button class="btn sm danger x" data-del="' + w.id + '" type="button">✕</button></div>';
+        }).join("") + "</div>" +
+        '<div class="form-actions"><button class="btn ghost spacer" data-toggle="' + p.id + '" type="button">Close</button></div>';
+    }) + "</section>";
+  });
+  return h + '<p class="empty">Research figures are images inside research.html — those still need Claude, or a hand edit.</p>';
+}
+
+var VIEWS = { publications: viewPublications, people: viewPeople, projects: viewProjects,
+              news: viewNews, research: viewResearch };
+
+function counts(n) {
+  var d = docs[n];
+  if (n === "publications") return d.papers.length;
+  if (n === "people") return d.members.length;
+  if (n === "projects") return d.projects.length;
+  if (n === "news") return d.stories.length;
+  return d.programmes.length;
+}
+
+function halt() {
+  document.querySelector(".intro").innerHTML =
+    '<b style="color:#FF8B7A">This page cannot find the site’s content.</b><br><br>' +
+    "It could not load: <code>content/" + MISSING.join(".js</code>, <code>content/") + ".js</code><br><br>" +
+    "Every tab would look empty, and pressing <b>Get the code</b> would produce a file that " +
+    "<b>erases that whole section of the site</b>. So the buttons are switched off.<br><br>" +
+    "<b>Almost always the cause is that <code>edit.html</code> is in the wrong folder.</b> " +
+    "It has to sit right next to <code>index.html</code> and the <code>content/</code> folder — " +
+    "in <code>" + esc(FOLDER || "the site root") + "</code>. Move it there and reload this page.";
+  document.querySelector(".intro").style.borderLeftColor = "#FF8B7A";
+  $("exportBtn").disabled = true;
+  $("xlsDown").disabled = true;
+  $("xlsUpLabel").style.opacity = ".4";
+  $("xlsUpLabel").style.pointerEvents = "none";
+  $("q").disabled = true;
+  $("view").innerHTML = "";
+  $("tabs").innerHTML = "";
+}
+
+function render() {
+  if (MISSING.length) return halt();
+  $("tabs").innerHTML = TABS.map(function (t) {
+    return '<button class="tab" role="tab" data-tab="' + t[0] + '" aria-selected="' + (t[0] === tab) + '">' +
+      esc(t[1]) + '<span class="c">' + counts(t[0]) + "</span>" +
+      (dirty[t[0]] ? '<span class="dirty">●</span>' : "") + "</button>";
+  }).join("");
+  $("view").innerHTML = VIEWS[tab]();
+  $("repo").textContent = REPO;
+}
+
+/* ── interaction ─────────────────────────────────────────────────────── */
+document.addEventListener("input", function (e) {
+  var el = e.target;
+  if (el.id === "q") { filter = el.value.trim().toLowerCase(); render(); return; }
+  if (!el.dataset || !el.dataset.id || !el.dataset.key) return;
+  var found = find(el.dataset.id); if (!found) return;
+  found.item[el.dataset.key] = el.type === "checkbox" ? el.checked : el.value;
+  touch(found.name);
+  var k = el.dataset.key;
+  if ((k === "title" || k === "name" || k === "headline") && el.closest(".form") && !el.closest(".sub")) {
+    var t = el.closest(".row").querySelector(".r-title");
+    if (t) t.textContent = el.value || "Untitled";
+  }
+});
+document.addEventListener("change", function (e) {
+  var el = e.target;
+  if (el.tagName !== "SELECT" || !el.dataset.id) return;
+  var found = find(el.dataset.id); if (!found) return;
+  found.item[el.dataset.key] = el.value; touch(found.name); render();
+});
+document.addEventListener("click", function (e) {
+  var t = e.target.closest("[data-tab],[data-toggle],[data-del],[data-add],[data-promote],[data-graduate],[data-dl]");
+  if (!t) return;
+  var ds = t.dataset;
+  if (ds.dl) {
+    e.stopPropagation();
+    var ph = PHOTOS[ds.dl]; if (!ph) return;
+    var a = document.createElement("a");
+    a.href = ph.url; a.download = ph.file.name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    return;
+  }
+  if (ds.tab) { tab = ds.tab; openRow = null; render(); window.scrollTo(0, 0); return; }
+  if (ds.toggle) { openRow = openRow === ds.toggle ? null : ds.toggle; render(); return; }
+  if (ds.del) {
+    var found = find(ds.del); if (!found) return;
+    var label = found.item.title || found.item.name || found.item.headline || "this entry";
+    if (!confirm("Delete “" + label + "”?")) return;
+    found.list.splice(found.list.indexOf(found.item), 1);
+    if (openRow === ds.del) openRow = null;
+    touch(found.name); render(); return;
+  }
+  if (ds.promote) {
+    var it = docs.publications.pipeline.filter(function (p) { return p.id === ds.promote; })[0];
+    if (!it) return;
+    var nid = uid();
+    docs.publications.papers.unshift({ id: nid, year: String(new Date().getFullYear()),
+      authors: "", title: it.title, journal: "", detail: "" });
+    docs.publications.pipeline.splice(docs.publications.pipeline.indexOf(it), 1);
+    openRow = nid; touch("publications"); render(); return;
+  }
+  if (ds.graduate) {
+    var m = docs.people.members.filter(function (x) { return x.id === ds.graduate; })[0];
+    if (!m) return;
+    var lvl = m.group.indexOf("M.S.") === 0 ? "M.S." :
+              m.group.indexOf("Post") === 0 ? "Post-doctoral fellow" : "Ph.D.";
+    var gid = uid();
+    docs.people.alumni.unshift({ id: gid, name: m.name,
+      term: lvl + " · " + String(m.since || "").replace(/–$/, "–" + new Date().getFullYear()), now: "" });
+    docs.people.members.splice(docs.people.members.indexOf(m), 1);
+    openRow = gid; touch("people"); render(); return;
+  }
+  if (ds.add) {
+    var id = uid(), y;
+    if (ds.add === "pipe") { docs.publications.pipeline.unshift({ id: id, title: "", status: "submitted" }); touch("publications"); }
+    else if (ds.add === "paper") { docs.publications.papers.unshift({ id: id, year: ds.arg, authors: "", title: "", journal: "", detail: "" }); touch("publications"); }
+    else if (ds.add === "year") { y = prompt("Year (e.g. 2027)"); if (!y) return;
+      docs.publications.papers.unshift({ id: id, year: y.trim(), authors: "", title: "", journal: "", detail: "" }); touch("publications"); }
+    else if (ds.add === "member") { docs.people.members.push({ id: id, group: ds.arg, name: "",
+      since: new Date().getFullYear() + "–", where: "", co: "", mail: "" }); touch("people"); }
+    else if (ds.add === "alum") { docs.people.alumni.unshift({ id: id, name: "", term: "", now: "" }); touch("people"); }
+    else if (ds.add === "project") { docs.projects.projects.unshift({ id: id, title: "", funder: "",
+      start: "", end: "", track: "thermal", done: false }); touch("projects"); }
+    else if (ds.add === "story") { docs.news.stories.unshift({ id: id, when: "", headline: "", blurb: "",
+      tag: "Energy", source: "", items: [] }); touch("news"); }
+    else if (ds.add === "article") {
+      var s = docs.news.stories.filter(function (x) { return x.id === ds.arg; })[0]; if (!s) return;
+      s.items.push({ id: id, url: "", outlet: "", title: "", video: false }); touch("news"); render(); return; }
+    else if (ds.add === "grant") {
+      var pg = docs.research.programmes.filter(function (x) { return x.id === ds.arg; })[0]; if (!pg) return;
+      pg.grants.push({ id: id, title: "", meta: "", done: false }); touch("research"); render(); return; }
+    else if (ds.add === "work") {
+      var pw = docs.research.programmes.filter(function (x) { return x.id === ds.arg; })[0]; if (!pw) return;
+      pw.works.push({ id: id, title: "", venue: "", detail: "" }); touch("research"); render(); return; }
+    openRow = id; render();
+    setTimeout(function () { var el = document.querySelector('[data-id="' + id + '"]'); if (el) el.focus(); }, 0);
+  }
+});
+
+/* ── the code to paste ───────────────────────────────────────────────── */
+function contentFile(name) {
+  var copy = JSON.parse(JSON.stringify(docs[name]));
+  copy.updated = new Date().toISOString().slice(0, 10);
+  return "/* " + name + " — the text of the site. Edit here or in the Site editor. */\n" +
+         "window." + GLOBALS[name] + " = " + JSON.stringify(copy, null, 1) + ";\n";
+}
+$("exportBtn").addEventListener("click", function () {
+  if (MISSING.length) return;
+  if (counts(tab) === 0 && !confirm(
+      "The " + tab + " tab is empty.\n\nThe file this makes would remove everything in that " +
+      "section of the site. Are you sure that is what you want?")) return;
+  var path = FOLDER + "content/" + tab + ".js";
+  var pend = [];
+  for (var _p in PHOTOS) pend.push(PHOTOS[_p].file.name);
+  $("exportNote").innerHTML = "<b>This is the whole of <code>" + esc(path) + "</code>.</b> " +
+    "Copy it, open the file on GitHub, click the pencil, select everything, paste, and Commit." +
+    (tab === "people" && pend.length
+      ? '<br><br><b style="color:var(--accent)">Do not forget the ' + pend.length + " photo" +
+        (pend.length > 1 ? "s" : "") + ".</b> Download " + (pend.length > 1 ? "them" : "it") +
+        " with the ⤓ button on each person, then upload " + (pend.length > 1 ? "them" : "it") +
+        " into <code>" + esc(FOLDER + PHOTO_DIR) + "</code> on GitHub — the text file alone will " +
+        "show a broken picture. (" + esc(pend.join(", ")) + ")"
+      : "");
+  $("exportCode").value = contentFile(tab);
+  $("ghLink").href = "https://github.com/" + REPO + "/edit/" + BRANCH + "/" + path;
+  $("exportPanel").hidden = false;
+  $("exportPanel").scrollIntoView({ behavior: "smooth", block: "end" });
+});
+$("closeExport").addEventListener("click", function () { $("exportPanel").hidden = true; });
+$("copyCode").addEventListener("click", function () {
+  var el = $("exportCode"); el.focus(); el.select();
+  var done = function () { $("copyCode").textContent = "Copied"; setTimeout(function () { $("copyCode").textContent = "Copy"; }, 1600); };
+  if (navigator.clipboard) navigator.clipboard.writeText(el.value).then(done, function () { try { document.execCommand("copy"); done(); } catch (_) {} });
+  else { try { document.execCommand("copy"); done(); } catch (_) {} }
+});
+
+/* ── Excel / CSV round trip ──────────────────────────────────────────────
+   Excel ↓ writes the current tab as a spreadsheet. Edit it in Excel, save,
+   then Excel ↑ reads it back in. Keep the header row and the id column as
+   they are; a row with a blank id is treated as brand new.               */
+var SHEET = {
+  publications: {
+    cols: ["id","kind","year","title","authors","journal","detail","note","status"],
+    rows: function (d) {
+      var r = d.pipeline.map(function (p) {
+        return { id: p.id, kind: "pipeline", title: p.title, status: p.status }; });
+      return r.concat(d.papers.map(function (p) {
+        return { id: p.id, kind: "paper", year: p.year, title: p.title, authors: p.authors,
+                 journal: p.journal, detail: p.detail, note: p.note }; }));
+    },
+    build: function (rows, old) {
+      var d = { papers: [], pipeline: [], yearNotes: old.yearNotes || {} };
+      rows.forEach(function (r) {
+        if (r.kind === "pipeline")
+          d.pipeline.push({ id: r.id || uid(), title: r.title, status: r.status || "submitted" });
+        else
+          d.papers.push({ id: r.id || uid(), year: String(r.year || ""), title: r.title,
+                          authors: r.authors, journal: r.journal, detail: r.detail, note: r.note });
+      });
+      return d;
+    }
+  },
+  people: {
+    cols: ["id","kind","group","name","since","where","co","mail","photo","term","now"],
+    rows: function (d) {
+      return d.members.map(function (m) {
+        return { id: m.id, kind: "member", group: m.group, name: m.name, since: m.since,
+                 where: m.where, co: m.co, mail: m.mail, photo: m.photo };
+      }).concat(d.alumni.map(function (a) {
+        return { id: a.id, kind: "alumni", name: a.name, term: a.term, now: a.now }; }));
+    },
+    build: function (rows) {
+      var d = { members: [], alumni: [] };
+      rows.forEach(function (r) {
+        if (r.kind === "alumni")
+          d.alumni.push({ id: r.id || uid(), name: r.name, term: r.term, now: r.now });
+        else {
+          var m = { id: r.id || uid(), group: r.group || GROUPS[1], name: r.name,
+                    since: r.since, where: r.where, co: r.co, mail: r.mail };
+          if (r.photo) m.photo = r.photo;
+          d.members.push(m);
+        }
+      });
+      return d;
+    }
+  },
+  projects: {
+    cols: ["id","kind","title","funder","start","end","track","done"],
+    rows: function (d) {
+      return d.projects.map(function (p) {
+        return { id: p.id, kind: "project", title: p.title, funder: p.funder, start: p.start,
+                 end: p.end, track: p.track, done: p.done ? "yes" : "" }; });
+    },
+    build: function (rows, old) {
+      return { axisStart: old.axisStart, axisEnd: old.axisEnd,
+        projects: rows.map(function (r) {
+          return { id: r.id || uid(), title: r.title, funder: r.funder, start: r.start,
+                   end: r.end, track: r.track || "thermal", done: yes(r.done) }; }) };
+    }
+  },
+  news: {
+    cols: ["id","kind","when","headline","blurb","tag","source","outlet","title","url","video"],
+    rows: function (d) {
+      var out = [];
+      d.stories.forEach(function (s) {
+        out.push({ id: s.id, kind: "story", when: s.when, headline: s.headline,
+                   blurb: s.blurb, tag: s.tag, source: s.source });
+        (s.items || []).forEach(function (a) {
+          out.push({ id: a.id, kind: "article", outlet: a.outlet, title: a.title,
+                     url: a.url, video: a.video ? "yes" : "" });
+        });
+      });
+      return out;
+    },
+    build: function (rows) {
+      var d = { stories: [] }, cur = null;
+      rows.forEach(function (r) {
+        if (r.kind === "article") {
+          if (!cur) return;
+          cur.items.push({ id: r.id || uid(), outlet: r.outlet, title: r.title,
+                           url: r.url, video: yes(r.video) });
+        } else {
+          cur = { id: r.id || uid(), when: r.when, headline: r.headline, blurb: r.blurb,
+                  tag: r.tag || "Energy", source: r.source, items: [] };
+          d.stories.push(cur);
+        }
+      });
+      return d;
+    }
+  },
+  research: {
+    cols: ["id","kind","title","lead","coupling","body","meta","venue","detail","done"],
+    rows: function (d) {
+      var out = [];
+      (d.programmes || []).forEach(function (p) {
+        out.push({ id: p.id, kind: "programme", title: p.title, lead: p.lead,
+                   coupling: p.coupling, body: p.body });
+        (p.grants || []).forEach(function (g) {
+          out.push({ id: g.id, kind: "grant", title: g.title, meta: g.meta, done: g.done ? "yes" : "" }); });
+        (p.works || []).forEach(function (w) {
+          out.push({ id: w.id, kind: "work", title: w.title, venue: w.venue, detail: w.detail }); });
+      });
+      return out;
+    },
+    build: function (rows) {
+      var d = { programmes: [] }, cur = null;
+      rows.forEach(function (r) {
+        if (r.kind === "grant" && cur) cur.grants.push({ id: r.id || uid(), title: r.title, meta: r.meta, done: yes(r.done) });
+        else if (r.kind === "work" && cur) cur.works.push({ id: r.id || uid(), title: r.title, venue: r.venue, detail: r.detail });
+        else if (r.kind === "programme") {
+          cur = { id: r.id || uid(), title: r.title, lead: r.lead, coupling: r.coupling,
+                  body: r.body, grants: [], works: [] };
+          d.programmes.push(cur);
+        }
+      });
+      return d;
+    }
+  }
+};
+function yes(v) { return /^(y|yes|true|1|o|예|참)/i.test(String(v == null ? "" : v).trim()); }
+
+function toCSV(name) {
+  var s = SHEET[name], rows = s.rows(docs[name]);
+  var cell = function (v) {
+    v = v == null ? "" : String(v);
+    return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+  };
+  var lines = [s.cols.join(",")];
+  rows.forEach(function (r) { lines.push(s.cols.map(function (c) { return cell(r[c]); }).join(",")); });
+  return "﻿" + lines.join("\r\n") + "\r\n";   /* BOM so Excel reads Korean */
+}
+function parseCSV(text) {
+  text = text.replace(/^﻿/, "");
+  var rows = [], row = [], v = "", q = false, i = 0, c;
+  for (; i < text.length; i++) {
+    c = text[i];
+    if (q) {
+      if (c === '"' && text[i + 1] === '"') { v += '"'; i++; }
+      else if (c === '"') q = false;
+      else v += c;
+    } else if (c === '"') q = true;
+    else if (c === ",") { row.push(v); v = ""; }
+    else if (c === "\n") { row.push(v); rows.push(row); row = []; v = ""; }
+    else if (c !== "\r") v += c;
+  }
+  if (v !== "" || row.length) { row.push(v); rows.push(row); }
+  return rows.filter(function (r) { return r.some(function (x) { return String(x).trim() !== ""; }); });
+}
+function applySheet(name, grid) {
+  if (!grid.length) throw new Error("The file is empty.");
+  var head = grid[0].map(function (h) { return String(h).trim().toLowerCase(); });
+  var need = SHEET[name].cols;
+  if (head.indexOf("kind") < 0)
+    throw new Error("This does not look like a " + name + " sheet — the header row must be:\n" + need.join(", "));
+  var objs = grid.slice(1).map(function (r) {
+    var o = {};
+    head.forEach(function (h, i) { o[h] = r[i] == null ? "" : String(r[i]).trim(); });
+    return o;
+  });
+  var old = docs[name];
+  var built = SHEET[name].build(objs, old);
+  var n = 0; for (var k in built) if (Array.isArray(built[k])) n += built[k].length;
+  if (!confirm("Replace the " + name + " tab with " + objs.length + " rows from this file?\n\n" +
+               "Anything not in the file is removed. Nothing is published until you press Get the code."))
+    return;
+  docs[name] = built;
+  touch(name); openRow = null; render();
+  alert("Loaded. Check it over, then press Get the code.");
+}
+$("xlsDown").addEventListener("click", function () {
+  var blob = new Blob([toCSV(tab)], { type: "text/csv;charset=utf-8;" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "hurlab-" + tab + ".csv";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+});
+function withXLSX(cb) {
+  if (window.XLSX) return cb();
+  var s = document.createElement("script");
+  s.src = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+  s.onload = cb;
+  s.onerror = function () { alert("Could not load the .xlsx reader (no internet?).\nSave the file as CSV in Excel and try again."); };
+  document.head.appendChild(s);
+}
+$("xlsUp").addEventListener("change", function (e) {
+  var file = e.target.files && e.target.files[0];
+  e.target.value = "";
+  if (!file) return;
+  var name = tab;
+  var fail = function (err) { alert(String(err && err.message || err)); };
+  if (/\.csv$/i.test(file.name)) {
+    var fr = new FileReader();
+    fr.onload = function () { try { applySheet(name, parseCSV(fr.result)); } catch (err) { fail(err); } };
+    fr.readAsText(file, "utf-8");
+  } else {
+    withXLSX(function () {
+      var fr = new FileReader();
+      fr.onload = function () {
+        try {
+          var wb = XLSX.read(new Uint8Array(fr.result), { type: "array" });
+          var sh = wb.Sheets[wb.SheetNames[0]];
+          applySheet(name, XLSX.utils.sheet_to_json(sh, { header: 1, raw: false, defval: "" }));
+        } catch (err) { fail(err); }
+      };
+      fr.readAsArrayBuffer(file);
+    });
+  }
+});
+
+window.addEventListener("beforeunload", function (e) {
+  for (var k in dirty) if (dirty[k]) { e.preventDefault(); e.returnValue = ""; return ""; }
+});
+
+render();
+</script>
+</body>
+</html>
