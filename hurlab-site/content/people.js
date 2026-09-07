@@ -138,7 +138,5 @@ window.PEOPLE = {
    "since": "2026–",
    "where": "KU-KIST Graduate School of Converging Science and Technology, Korea University",
    "photo": "images/subeen-park.jpg"
-  }
- ],
- "updated": "2026-09-07"
-};
+  },
+
