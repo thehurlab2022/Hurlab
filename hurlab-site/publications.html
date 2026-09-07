@@ -334,6 +334,16 @@
     font-family: var(--serif); font-size: 1.16rem; line-height: 1.3;
     font-weight: 400; margin: 0; text-wrap: pretty;
   }
+  .p-title a {
+    color: inherit; text-decoration: none;
+    border-bottom: 1px solid transparent; transition: color .15s, border-color .15s;
+  }
+  .p-title a::after {
+    content: "\2197"; font-family: var(--mono); font-size: 0.6em;
+    margin-left: 7px; color: var(--ink-3); vertical-align: 3px;
+  }
+  .p-title a:hover, .p-title a:focus-visible { color: var(--accent); border-bottom-color: var(--accent); }
+  .p-title a:hover::after, .p-title a:focus-visible::after { color: var(--accent); }
   .p-authors { font-size: 0.86rem; color: var(--ink-2); line-height: 1.55; }
   .p-authors .me { color: var(--ink); font-weight: 600; }
   .p-venue {
@@ -455,7 +465,11 @@
       html += '<section class="yearblock"><div class="yearmark"><b>' + esc(y) + "</b>" +
         ((corrOnly || term) ? rows.length + " shown" : esc(note)) + '</div><ul class="entries">';
       rows.forEach(function (p) {
-        html += highlight('<li><h3 class="p-title">' + esc(p.title) +
+        var href = p.doi ? "https://doi.org/" + String(p.doi).replace(/^https?:\/\/doi\.org\//i, "")
+                         : (p.url || "");
+        var t = esc(p.title);
+        if (href) t = '<a href="' + esc(href) + '" target="_blank" rel="noopener">' + t + "</a>";
+        html += highlight('<li><h3 class="p-title">' + t +
           (isCorr(p.authors) ? '<span class="corr-flag">Corresponding</span>' : "") + "</h3>" +
           '<p class="p-authors">' + markPI(esc(p.authors)) + "</p>" +
           '<p class="p-venue"><em>' + esc(p.journal) + "</em>" +

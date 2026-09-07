@@ -648,7 +648,10 @@ function viewPublications() {
             hint: "¹ equal contribution, * corresponding author. S. Hur is bolded automatically." }) +
           f("Journal", p.id, "journal", p.journal) +
           f("Volume, pages", p.id, "detail", p.detail, { hint: "e.g. 45, 3, 117851" }) +
-          f("Year", p.id, "year", p.year) + actions(p.id, "Delete paper");
+          f("Year", p.id, "year", p.year) +
+          f("DOI or link", p.id, "doi", p.doi || "", { full: true,
+            hint: "e.g. 10.1016/j.nanoen.2025.111410 — the title becomes a link. Leave blank for none." }) +
+          actions(p.id, "Delete paper");
       });
     }).join("") + "</section>";
   });
@@ -947,13 +950,13 @@ $("copyCode").addEventListener("click", function () {
    they are; a row with a blank id is treated as brand new.               */
 var SHEET = {
   publications: {
-    cols: ["id","kind","year","title","authors","journal","detail","note","status"],
+    cols: ["id","kind","year","title","authors","journal","detail","doi","note","status"],
     rows: function (d) {
       var r = d.pipeline.map(function (p) {
         return { id: p.id, kind: "pipeline", title: p.title, status: p.status }; });
       return r.concat(d.papers.map(function (p) {
         return { id: p.id, kind: "paper", year: p.year, title: p.title, authors: p.authors,
-                 journal: p.journal, detail: p.detail, note: p.note }; }));
+                 journal: p.journal, detail: p.detail, doi: p.doi, note: p.note }; }));
     },
     build: function (rows, old) {
       var d = { papers: [], pipeline: [], yearNotes: old.yearNotes || {} };
@@ -962,7 +965,8 @@ var SHEET = {
           d.pipeline.push({ id: r.id || uid(), title: r.title, status: r.status || "submitted" });
         else
           d.papers.push({ id: r.id || uid(), year: String(r.year || ""), title: r.title,
-                          authors: r.authors, journal: r.journal, detail: r.detail, note: r.note });
+                          authors: r.authors, journal: r.journal, detail: r.detail,
+                          doi: r.doi, note: r.note });
       });
       return d;
     }

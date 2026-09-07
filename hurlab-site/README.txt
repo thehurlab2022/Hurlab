@@ -13,6 +13,7 @@ Six HTML pages. No build step, no framework, no server code.
   content/           THE TEXT OF THE SITE — edit these, not the HTML
     people.js  projects.js  publications.js  news.js  research.js
 
+  edit.html          THE SITE EDITOR — open it in a browser to change the text
   UPDATING-ko.md     How to run and edit this site (Korean) — read this first
 
 Every page reads its text from the matching file in content/. To change what
