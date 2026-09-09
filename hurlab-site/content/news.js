@@ -1,7 +1,24 @@
-/* news — edited in the HUR Lab Editor, or by hand right here.
-   Change a value, save, commit. The page reads this file. */
+/* news — the text of the site. Edit here or in the Site editor. */
 window.NEWS = {
  "stories": [
+  {
+   "id": "xmttlokmd8zk6",
+   "when": "",
+   "headline": "",
+   "blurb": "",
+   "tag": "Energy",
+   "source": "",
+   "items": []
+  },
+  {
+   "id": "xmttln8d5ashe",
+   "when": "",
+   "headline": "Our research proposal \"AI-Based Electrocaloric Material-Device-Thermal Management Integrated On-Chip Solid-State Cooling System\" has been selected for 미래유망융합기술파이오니어 funded by National Korea Research Foundation. Congratulations!",
+   "blurb": "",
+   "tag": "Thermal",
+   "source": "",
+   "items": []
+  },
   {
    "blurb": "A flexible, body-conformal receiver takes power through tissue by ultrasound, so an implant's battery no longer has to be replaced surgically. Reported across twelve outlets over three days.",
    "headline": "An ultrasound receiver that charges implanted devices through the body",
@@ -337,5 +354,5 @@ window.NEWS = {
    "when": "2020 · June"
   }
  ],
- "updated": "2026-09-04"
+ "updated": "2026-09-09"
 };
