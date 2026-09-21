@@ -207,11 +207,11 @@
 
   .hk-edge    { stroke: rgba(17, 22, 28, 0.17); stroke-width: 1.2; fill: none; }
   .hk-edge-in { stroke: rgba(17, 22, 28, 0.12); stroke-width: 1; fill: none; }
-  .hk-node    { fill: #FFFFFF; stroke-width: 1.6; }
-  .n-mech     { stroke: var(--h-mech); }
-  .n-therm    { stroke: var(--h-therm); }
-  .n-elec     { stroke: var(--h-elec); }
-  .hk-inner   { fill: #FFFFFF; stroke: rgba(17, 22, 28, 0.30); stroke-width: 1.2; }
+  .hk-node    { stroke-width: 1.8; }
+  .n-mech     { stroke: var(--h-mech);  fill: #E3ECF8; }
+  .n-therm    { stroke: var(--h-therm); fill: #F8E3E3; }
+  .n-elec     { stroke: var(--h-elec);  fill: #E2F0E5; }
+  .hk-inner   { fill: #EEF1F5; stroke: rgba(17, 22, 28, 0.30); stroke-width: 1.2; }
 
   .hk-direct { stroke: rgba(17, 22, 28, 0.42); stroke-width: 1.3; fill: none; }
   .a-mech    { stroke: var(--h-mech);  stroke-width: 1.5; fill: none; opacity: 0.9; }
@@ -698,6 +698,10 @@ function viewPublications() {
           f("Year", p.id, "year", p.year) +
           f("DOI or link", p.id, "doi", p.doi || "", { full: true,
             hint: "e.g. 10.1016/j.nanoen.2025.111410 — the title becomes a link. Leave blank for none." }) +
+          f("Research field", p.id, "field", p.field || "", { select: [["", "Automatic (from the title)"]]
+            .concat(docs.research.programmes.map(function (g) { return [g.id, g.title || g.id]; }))
+            .concat([["none", "None — keep off the Research page"]]),
+            hint: "The newest four papers of each field appear as Recent work on the Research page." }) +
           actions(p.id, "Delete paper");
       });
     }).join("") + "</section>";
@@ -782,6 +786,8 @@ function viewNews() {
           f("Programme tag", s.id, "tag", s.tag, { select: [["Thermal","Thermal"],["Energy","Energy"],["Transducers","Transducers"]] }) +
           f("Summary", s.id, "blurb", s.blurb, { full: true, area: true }) +
           f("Paper behind it", s.id, "source", s.source, { full: true }) +
+          f("Paper DOI or link", s.id, "doi", s.doi || "", { full: true,
+            hint: "e.g. 10.1002/adma.202419264 — adds a Read the paper button to the story." }) +
           '<div class="sub"><div class="sub-head"><h4>Coverage — ' + s.items.length + ' articles</h4>' +
           '<button class="btn sm" data-add="article" data-arg="' + s.id + '" type="button">+ Add article</button></div>' +
           s.items.map(function (it) {
@@ -1021,13 +1027,13 @@ $("copyCode").addEventListener("click", function () {
    they are; a row with a blank id is treated as brand new.               */
 var SHEET = {
   publications: {
-    cols: ["id","kind","year","title","authors","journal","detail","doi","note","status"],
+    cols: ["id","kind","year","title","authors","journal","detail","doi","field","note","status"],
     rows: function (d) {
       var r = d.pipeline.map(function (p) {
         return { id: p.id, kind: "pipeline", title: p.title, status: p.status }; });
       return r.concat(d.papers.map(function (p) {
         return { id: p.id, kind: "paper", year: p.year, title: p.title, authors: p.authors,
-                 journal: p.journal, detail: p.detail, doi: p.doi, note: p.note }; }));
+                 journal: p.journal, detail: p.detail, doi: p.doi, field: p.field, note: p.note }; }));
     },
     build: function (rows, old) {
       var d = { papers: [], pipeline: [], yearNotes: old.yearNotes || {} };
@@ -1037,7 +1043,7 @@ var SHEET = {
         else
           d.papers.push({ id: r.id || uid(), year: String(r.year || ""), title: r.title,
                           authors: r.authors, journal: r.journal, detail: r.detail,
-                          doi: r.doi, note: r.note });
+                          doi: r.doi, field: r.field, note: r.note });
       });
       return d;
     }

@@ -207,11 +207,11 @@
 
   .hk-edge    { stroke: rgba(17, 22, 28, 0.17); stroke-width: 1.2; fill: none; }
   .hk-edge-in { stroke: rgba(17, 22, 28, 0.12); stroke-width: 1; fill: none; }
-  .hk-node    { fill: #FFFFFF; stroke-width: 1.6; }
-  .n-mech     { stroke: var(--h-mech); }
-  .n-therm    { stroke: var(--h-therm); }
-  .n-elec     { stroke: var(--h-elec); }
-  .hk-inner   { fill: #FFFFFF; stroke: rgba(17, 22, 28, 0.30); stroke-width: 1.2; }
+  .hk-node    { stroke-width: 1.8; }
+  .n-mech     { stroke: var(--h-mech);  fill: #E3ECF8; }
+  .n-therm    { stroke: var(--h-therm); fill: #F8E3E3; }
+  .n-elec     { stroke: var(--h-elec);  fill: #E2F0E5; }
+  .hk-inner   { fill: #EEF1F5; stroke: rgba(17, 22, 28, 0.30); stroke-width: 1.2; }
 
   .hk-direct { stroke: rgba(17, 22, 28, 0.42); stroke-width: 1.3; fill: none; }
   .a-mech    { stroke: var(--h-mech);  stroke-width: 1.5; fill: none; opacity: 0.9; }
@@ -326,7 +326,7 @@
     padding: 5px 13px;
   }
   .more {
-    padding: 0 0 56px;
+    padding: 18px 0 60px;
     display: flex; flex-wrap: wrap; justify-content: center;
     align-items: baseline; gap: 6px 14px; text-align: center;
   }
@@ -385,23 +385,29 @@
     font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.16em;
     text-transform: uppercase; color: var(--tone, var(--ink-3));
   }
+  /* no picture yet: a solid panel in the field's colour, title on top */
+  .card-img:has(.noimg) {
+    background: linear-gradient(135deg, var(--tone, var(--mech)), color-mix(in srgb, var(--tone, var(--mech)) 62%, #0A0E14));
+  }
+  .card-img:has(.noimg)::after { background: none !important; }
+  .card-img:has(.noimg) .noimg { display: none; }
   .card-body {
     display: flex; flex-direction: column; gap: 10px; flex: 1;
     padding: 18px 20px 20px; background: #FAFBFC; border-top: 1px solid var(--rule);
   }
   .card-body p { margin: 0; font-size: 0.92rem; line-height: 1.6; color: var(--ink-2); }
 
-  /* research field: title sits on the picture */
-  .field .card-img::after {
+  /* research field + news: title sits on the picture */
+  .field .card-img::after, .news .card-img::after {
     content: ""; position: absolute; inset: 0;
     background: linear-gradient(to top, rgba(10, 14, 20, 0.78) 0%, rgba(10, 14, 20, 0.28) 42%, transparent 70%);
   }
-  .field .card-img h3 {
+  .field .card-img h3, .news .card-img h3 {
     position: absolute; left: 20px; right: 20px; bottom: 16px; z-index: 1; margin: 0;
     font-family: var(--sans); font-weight: 700; font-size: 1.42rem; line-height: 1.2;
     color: #FFFFFF; letter-spacing: -0.01em; text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
   }
-  .field .coupling {
+  .field .coupling, .news .when {
     position: absolute; left: 20px; top: 14px; z-index: 1;
     font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase;
     color: #FFFFFF; background: rgba(10, 14, 20, 0.55); padding: 4px 9px; border-radius: 999px;
@@ -413,25 +419,18 @@
   }
 
   /* news card */
-  .news .meta {
-    display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
-    font-size: 0.8rem; color: var(--ink-3);
-  }
-  .news .badge {
-    font-size: 0.7rem; font-weight: 600; color: var(--tone); background: var(--tint);
-    padding: 3px 9px; border-radius: 6px;
-  }
-  .news h3 {
-    font-family: var(--sans); font-weight: 600; font-size: 1.06rem; line-height: 1.4;
-    margin: 0; letter-spacing: -0.005em;
-  }
-  .news > a:hover h3 { color: var(--tone); }
+  .news .card-img h3 { font-size: 1.12rem; font-weight: 600; line-height: 1.35; }
+  .news .when { text-transform: none; letter-spacing: 0.04em; }
   .news .card-body p {
     display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
   }
-  .news .count {
-    margin-top: auto; padding-top: 6px;
-    font-size: 0.78rem; color: var(--ink-3);
+  .news .foot {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    margin-top: auto; padding-top: 6px; font-size: 0.78rem; color: var(--ink-3);
+  }
+  .news .badge {
+    font-size: 0.72rem; font-weight: 600; color: var(--tone); background: var(--tint);
+    padding: 3px 9px; border-radius: 6px;
   }
 
   .t-therm  { --tone: var(--therm); --tint: var(--therm-fill); }
@@ -439,52 +438,33 @@
   .t-mech   { --tone: var(--mech);  --tint: var(--mech-fill); }
 
 
-  /* ---------- research fields: a slow, endless sideways drift ---------- */
+  /* ---------- latest news: a slow drift to the end and back, no repeats ---------- */
   html { overflow-x: clip; }
   .marquee {
     width: 100vw; margin-left: calc(50% - 50vw);
-    overflow: hidden; padding: 6px 0 24px;
-    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 7%, #000 93%, transparent 100%);
-            mask-image: linear-gradient(to right, transparent 0, #000 7%, #000 93%, transparent 100%);
+    overflow: hidden; padding: 6px 0 26px;
+    --pad: max(28px, calc((100vw - var(--maxw)) / 2 + 28px));
+  }
+  .marquee.moving {
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 44px, #000 calc(100% - 44px), transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0, #000 44px, #000 calc(100% - 44px), transparent 100%);
   }
   .marquee-track {
-    list-style: none; margin: 0; padding: 0;
-    display: flex; width: max-content;
-    animation: drift var(--dur, 60s) linear infinite;
+    list-style: none; margin: 0; padding: 0 var(--pad);
+    display: flex; gap: 24px; width: max-content;
   }
-  .marquee-track > .card { flex: 0 0 340px; margin-right: 26px; }
+  .marquee.moving .marquee-track {
+    animation: glide var(--dur, 40s) ease-in-out 1.5s infinite alternate;
+  }
   .marquee:hover .marquee-track,
   .marquee:focus-within .marquee-track { animation-play-state: paused; }
-  @keyframes drift { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes glide { from { transform: translateX(0); } to { transform: translateX(calc(-1 * var(--dist, 0px))); } }
+  .marquee-track > .card { flex: 0 0 360px; }
+  /* no motion wanted: a row you can swipe */
+  .marquee.still { overflow-x: auto; }
+  @media (max-width: 560px) { .marquee-track > .card { flex-basis: 290px; } }
 
-  /* no motion: a plain row you can swipe */
-  .marquee.still { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
-  .marquee.still .marquee-track { animation: none; margin: 0 auto; }
-  @media (prefers-reduced-motion: reduce) {
-    .marquee-track { animation: none; }
-  }
-  @media (max-width: 560px) {
-    .marquee-track > .card { flex-basis: 280px; }
-  }
-
-  /* ---------- about + glance ---------- */
-  .about { padding: 80px 0 8px; display: grid; gap: 22px; max-width: 44rem; }
-  .about h2 {
-    font-family: var(--serif); font-weight: 300; font-size: clamp(1.6rem, 3.4vw, 2.1rem);
-    line-height: 1.2; margin: 0; letter-spacing: -0.015em; text-wrap: balance;
-  }
-  .about p { margin: 0; color: var(--ink-2); font-size: 1.02rem; }
-  .glance {
-    margin-top: 52px; border-top: 1px solid var(--rule); padding-top: 26px;
-    display: flex; flex-wrap: wrap; gap: 16px 48px;
-  }
-  .stat { display: grid; gap: 2px; }
-  .stat dt {
-    font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.13em;
-    text-transform: uppercase; color: var(--ink-3);
-  }
-  .stat dd { margin: 0; font-size: 0.98rem; font-variant-numeric: tabular-nums; }
-
+  .home-foot { margin-top: 80px; }
   footer a { text-decoration: none; }
   footer a:hover { color: var(--accent); }
 
@@ -512,18 +492,6 @@
     <p class="lede">Thermal Energy Materials &amp; Metrology — we measure the thermal and energy properties that arise inside materials, and turn what we measure into devices.</p>
   </div>
 
-  <ul class="keywords">
-    <li>Thermal metrology</li>
-    <li>Heat transfer</li>
-    <li>Thermal management</li>
-    <li>Thermal control</li>
-    <li>Cooling</li>
-    <li>Energy</li>
-    <li>Energy harvesting</li>
-    <li>Piezoelectric materials</li>
-    <li>Electronic materials</li>
-    <li>Thermal properties</li>
-  </ul>
 
   <div class="wrap more">
     <span>For more information</span>
@@ -535,31 +503,18 @@
 
   <section class="home-sec" id="fields">
     <h2>Research Fields</h2>
-    <div class="marquee" id="fieldsMarquee">
-      <ul class="marquee-track" id="tiles"></ul>
-    </div>
+    <ul class="cards" id="tiles"></ul>
   </section>
 
   <section class="home-sec news-home" id="latest">
     <h2>Latest News</h2>
-    <ul class="cards" id="newsHome"></ul>
+    <div class="marquee" id="newsStrip">
+      <ul class="marquee-track" id="newsHome"></ul>
+    </div>
     <p class="sec-more"><a href="news.html">All news &rarr;</a></p>
   </section>
 
-  <section class="about">
-    <h2>Mechanical, thermal and electrical properties are not independent inside a solid.</h2>
-    <p>Apply a field and the entropy shifts; squeeze a crystal and charge appears; heat it and both respond. Each of those couplings is a real effect, and each one is something that can be measured — or used.</p>
-    <p>The lab works on both halves of that sentence. We develop the metrology that pins these couplings down in solid-state materials, and we build the devices they make possible: solid-state cooling, thermal switching, and harvesters that run sensors with no battery.</p>
-  </section>
-
-  <dl class="glance">
-    <div class="stat"><dt>Located at</dt><dd>KIST, Seoul</dd></div>
-    <div class="stat"><dt>Researchers</dt><dd>11</dd></div>
-    <div class="stat"><dt>Active projects</dt><dd>7</dd></div>
-    <div class="stat"><dt>Publications</dt><dd>43</dd></div>
-  </dl>
-
-  <footer>
+  <footer class="home-foot">
     <span>HUR Lab · Thermal Energy Materials &amp; Metrology</span>
     <a href="mailto:hur@kist.re.kr">hur@kist.re.kr</a>
   </footer>
@@ -579,18 +534,16 @@
       : '<span class="noimg">' + esc(fallback || "") + "</span>";
   };
 
-  /* ---- research fields: only the ones ticked "Show on the home page",
-         drifting slowly sideways, pausing under the pointer ---- */
+  /* ---- research fields: the ticked ones, fixed in place ---- */
   var R = (window.RESEARCH && window.RESEARCH.programmes) || [];
   var tiles = document.getElementById("tiles");
-  var box = document.getElementById("fieldsMarquee");
-  if (tiles && box) {
+  if (tiles) {
     var shown = R.filter(function (p) { return p.home; });
     if (!shown.length) shown = R.slice(0, 3);
-    var card = function (p, i, clone) {
+    tiles.innerHTML = shown.map(function (p, i) {
       var chips = String(p.keys || "").split(/\s*[·,]\s*/).filter(Boolean);
-      return '<li class="card field ' + TONE[i % TONE.length] + '"' + (clone ? ' aria-hidden="true"' : "") + ">" +
-        '<a href="research.html#' + esc(p.id) + '"' + (clone ? ' tabindex="-1"' : "") + ">" +
+      return '<li class="card field ' + TONE[i % TONE.length] + '">' +
+        '<a href="research.html#' + esc(p.id) + '">' +
           '<div class="card-img">' + img(p.image, p.title, p.title) +
             (p.coupling ? '<span class="coupling">' + esc(p.coupling) + "</span>" : "") +
             "<h3>" + esc(p.title) + "</h3></div>" +
@@ -599,54 +552,54 @@
             (chips.length ? '<div class="chips">' + chips.map(function (c) {
               return "<span>" + esc(c) + "</span>"; }).join("") + "</div>" : "") +
           "</div></a></li>";
-    };
-    var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    var build = function () {
-      var one = shown.map(function (p, i) { return card(p, i, false); }).join("");
-      tiles.innerHTML = one;
-      if (still) { box.classList.add("still"); return; }
-      /* repeat the set until it is wider than the screen, then double it:
-         sliding by exactly half then lands on an identical frame — no seam */
-      var setW = tiles.scrollWidth || 1;
-      var k = Math.max(1, Math.ceil(window.innerWidth / setW));
-      var clones = shown.map(function (p, i) { return card(p, i, true); }).join("");
-      var group = one + new Array(k).join(clones);
-      tiles.innerHTML = group + group.replace(/<li class="card field ([^"]*)">/g,
-        '<li class="card field $1" aria-hidden="true">').replace(/<a href="([^"]*)">/g,
-        '<a href="$1" tabindex="-1">');
-      tiles.style.setProperty("--dur", Math.round((setW * k) / 32) + "s");   /* ~32 px per second */
-    };
-    build();
-    var t;
-    window.addEventListener("resize", function () { clearTimeout(t); t = setTimeout(build, 250); });
+    }).join("");
     if (!shown.length) tiles.closest(".home-sec").hidden = true;
   }
 
-  /* ---- news: stories ticked "Show on the home page" ---- */
+  /* ---- latest news: the ticked stories (or every story, if none is
+         ticked), gliding to the last card and back — each one shown once ---- */
   var N = (window.NEWS && window.NEWS.stories) || [];
   var el = document.getElementById("newsHome");
-  if (!el) return;
+  var strip = document.getElementById("newsStrip");
+  if (!el || !strip) return;
   /* pictures for the older stories, used until a story carries its own */
   var NEWSIMG = { s2025: "images/ultrasound.jpg", s2023: "images/hybrid.jpg", s2022: "images/acoustic.jpg" };
   N = N.filter(function (s) { return String(s.headline || "").trim(); });   /* skip blank drafts */
   N.forEach(function (s) { if (!s.image && NEWSIMG[s.id]) s.image = NEWSIMG[s.id]; });
   var picked = N.filter(function (s) { return s.home; });
-  if (!picked.length) picked = N.slice(0, 3);
+  if (!picked.length) picked = N.slice(0, 8);
   if (!picked.length) { el.closest(".home-sec").hidden = true; return; }
   el.innerHTML = picked.map(function (s) {
     var n = (s.items || []).length;
     var tone = TAGTONE[s.tag] || "t-elec";
     return '<li class="card news ' + tone + '">' +
       '<a href="news.html#' + esc(s.id) + '">' +
-        '<div class="card-img">' + img(s.image, s.headline, s.tag) + "</div>" +
+        '<div class="card-img">' + img(s.image, s.headline, s.tag) +
+          (s.when ? '<span class="when">' + esc(s.when) + "</span>" : "") +
+          "<h3>" + esc(s.headline) + "</h3></div>" +
         '<div class="card-body">' +
-          '<div class="meta"><span>' + esc(s.when) + "</span>" +
-            (s.tag ? '<span class="badge">' + esc(s.tag) + "</span>" : "") + "</div>" +
-          "<h3>" + esc(s.headline) + "</h3>" +
-          "<p>" + esc(s.blurb) + "</p>" +
-          '<span class="count">' + n + (n === 1 ? " article" : " articles") + " &rarr;</span>" +
+          (s.blurb ? "<p>" + esc(s.blurb) + "</p>" : "") +
+          '<div class="foot">' + (s.tag ? '<span class="badge">' + esc(s.tag) + "</span>" : "<span></span>") +
+            "<span>" + (n ? n + (n === 1 ? " article" : " articles") + " &rarr;" : "Read &rarr;") + "</span></div>" +
         "</div></a></li>";
   }).join("");
+
+  var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var fit = function () {
+    var dist = el.scrollWidth - strip.clientWidth;
+    if (still || dist <= 4) {                       /* everything fits, or motion is off */
+      strip.classList.remove("moving");
+      strip.classList.toggle("still", still && dist > 4);
+      return;
+    }
+    strip.classList.add("moving");
+    el.style.setProperty("--dist", dist + "px");
+    el.style.setProperty("--dur", Math.max(12, Math.round(dist / 28)) + "s");   /* ~28 px a second */
+  };
+  fit();
+  var t;
+  window.addEventListener("resize", function () { clearTimeout(t); t = setTimeout(fit, 200); });
+  window.addEventListener("load", fit);
 }());
 </script>
 </body>

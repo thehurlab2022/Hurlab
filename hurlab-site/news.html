@@ -207,11 +207,11 @@
 
   .hk-edge    { stroke: rgba(17, 22, 28, 0.17); stroke-width: 1.2; fill: none; }
   .hk-edge-in { stroke: rgba(17, 22, 28, 0.12); stroke-width: 1; fill: none; }
-  .hk-node    { fill: #FFFFFF; stroke-width: 1.6; }
-  .n-mech     { stroke: var(--h-mech); }
-  .n-therm    { stroke: var(--h-therm); }
-  .n-elec     { stroke: var(--h-elec); }
-  .hk-inner   { fill: #FFFFFF; stroke: rgba(17, 22, 28, 0.30); stroke-width: 1.2; }
+  .hk-node    { stroke-width: 1.8; }
+  .n-mech     { stroke: var(--h-mech);  fill: #E3ECF8; }
+  .n-therm    { stroke: var(--h-therm); fill: #F8E3E3; }
+  .n-elec     { stroke: var(--h-elec);  fill: #E2F0E5; }
+  .hk-inner   { fill: #EEF1F5; stroke: rgba(17, 22, 28, 0.30); stroke-width: 1.2; }
 
   .hk-direct { stroke: rgba(17, 22, 28, 0.42); stroke-width: 1.3; fill: none; }
   .a-mech    { stroke: var(--h-mech);  stroke-width: 1.5; fill: none; opacity: 0.9; }
@@ -295,73 +295,95 @@
 </header>
 
 <style>
-  .story { border-top: 2px solid var(--edge); padding-top: 22px; margin-top: 58px; }
-  .story:first-of-type { margin-top: 8px; }
-  .t-Thermal     { --edge: var(--therm); }
-  .t-Energy      { --edge: var(--elec); }
-  .t-Transducers { --edge: var(--mech); }
+  .ngrid {
+    list-style: none; margin: 0; padding: 48px 0 0;
+    display: grid; gap: 26px; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  }
+  .ncard { display: flex; }
+  .ncard > button {
+    all: unset; box-sizing: border-box; cursor: pointer;
+    display: flex; flex-direction: column; width: 100%;
+    background: #FFFFFF; border: 1px solid var(--rule); border-radius: 14px; overflow: hidden;
+    transition: box-shadow .2s ease, transform .2s ease, border-color .2s ease;
+  }
+  .ncard > button:hover, .ncard > button:focus-visible {
+    transform: translateY(-3px); border-color: transparent;
+    box-shadow: 0 14px 34px rgba(17, 22, 28, 0.10);
+  }
+  .ncard > button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .n-img { aspect-ratio: 16 / 10; overflow: hidden; background: var(--tint); }
+  .n-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s ease; }
+  .ncard > button:hover .n-img img { transform: scale(1.04); }
+  .n-body { display: flex; flex-direction: column; gap: 9px; flex: 1; padding: 20px 22px 22px; }
+  .n-date { font-size: 0.82rem; color: var(--ink-3); }
+  .n-title { font-weight: 600; font-size: 1.08rem; line-height: 1.4; margin: 0; color: var(--ink); }
+  .ncard > button:hover .n-title { color: var(--tone); }
+  .n-text {
+    margin: 0; font-size: 0.9rem; line-height: 1.6; color: var(--ink-2);
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .n-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: auto; padding-top: 10px; }
+  .tagb {
+    font-size: 0.74rem; font-weight: 500; color: var(--ink-2);
+    border: 1px solid var(--rule); border-radius: 6px; padding: 3px 9px;
+  }
+  .tagb.tone { color: var(--tone); border-color: var(--tint); background: var(--tint); font-weight: 600; }
+  .n-more { margin-left: auto; font-size: 0.8rem; color: var(--ink-3); }
 
-  .story-head {
-    display: grid; grid-template-columns: 130px 1fr; gap: 8px 32px;
-    align-items: start; margin-bottom: 24px;
-  }
-  .when {
-    font-family: var(--mono); font-size: 0.78rem; color: var(--ink-3);
-    font-variant-numeric: tabular-nums; letter-spacing: 0.04em; padding-top: 6px;
-  }
-  .story-head h2 {
-    font-family: var(--serif); font-weight: 400; font-size: 1.65rem;
-    line-height: 1.2; letter-spacing: -0.01em; margin: 0 0 10px; text-wrap: balance;
-  }
-  .story-head p { margin: 0 0 12px; color: var(--ink-2); font-size: 0.98rem; max-width: 40rem; }
-  .source {
-    font-family: var(--mono); font-size: 0.72rem; color: var(--ink-3);
-    display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline;
-  }
-  .source em { font-style: normal; color: var(--edge); }
-  .tag {
-    font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.11em;
-    text-transform: uppercase; color: var(--edge);
-    border: 1px solid var(--edge); border-radius: 2px; padding: 2px 8px; white-space: nowrap;
-  }
+  .t-Thermal     { --tone: var(--therm); --tint: var(--therm-fill); }
+  .t-Energy      { --tone: var(--elec);  --tint: var(--elec-fill); }
+  .t-Transducers { --tone: var(--mech);  --tint: var(--mech-fill); }
 
-  .coverage {
-    list-style: none; margin: 0; padding: 0;
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-    gap: 0 36px; grid-column: 1 / -1;
+  /* ---------- the story, opened ---------- */
+  dialog.story {
+    width: min(760px, calc(100vw - 32px)); max-height: calc(100vh - 48px);
+    padding: 0; border: 0; border-radius: 16px; overflow: auto;
+    box-shadow: 0 30px 80px rgba(10, 14, 20, 0.30); color: var(--ink);
   }
-  .coverage li { border-top: 1px solid var(--rule); }
-  .coverage a {
-    display: grid; grid-template-columns: 92px 1fr; gap: 12px;
-    padding: 11px 0; text-decoration: none; align-items: baseline;
+  dialog.story::backdrop { background: rgba(10, 14, 20, 0.45); }
+  .d-img { aspect-ratio: 16 / 8; background: var(--tint); }
+  .d-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .d-body { padding: 26px 30px 30px; display: grid; gap: 14px; }
+  .d-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: 0.84rem; color: var(--ink-3); }
+  .d-body h2 { margin: 0; font-size: 1.5rem; line-height: 1.3; font-weight: 600; letter-spacing: -0.01em; }
+  .d-body > p { margin: 0; font-size: 0.98rem; line-height: 1.7; color: var(--ink-2); }
+  .d-links { display: flex; flex-wrap: wrap; gap: 10px; }
+  .d-links a {
+    display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
+    font-size: 0.86rem; font-weight: 500; color: var(--accent);
+    border: 1px solid var(--rule); border-radius: 999px; padding: 7px 14px;
   }
-  .coverage a:hover .h { color: var(--ink); border-bottom-color: var(--edge); }
-  .coverage .o {
-    font-family: var(--mono); font-size: 0.7rem; color: var(--ink-3);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  .d-links a:hover { border-color: var(--accent); }
+  .d-src { font-size: 0.84rem; color: var(--ink-3); }
+  .cov-h { margin: 10px 0 0; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+           color: var(--ink-3); font-family: var(--mono); font-weight: 400; }
+  .cov { list-style: none; margin: 0; padding: 0; }
+  .cov li { border-top: 1px solid var(--rule); }
+  .cov li:last-child { border-bottom: 1px solid var(--rule); }
+  .cov a {
+    display: grid; grid-template-columns: 120px 1fr auto; gap: 14px; align-items: baseline;
+    padding: 11px 2px; text-decoration: none; color: var(--ink);
   }
-  .coverage .h {
-    font-size: 0.87rem; color: var(--ink-2); line-height: 1.4;
-    border-bottom: 1px solid transparent;
-    transition: color .15s ease, border-color .15s ease;
+  .cov a:hover .h { color: var(--accent); }
+  .cov .o { font-size: 0.8rem; color: var(--ink-3); }
+  .cov .h { font-size: 0.92rem; line-height: 1.45; }
+  .cov .v { font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.1em; color: var(--therm); }
+  .cov .ar { color: var(--ink-3); font-size: 0.8rem; }
+  .d-close {
+    position: sticky; top: 12px; float: right; margin: 12px 12px -48px 0; z-index: 2;
+    width: 36px; height: 36px; border-radius: 50%; border: 0; cursor: pointer;
+    background: rgba(255, 255, 255, 0.92); color: var(--ink); font-size: 1.2rem; line-height: 1;
+    box-shadow: 0 2px 10px rgba(10, 14, 20, 0.18);
   }
-  .coverage .vid::after {
-    content: "video";
-    font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.1em;
-    text-transform: uppercase; color: var(--ink-3);
-    border: 1px solid var(--rule); border-radius: 2px;
-    padding: 1px 5px; margin-left: 7px; white-space: nowrap;
+  .d-close:hover { background: #FFFFFF; }
+  @media (max-width: 560px) {
+    .d-body { padding: 22px 20px 24px; }
+    .cov a { grid-template-columns: 1fr auto; }
+    .cov .o { grid-column: 1 / -1; }
   }
-
-  .note {
-    margin-top: 58px; padding: 24px 28px;
-    background: var(--surface); border: 1px solid var(--rule);
-  }
-  .note p { margin: 0; font-size: 0.9rem; color: var(--ink-2); max-width: 52rem; }
-
-  @media (max-width: 700px) {
-    .story-head { grid-template-columns: 1fr; gap: 6px; }
-    .coverage a { grid-template-columns: 1fr; gap: 2px; }
+  @media (prefers-reduced-motion: reduce) {
+    .ncard > button, .n-img img { transition: none; }
+    .ncard > button:hover { transform: none; }
   }
 </style>
 
@@ -370,17 +392,13 @@
 <section class="pagehero">
   <div class="wrap pagehead">
     <p class="eyebrow" id="newsCount"></p>
-    <h1>In the news</h1>
-    <p class="lede">Press coverage grouped by the research it reported on, so each burst of articles sits with the paper behind it.</p>
+    <h1>News</h1>
+    <p class="lede">What the lab has been up to — research in the press, grants and milestones. Open a story for the paper behind it and every article that covered it.</p>
   </div>
 </section>
 
 <main class="wrap">
-  <div id="stories"></div>
-
-  <section class="note">
-    <p>Coverage is listed as it appears on the lab&#8217;s records. A few outlets were carried by the same wire copy, so their links point to the same article.</p>
-  </section>
+  <ul class="ngrid" id="stories"></ul>
 
   <footer>
     <span>HUR Lab · Thermal Energy Materials &amp; Metrology</span>
@@ -388,36 +406,128 @@
   </footer>
 </main>
 
+<dialog class="story" id="story" aria-labelledby="storyTitle">
+  <button class="d-close" type="button" id="storyClose" aria-label="Close">&times;</button>
+  <div id="storyBody"></div>
+</dialog>
+
 <script>
 (function () {
   var D = window.NEWS || { stories: [] };
-  D = { stories: (D.stories || []).filter(function (s) { return String(s.headline || "").trim(); }) };
+  var S = (D.stories || []).filter(function (s) { return String(s.headline || "").trim(); });
+
+  /* Kept here so the page is right even before content/news.js carries them.
+     Anything set in news.js (image, doi, a corrected url) wins. */
+  var NEWSIMG = { s2025: "images/ultrasound.jpg", s2023: "images/hybrid.jpg", s2022: "images/acoustic.jpg" };
+  var NEWSDOI = { s2025: "10.1002/adma.202419264", s2023: "10.1016/j.enconman.2023.117774",
+                  s2022: "10.1039/d1ee02623b",    s2020: "10.1038/s41467-020-16690-y" };
+  /* outlet|old-url → the article that outlet actually ran (null: none found, hide it) */
+  var FIX = {
+    "BBS 뉴스|https://www.koit.co.kr/news/articleView.html?idxno=118367": "https://news.bbsi.co.kr/news/articleView.html?idxno=3132343",
+    "워크투데이|https://www.koit.co.kr/news/articleView.html?idxno=118367": null,
+    "아이뉴스24|https://www.etnews.com/20231114000402": "https://www.inews24.com/view/1654024",
+    "파이낸셜뉴스|https://www.etnews.com/20231114000402": "https://www.fnnews.com/news/202311141134576558",
+    "사이언스타임즈|https://www.sciencetimes.co.kr/": null,
+    "Michigan Eng.|https://me.engin.umich.edu/news-events/news/breakthrough-calorimeter-tool-gives-closer-look-at-":
+      "https://me.engin.umich.edu/news-events/news/breakthrough-calorimeter-tool-gives-closer-look-cell-growth"
+  };
+  var unamp = function (u) { return String(u || "").replace(/&amp;/g, "&").trim(); };
+  var fixUrl = function (it) {
+    var u = unamp(it.url), k = it.outlet + "|" + u;
+    return Object.prototype.hasOwnProperty.call(FIX, k) ? FIX[k] : u;
+  };
+  S.forEach(function (s) {
+    if (!s.image && NEWSIMG[s.id]) s.image = NEWSIMG[s.id];
+    if (!s.doi && NEWSDOI[s.id]) s.doi = NEWSDOI[s.id];
+    s.items = (s.items || []).map(function (it) {
+      var u = fixUrl(it);
+      return u ? { outlet: it.outlet, title: it.title, url: u, video: it.video } : null;
+    }).filter(Boolean);
+  });
+
   var esc = function (s) {
     return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
       .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   };
-  var attr = function (s) { return esc(s).replace(/'/g, "&#39;"); };
+  var dec = function (s) {        /* stored text sometimes carries &amp; already */
+    return String(s == null ? "" : s).replace(/&amp;/g, "&");
+  };
+  var doiUrl = function (d) {
+    return d ? "https://doi.org/" + String(d).replace(/^https?:\/\/doi\.org\//i, "") : "";
+  };
 
-  document.getElementById("stories").innerHTML = D.stories.map(function (s) {
-    return '<section class="story t-' + esc(s.tag || "Energy") + '" id="' + esc(s.id) + '">' +
-      '<div class="story-head">' +
-        '<span class="when">' + esc(s.when) + "</span>" +
-        "<div><h2>" + esc(s.headline) + "</h2>" +
-        (s.blurb ? "<p>" + esc(s.blurb) + "</p>" : "") +
-        '<div class="source"><span class="tag">' + esc(s.tag) + "</span>" +
-        (s.source ? "<span>" + esc(s.source) + "</span>" : "") + "</div></div>" +
-        '<ul class="coverage">' + (s.items || []).map(function (it) {
-          return '<li><a href="' + attr(it.url) + '" target="_blank" rel="noopener">' +
-            '<span class="o">' + esc(it.outlet) + "</span>" +
-            '<span class="h' + (it.video ? " vid" : "") + '">' + esc(it.title) + "</span></a></li>";
-        }).join("") + "</ul>" +
-      "</div></section>";
+  var total = S.reduce(function (a, s) { return a + s.items.length; }, 0);
+  document.getElementById("newsCount").textContent =
+    S.length + " stories" + (total ? " · " + total + " articles" : "");
+
+  document.getElementById("stories").innerHTML = S.map(function (s, i) {
+    var n = s.items.length;
+    return '<li class="ncard t-' + esc(s.tag || "Energy") + '">' +
+      '<button type="button" data-i="' + i + '">' +
+        (s.image ? '<div class="n-img"><img src="' + esc(s.image) + '" alt="" loading="lazy"></div>' : "") +
+        '<div class="n-body">' +
+          (s.when ? '<span class="n-date">' + esc(dec(s.when)) + "</span>" : "") +
+          '<h2 class="n-title">' + esc(dec(s.headline)) + "</h2>" +
+          (s.blurb ? '<p class="n-text">' + esc(dec(s.blurb)) + "</p>" : "") +
+          '<div class="n-foot">' +
+            (s.tag ? '<span class="tagb tone">' + esc(s.tag) + "</span>" : "") +
+            (s.doi ? '<span class="tagb">Paper</span>' : "") +
+            (n ? '<span class="tagb">' + n + (n === 1 ? " article" : " articles") + "</span>" : "") +
+            '<span class="n-more">Open &rarr;</span>' +
+          "</div></div></button></li>";
   }).join("");
 
-  var n = D.stories.reduce(function (a, s) { return a + (s.items ? s.items.length : 0); }, 0);
-  document.getElementById("newsCount").textContent =
-    n + " articles · " + D.stories.length + " research stories";
-})();
+  /* ---- open a story ---- */
+  var dlg = document.getElementById("story"), body = document.getElementById("storyBody");
+  function open(i, push) {
+    var s = S[i]; if (!s) return;
+    dlg.className = "story t-" + (s.tag || "Energy");
+    var links = [];
+    if (s.doi || s.link) links.push('<a href="' + esc(s.doi ? doiUrl(s.doi) : s.link) +
+      '" target="_blank" rel="noopener">Read the paper &#8599;</a>');
+    body.innerHTML =
+      (s.image ? '<div class="d-img"><img src="' + esc(s.image) + '" alt=""></div>' : "") +
+      '<div class="d-body">' +
+        '<div class="d-meta">' + (s.when ? "<span>" + esc(dec(s.when)) + "</span>" : "") +
+          (s.tag ? '<span class="tagb tone">' + esc(s.tag) + "</span>" : "") + "</div>" +
+        '<h2 id="storyTitle">' + esc(dec(s.headline)) + "</h2>" +
+        (s.blurb ? "<p>" + esc(dec(s.blurb)) + "</p>" : "") +
+        (s.source ? '<div class="d-src">' + esc(dec(s.source)) + "</div>" : "") +
+        (links.length ? '<div class="d-links">' + links.join("") + "</div>" : "") +
+        (s.items.length
+          ? '<h3 class="cov-h">In the press — ' + s.items.length + "</h3><ul class=\"cov\">" +
+            s.items.map(function (it) {
+              return '<li><a href="' + esc(it.url) + '" target="_blank" rel="noopener">' +
+                '<span class="o">' + esc(dec(it.outlet)) + "</span>" +
+                '<span class="h">' + esc(dec(it.title)) + (it.video ? ' <span class="v">VIDEO</span>' : "") + "</span>" +
+                '<span class="ar">&#8599;</span></a></li>';
+            }).join("") + "</ul>"
+          : "") +
+      "</div>";
+    if (typeof dlg.showModal === "function") { if (!dlg.open) dlg.showModal(); }
+    else dlg.setAttribute("open", "");
+    dlg.scrollTop = 0;
+    if (push !== false && s.id) history.replaceState(null, "", "#" + s.id);
+  }
+  function close() {
+    if (dlg.open) { if (dlg.close) dlg.close(); else dlg.removeAttribute("open"); }
+  }
+  dlg.addEventListener("close", function () {
+    history.replaceState(null, "", location.pathname + location.search);
+  });
+  document.getElementById("storyClose").addEventListener("click", close);
+  dlg.addEventListener("click", function (e) { if (e.target === dlg) close(); });   /* backdrop */
+  document.getElementById("stories").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-i]"); if (b) open(+b.dataset.i);
+  });
+  /* arriving from a home-page card: news.html#s2025 */
+  function fromHash() {
+    var id = decodeURIComponent(location.hash.slice(1)); if (!id) return;
+    for (var i = 0; i < S.length; i++) if (S[i].id === id) { open(i, false); return; }
+  }
+  fromHash();
+  window.addEventListener("hashchange", fromHash);
+}());
 </script>
 </body>
 </html>

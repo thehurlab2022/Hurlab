@@ -207,11 +207,11 @@
 
   .hk-edge    { stroke: rgba(17, 22, 28, 0.17); stroke-width: 1.2; fill: none; }
   .hk-edge-in { stroke: rgba(17, 22, 28, 0.12); stroke-width: 1; fill: none; }
-  .hk-node    { fill: #FFFFFF; stroke-width: 1.6; }
-  .n-mech     { stroke: var(--h-mech); }
-  .n-therm    { stroke: var(--h-therm); }
-  .n-elec     { stroke: var(--h-elec); }
-  .hk-inner   { fill: #FFFFFF; stroke: rgba(17, 22, 28, 0.30); stroke-width: 1.2; }
+  .hk-node    { stroke-width: 1.8; }
+  .n-mech     { stroke: var(--h-mech);  fill: #E3ECF8; }
+  .n-therm    { stroke: var(--h-therm); fill: #F8E3E3; }
+  .n-elec     { stroke: var(--h-elec);  fill: #E2F0E5; }
+  .hk-inner   { fill: #EEF1F5; stroke: rgba(17, 22, 28, 0.30); stroke-width: 1.2; }
 
   .hk-direct { stroke: rgba(17, 22, 28, 0.42); stroke-width: 1.3; fill: none; }
   .a-mech    { stroke: var(--h-mech);  stroke-width: 1.5; fill: none; opacity: 0.9; }
@@ -328,6 +328,15 @@
   .works { list-style: none; margin: 0; padding: 0; display: grid; }
   .works li { padding: 13px 0; border-top: 1px solid var(--rule); display: grid; gap: 4px; }
   .works li:last-child { border-bottom: 1px solid var(--rule); }
+  .works .w-title a { color: inherit; text-decoration: none; border-bottom: 1px solid transparent;
+                      transition: color .15s, border-color .15s; }
+  .works .w-title a::after { content: "\2197"; font-family: var(--mono); font-size: 0.62em;
+                             margin-left: 6px; color: var(--ink-3); vertical-align: 2px; }
+  .works .w-title a:hover { color: var(--edge); border-bottom-color: var(--edge); }
+  .allpubs { display: inline-block; margin-top: 12px; font-size: 0.84rem; color: var(--ink-3);
+             text-decoration: none; }
+  .allpubs:hover { color: var(--accent); }
+
   .works .w-title { font-family: var(--serif); font-size: 1.02rem; line-height: 1.3; }
   .works .w-venue {
     font-family: var(--mono); font-size: 0.72rem; color: var(--ink-3);
@@ -386,6 +395,7 @@
 </style>
 
 <script src="content/research.js"></script>
+<script src="content/publications.js"></script>
 
 <section class="pagehero">
   <div class="wrap pagehead">
@@ -525,6 +535,94 @@ var FIGURES = {
       .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   };
 
+  /* ---- recent work: the newest papers of each field, straight from
+         content/publications.js. Add a paper there (or in the editor) and it
+         shows up here on its own. A paper can name its field; if it doesn't,
+         the title decides. ---- */
+  var PUBS = (window.PUBLICATIONS && window.PUBLICATIONS.papers) || [];
+  var DOIS = {
+"w1": "10.1088/2631-7990/ae8aca",
+"w2": "10.1007/s42114-026-01782-y",
+"w3": "10.1016/j.cej.2026.176688",
+"w4": "10.1016/j.cossms.2026.101260",
+"w5": "10.1002/smtd.202502326",
+"w6": "10.1016/j.ymssp.2026.114310",
+"w7": "10.1016/j.applthermaleng.2026.129931",
+"w8": "10.1002/adfm.202527482",
+"w9": "10.1002/advs.202522932",
+"w10": "10.1016/j.jeurceramsoc.2025.117851",
+"w11": "10.1016/j.jeurceramsoc.2025.117747",
+"w12": "10.1016/j.ccr.2025.217132",
+"w13": "10.1002/admt.202501606",
+"w14": "10.1002/aenm.202503097",
+"w15": "10.1016/j.nanoen.2025.111410",
+"w16": "10.1016/j.bioactmat.2025.01.009",
+"w17": "10.1038/s41746-025-01851-4",
+"w18": "10.1002/aenm.202500856",
+"w19": "10.1016/j.jeurceramsoc.2025.117536",
+"w20": "10.1002/adma.202419264",
+"w21": "10.1016/j.nanoen.2024.109447",
+"w22": "10.1002/advs.202401494",
+"w23": "10.1016/j.enconman.2023.117774",
+"w24": "10.1016/j.ceramint.2023.07.164",
+"w25": "10.1016/j.apenergy.2023.121271",
+"w26": "10.1021/acsaelm.3c00691",
+"w27": "10.1016/j.nanoen.2023.108596",
+"w28": "10.1002/advs.202301002",
+"w29": "10.3390/act12040177",
+"w30": "10.1016/j.addma.2023.103470",
+"w31": "10.1088/1361-665x/acb1e3",
+"w32": "10.1002/aenm.202300530",
+"w33": "10.1002/advs.202205179",
+"w34": "10.1016/j.apenergy.2022.120129",
+"w35": "10.1021/acsami.2c12247",
+"w36": "10.3390/machines10090803",
+"w37": "10.1039/d1ee02623b",
+"w38": "10.1002/smll.202007289",
+"w39": "10.1038/s41467-020-16690-y",
+"w40": "10.1038/s41586-019-1420-z",
+"w41": "10.1126/science.aam6622",
+"w42": "10.1088/1748-3190/11/3/036006",
+"w43": "10.1080/15567265.2015.1109740"
+};
+  var SKIP = /therap|sepsis|macrophage|memristor|synap|neuromorphic|sns|mofs|nasal/i;
+  var RULES = [
+    ["metrology",  /calorimetr|thermal conductance|thermal transport|scanning probe|thermometr|metrolog/i],
+    ["harvesting", /harvest|piezoelectric|generator|triboelectric|ultrasound|acoustic|wireless power|power transfer|energy transfer|transducer/i],
+    ["cooling",    /cooling|electrocaloric|caloric|thermal switch|thermal transistor|immersion|thermomagnetic|refrigerat|thermoelectric energy conversion/i]
+  ];
+  function fieldOf(paper) {
+    if (paper.field) return paper.field === "none" ? "" : paper.field;
+    var t = paper.title + " " + (paper.journal || "");
+    if (SKIP.test(t)) return "";
+    for (var i = 0; i < RULES.length; i++) if (RULES[i][1].test(t)) return RULES[i][0];
+    return "";
+  }
+  function recentWork(p) {
+    var list = PUBS.filter(function (w) { return fieldOf(w) === p.id; }).slice(0, 4);
+    var items;
+    if (list.length) {
+      items = list.map(function (w) {
+        var doi = w.doi || DOIS[w.id] || "";
+        var href = doi ? "https://doi.org/" + String(doi).replace(/^https?:\/\/doi\.org\//i, "") : (w.url || "");
+        var t = esc(w.title);
+        if (href) t = '<a href="' + esc(href) + '" target="_blank" rel="noopener">' + t + "</a>";
+        return '<li><span class="w-title">' + t + "</span>" +
+          '<span class="w-venue"><em>' + esc(w.journal) + "</em> &nbsp;" +
+          (/^\d{4}\b/.test(w.detail || "") ? esc(w.detail)
+            : esc(w.year) + (w.detail ? ", " + esc(w.detail) : "")) + "</span></li>";
+      });
+    } else {                                   /* nothing tagged yet: the hand-picked list */
+      items = (p.works || []).map(function (w) {
+        return '<li><span class="w-title">' + esc(w.title) + "</span>" +
+          '<span class="w-venue"><em>' + esc(w.venue) + "</em> &nbsp;" + esc(w.detail) + "</span></li>";
+      });
+    }
+    if (!items.length) return "";
+    return '<p class="sublabel">Recent work</p><ul class="works">' + items.join("") + "</ul>" +
+      '<a class="allpubs" href="publications.html">All publications &rarr;</a>';
+  }
+
   function figures(id) {
     var f = FIGURES[id];
     if (!f || !f.items.length) return "";
@@ -551,13 +649,7 @@ var FIGURES = {
             }).join("") + "</ul>"
           : "") +
       "</div><div>" +
-        ((p.works || []).length
-          ? '<p class="sublabel">Representative work</p><ul class="works">' +
-            p.works.map(function (w) {
-              return "<li><span class=\"w-title\">" + esc(w.title) + "</span>" +
-                '<span class="w-venue"><em>' + esc(w.venue) + "</em> &nbsp;" + esc(w.detail) + "</span></li>";
-            }).join("") + "</ul>"
-          : "") +
+        recentWork(p) +
       "</div></div>" + figures(p.id) + "</section>";
   }).join("");
 })();
