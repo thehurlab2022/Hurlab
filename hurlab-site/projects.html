@@ -160,20 +160,21 @@
      Literal colours, so the band holds independently of the tokens. */
 
   .hero, .pagehero {
-    /* the lab's colours: violet in the top-left corner, washing out to sky blue */
-    --h-ink:   #FFFFFF;
-    --h-ink-2: rgba(255, 255, 255, 0.88);
-    --h-ink-3: rgba(255, 255, 255, 0.72);
-    --h-line:  rgba(255, 255, 255, 0.30);
-    --h-mech:  #FFFFFF;
-    --h-therm: #FFFFFF;
-    --h-elec:  #FFFFFF;
-
+    --h-ink:   #11161C;
+    --h-ink-2: #4C5761;
+    --h-ink-3: #7F8A95;
+    --h-line:  #E3E7EC;
+    --h-mech:  #1E63B8;
+    --h-therm: #C62D2D;
+    --h-elec:  #2A7D3F;
     position: relative; overflow: hidden;
-    color: var(--h-ink);
-    background:
-      radial-gradient(ellipse 70% 90% at 88% 110%, rgba(77, 154, 211, 0.55), transparent 70%),
-      radial-gradient(ellipse farthest-side at 0% 0%, #9460C9 0%, #7C6ECB 34%, #6682CF 66%, #4D9AD3 100%);
+    color: var(--h-ink); background: #FFFFFF;
+  }
+
+  /* the lab's colours: one thin band across the very top of every page */
+  .masthead::before {
+    content: ""; display: block; height: 5px;
+    background: linear-gradient(90deg, #9460C9 0%, #7C6ECB 34%, #6682CF 66%, #4D9AD3 100%);
   }
   .hero > *, .pagehero > * { position: relative; }
 
@@ -191,8 +192,7 @@
   .pagehero .lede { color: var(--h-ink-2); text-wrap: balance; }
   .pagehero .legend { justify-content: center; color: var(--h-ink-3); }
   .pagehero .legend b { color: var(--h-ink); }
-  .pagehero .legend .mk { color: #FFFFFF; font-weight: 600; }
-  .pagehero a { color: #FFFFFF; }
+  .pagehero .legend .mk { color: var(--accent); font-weight: 600; }
 
   /* ================= Heckmann diagram ================= */
 

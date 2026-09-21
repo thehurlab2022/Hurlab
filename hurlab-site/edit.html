@@ -160,20 +160,21 @@
      Literal colours, so the band holds independently of the tokens. */
 
   .hero, .pagehero {
-    /* the lab's colours: violet in the top-left corner, washing out to sky blue */
-    --h-ink:   #FFFFFF;
-    --h-ink-2: rgba(255, 255, 255, 0.88);
-    --h-ink-3: rgba(255, 255, 255, 0.72);
-    --h-line:  rgba(255, 255, 255, 0.30);
-    --h-mech:  #FFFFFF;
-    --h-therm: #FFFFFF;
-    --h-elec:  #FFFFFF;
-
+    --h-ink:   #11161C;
+    --h-ink-2: #4C5761;
+    --h-ink-3: #7F8A95;
+    --h-line:  #E3E7EC;
+    --h-mech:  #1E63B8;
+    --h-therm: #C62D2D;
+    --h-elec:  #2A7D3F;
     position: relative; overflow: hidden;
-    color: var(--h-ink);
-    background:
-      radial-gradient(ellipse 70% 90% at 88% 110%, rgba(77, 154, 211, 0.55), transparent 70%),
-      radial-gradient(ellipse farthest-side at 0% 0%, #9460C9 0%, #7C6ECB 34%, #6682CF 66%, #4D9AD3 100%);
+    color: var(--h-ink); background: #FFFFFF;
+  }
+
+  /* the lab's colours: one thin band across the very top of every page */
+  .masthead::before {
+    content: ""; display: block; height: 5px;
+    background: linear-gradient(90deg, #9460C9 0%, #7C6ECB 34%, #6682CF 66%, #4D9AD3 100%);
   }
   .hero > *, .pagehero > * { position: relative; }
 
@@ -191,8 +192,7 @@
   .pagehero .lede { color: var(--h-ink-2); text-wrap: balance; }
   .pagehero .legend { justify-content: center; color: var(--h-ink-3); }
   .pagehero .legend b { color: var(--h-ink); }
-  .pagehero .legend .mk { color: #FFFFFF; font-weight: 600; }
-  .pagehero a { color: #FFFFFF; }
+  .pagehero .legend .mk { color: var(--accent); font-weight: 600; }
 
   /* ================= Heckmann diagram ================= */
 
@@ -363,6 +363,8 @@
             border: 1px solid var(--rule); border-radius: 3px; padding: 6px 9px; width: 100%; }
   .subrow .x { justify-self: end; }
   .subrow:has(input:nth-of-type(3)) { grid-template-columns: 1fr 1.4fr 1.4fr auto; }
+  .subrow.art:has(input:nth-of-type(3)) { grid-template-columns: 0.9fr 1.4fr 1.3fr auto auto; }
+  .subrow .check { font-size: 0.78rem; white-space: nowrap; }
 
   .empty { padding: 30px 0; color: var(--ink-3); font-family: var(--mono); font-size: 0.8rem; }
 
@@ -502,6 +504,11 @@ var docs = {
   research:     window.RESEARCH     || { programmes: [] }
 };
 var tab = "publications", openRow = null, filter = "";
+(function () {
+  var P = docs.publications.papers || [];
+  if (!P.some(function (p) { return "home" in p; }))
+    P.forEach(function (p, i) { p.home = i < 3; });
+})();
 var dirty = {};
 
 /* ── safety catch ─────────────────────────────────────────────────────────
@@ -601,6 +608,7 @@ function slug(name, id) { return slugBase(name, "member-" + id) + ".jpg"; }
 function picName(tab, item) {
   if (tab === "people")   return slug(item.name, item.id);
   if (tab === "research") return "research-" + slugBase(item.id, item.id) + ".jpg";
+  if (tab === "publications") return "paper-" + slugBase(item.title, item.id) + ".jpg";
   return "news-" + slugBase(item.headline, item.id) + ".jpg";
 }
 function initials(name) {
@@ -679,6 +687,31 @@ document.addEventListener("change", function (e) {
 });
 
 /* ── views ───────────────────────────────────────────────────────────── */
+function paperForm(p) {
+  return f("Title", p.id, "title", p.title, { full: true, area: true }) +
+    f("Authors", p.id, "authors", p.authors, { full: true, area: true,
+      hint: "¹ equal contribution, * corresponding author. S. Hur is bolded automatically." }) +
+    f("Journal", p.id, "journal", p.journal) +
+    f("Volume, pages", p.id, "detail", p.detail, { hint: "e.g. 45, 3, 117851" }) +
+    f("Year", p.id, "year", p.year) +
+    f("DOI or link", p.id, "doi", p.doi || "", { full: true,
+      hint: "e.g. 10.1016/j.nanoen.2025.111410 — the title becomes a link. Leave blank for none." }) +
+    f("Research field", p.id, "field", p.field || "", { select: [["", "Automatic (from the title)"]]
+      .concat(docs.research.programmes.map(function (g) { return [g.id, g.title || g.id]; }))
+      .concat([["none", "None — keep off the Research page"]]),
+      hint: "The newest four papers of each field appear as Recent work on the Research page." }) +
+    '<div class="formsec">Home page</div>' +
+    check("Show in Latest News on the home page", p.id, "home", p.home) +
+    picField(p, { shape: "card", label: "Latest News picture", empty: p.journal || "",
+      none: "No picture — the picture of its research field is used.",
+      hint: "Cropped to 16:10 for you. The paper title is written over it." }) +
+    actions(p.id, "Delete paper");
+}
+function paperBadges(p) {
+  return (p.home ? '<span class="badge b-home">Home</span>' : "") +
+    (isCorr(p.authors) ? '<span class="badge b-corr">Corresponding</span>' : "");
+}
+
 function viewPublications() {
   var d = docs.publications;
   var years = [];
@@ -710,20 +743,8 @@ function viewPublications() {
       "+ Add paper", 'data-add="paper" data-arg="' + esc(y) + '"');
     h += rows.map(function (p) {
       return rowShell(p.id, p.title, esc(p.journal || "—") + (p.detail ? " · " + esc(p.detail) : ""),
-        isCorr(p.authors) ? '<span class="badge b-corr">Corresponding</span>' : "", function () {
-        return f("Title", p.id, "title", p.title, { full: true, area: true }) +
-          f("Authors", p.id, "authors", p.authors, { full: true, area: true,
-            hint: "¹ equal contribution, * corresponding author. S. Hur is bolded automatically." }) +
-          f("Journal", p.id, "journal", p.journal) +
-          f("Volume, pages", p.id, "detail", p.detail, { hint: "e.g. 45, 3, 117851" }) +
-          f("Year", p.id, "year", p.year) +
-          f("DOI or link", p.id, "doi", p.doi || "", { full: true,
-            hint: "e.g. 10.1016/j.nanoen.2025.111410 — the title becomes a link. Leave blank for none." }) +
-          f("Research field", p.id, "field", p.field || "", { select: [["", "Automatic (from the title)"]]
-            .concat(docs.research.programmes.map(function (g) { return [g.id, g.title || g.id]; }))
-            .concat([["none", "None — keep off the Research page"]]),
-            hint: "The newest four papers of each field appear as Recent work on the Research page." }) +
-          actions(p.id, "Delete paper");
+        paperBadges(p), function () {
+        return paperForm(p);
       });
     }).join("") + "</section>";
   });
@@ -789,18 +810,26 @@ function viewProjects() {
 
 function viewNews() {
   var d = docs.news;
-  var h = '<section class="group">' + groupHead("<h2>Stories</h2>",
-    d.stories.length + " stories · " + d.stories.reduce(function (a, s) { return a + s.items.length; }, 0) + " articles",
-    "+ Add story", 'data-add="story"') + "</section>";
+  var onHome = d.stories.filter(function (s) { return s.home; }).length +
+    d.stories.reduce(function (a, s) { return a + s.items.filter(function (i) { return i.home; }).length; }, 0);
+  var h = '<section class="group">' + groupHead("<h2>News</h2>",
+    d.stories.length + " news · " + d.stories.reduce(function (a, s) { return a + s.items.length; }, 0) +
+    " press articles · " + onHome + " in Latest News",
+    "+ Add news", 'data-add="story"') + "</section>";
+  h += '<p class="empty" style="padding:0 0 12px">Every news item and every press article has its own ' +
+    '“Home” tick. Each ticked one becomes its own card in Latest News on the home page, newest first.</p>';
   d.stories.forEach(function (s) {
     if (!hit(s.headline + " " + s.when + " " + s.items.map(function (i) { return i.outlet + i.title; }).join(" "))) return;
     h += '<section class="group">' + rowShell(s.id, s.headline,
-      esc(s.when) + " · " + s.items.length + " outlets",
+      esc(s.when) + (s.items.length ? " · " + s.items.length + " press articles" : ""),
+      (s.home ? '<span class="badge b-home">Home</span>' : "") +
       '<span class="badge b-' + (s.tag === "Thermal" ? "thermal" : "energy") + '">' + esc(s.tag) + "</span>",
       function () {
         return f("Headline", s.id, "headline", s.headline, { full: true, area: true }) +
           f("When", s.id, "when", s.when, { hint: "e.g. 2027 · March" }) +
-          check("Show on the home page", s.id, "home", s.home) +
+          check("Show in Latest News on the home page", s.id, "home", s.home) +
+          f("Link", s.id, "url", s.url || "", { full: true,
+            hint: "Optional. A web page for this news (e.g. the KIST press release). The card opens it directly." }) +
           picField(s, { shape: "card", label: "Home-page card picture", empty: s.tag || "",
             none: "No picture — a coloured panel is shown instead.",
             hint: "Cropped to 16:10 for you. A wide photo works best." }) +
@@ -809,15 +838,17 @@ function viewNews() {
           f("Paper behind it", s.id, "source", s.source, { full: true }) +
           f("Paper DOI or link", s.id, "doi", s.doi || "", { full: true,
             hint: "e.g. 10.1002/adma.202419264 — adds a Read the paper button to the story." }) +
-          '<div class="sub"><div class="sub-head"><h4>Coverage — ' + s.items.length + ' articles</h4>' +
+          '<div class="sub"><div class="sub-head"><h4>Press coverage — ' + s.items.length + ' articles</h4>' +
           '<button class="btn sm" data-add="article" data-arg="' + s.id + '" type="button">+ Add article</button></div>' +
           s.items.map(function (it) {
-            return '<div class="subrow">' +
+            return '<div class="subrow art">' +
               '<input data-id="' + it.id + '" data-key="outlet" value="' + esc(it.outlet) + '" placeholder="Outlet">' +
               '<input data-id="' + it.id + '" data-key="title" value="' + esc(it.title) + '" placeholder="Headline">' +
               '<input data-id="' + it.id + '" data-key="url" value="' + esc(it.url) + '" placeholder="https://">' +
+              '<label class="check" title="Its own card in Latest News"><input type="checkbox" data-id="' + it.id +
+                '" data-key="home"' + (it.home ? " checked" : "") + '> Home</label>' +
               '<button class="btn sm danger x" data-del="' + it.id + '" type="button">✕</button></div>';
-          }).join("") + "</div>" + actions(s.id, "Delete story");
+          }).join("") + "</div>" + actions(s.id, "Delete news");
       }) + "</section>";
   });
   return h;
@@ -866,8 +897,23 @@ function viewResearch() {
         actions(p.id, "Delete this field");
     }) + "</section>";
   });
-  return h + '<p class="empty">Only fields ticked “Show on the home page” drift across the home page. ' +
+  h += '<p class="empty">Only fields ticked “Show on the home page” appear on the home page. ' +
     'The large figures on the Research page itself are built into research.html — those still need Claude.</p>';
+
+  /* every paper, one at a time — newest first. They live in publications.js. */
+  var P = docs.publications.papers;
+  var rows = P.filter(function (p) { return hit(p.title + " " + p.authors + " " + p.journal); });
+  var onNews = P.filter(function (p) { return p.home; }).length;
+  h += '<section class="group">' + groupHead("<h2>Research papers — one by one</h2>",
+    (filter ? rows.length + " of " : "") + P.length + " papers · " + onNews + " in Latest News",
+    "+ Add paper", 'data-add="paper" data-arg="' + new Date().getFullYear() + '"');
+  h += '<p class="empty" style="padding:4px 0 14px">Tick “Show in Latest News” on a paper to put it on the home page. ' +
+    'These are saved in <code>content/publications.js</code> — Get the code will show that file too.</p>';
+  h += rows.map(function (p) {
+    return rowShell(p.id, p.title, esc(p.year || "") + " · " + esc(p.journal || "—"), paperBadges(p),
+      function () { return paperForm(p); });
+  }).join("") + "</section>";
+  return h;
 }
 
 var VIEWS = { publications: viewPublications, people: viewPeople, projects: viewProjects,
@@ -1022,27 +1068,44 @@ function contentFile(name) {
   return "/* " + name + " — the text of the site. Edit here or in the Site editor. */\n" +
          "window." + GLOBALS[name] + " = " + JSON.stringify(copy, null, 1) + ";\n";
 }
+function showExport(name) {
+  var path = FOLDER + "content/" + name + ".js";
+  var pend = [];
+  for (var _p in PHOTOS) if (PHOTOS[_p].tab === name) pend.push(PHOTOS[_p].file.name);
+  var others = [];
+  for (var d in dirty) if (dirty[d] && d !== name) others.push(d);
+  $("exportNote").innerHTML = "<b>This is the whole of <code>" + esc(path) + "</code>.</b> " +
+    "Copy it, open the file on GitHub, click the pencil, select everything, paste, and Commit." +
+    (pend.length
+      ? '<br><br><b style="color:var(--accent)">Do not forget the ' + pend.length + " picture" +
+        (pend.length > 1 ? "s" : "") + ".</b> Download " + (pend.length > 1 ? "them" : "it") +
+        " with the ⤓ button, then upload " + (pend.length > 1 ? "them" : "it") +
+        " into <code>" + esc(FOLDER + PHOTO_DIR) + "</code> on GitHub — the text file alone will " +
+        "show a broken picture. (" + esc(pend.join(", ")) + ")"
+      : "") +
+    (others.length
+      ? '<br><br><b style="color:var(--therm)">You also changed another file.</b> Commit this one, then: ' +
+        others.map(function (o) {
+          return '<button class="btn sm primary" data-export="' + o + '" type="button">Show ' + esc(o) + ".js →</button>";
+        }).join(" ")
+      : "");
+  $("exportCode").value = contentFile(name);
+  $("ghLink").href = "https://github.com/" + REPO + "/edit/" + BRANCH + "/" + path;
+  $("exportPanel").hidden = false;
+  $("exportPanel").scrollIntoView({ behavior: "smooth", block: "end" });
+}
 $("exportBtn").addEventListener("click", function () {
   if (MISSING.length) return;
   if (counts(tab) === 0 && !confirm(
       "The " + tab + " tab is empty.\n\nThe file this makes would remove everything in that " +
       "section of the site. Are you sure that is what you want?")) return;
-  var path = FOLDER + "content/" + tab + ".js";
-  var pend = [];
-  for (var _p in PHOTOS) if (PHOTOS[_p].tab === tab) pend.push(PHOTOS[_p].file.name);
-  $("exportNote").innerHTML = "<b>This is the whole of <code>" + esc(path) + "</code>.</b> " +
-    "Copy it, open the file on GitHub, click the pencil, select everything, paste, and Commit." +
-    (pend.length
-      ? '<br><br><b style="color:var(--accent)">Do not forget the ' + pend.length + " photo" +
-        (pend.length > 1 ? "s" : "") + ".</b> Download " + (pend.length > 1 ? "them" : "it") +
-        " with the ⤓ button on each person, then upload " + (pend.length > 1 ? "them" : "it") +
-        " into <code>" + esc(FOLDER + PHOTO_DIR) + "</code> on GitHub — the text file alone will " +
-        "show a broken picture. (" + esc(pend.join(", ")) + ")"
-      : "");
-  $("exportCode").value = contentFile(tab);
-  $("ghLink").href = "https://github.com/" + REPO + "/edit/" + BRANCH + "/" + path;
-  $("exportPanel").hidden = false;
-  $("exportPanel").scrollIntoView({ behavior: "smooth", block: "end" });
+  var name = tab;
+  if (!dirty[tab]) for (var d in dirty) if (dirty[d]) { name = d; break; }   /* e.g. papers edited from the Research tab */
+  showExport(name);
+});
+$("exportNote").addEventListener("click", function (e) {
+  var b = e.target.closest("[data-export]");
+  if (b) showExport(b.dataset.export);
 });
 $("closeExport").addEventListener("click", function () { $("exportPanel").hidden = true; });
 $("copyCode").addEventListener("click", function () {
@@ -1058,13 +1121,14 @@ $("copyCode").addEventListener("click", function () {
    they are; a row with a blank id is treated as brand new.               */
 var SHEET = {
   publications: {
-    cols: ["id","kind","year","title","authors","journal","detail","doi","field","note","status"],
+    cols: ["id","kind","year","title","authors","journal","detail","doi","field","home","image","note","status"],
     rows: function (d) {
       var r = d.pipeline.map(function (p) {
         return { id: p.id, kind: "pipeline", title: p.title, status: p.status }; });
       return r.concat(d.papers.map(function (p) {
         return { id: p.id, kind: "paper", year: p.year, title: p.title, authors: p.authors,
-                 journal: p.journal, detail: p.detail, doi: p.doi, field: p.field, note: p.note }; }));
+                 journal: p.journal, detail: p.detail, doi: p.doi, field: p.field,
+                 home: p.home ? "yes" : "", image: p.image, note: p.note }; }));
     },
     build: function (rows, old) {
       var d = { papers: [], pipeline: [], yearNotes: old.yearNotes || {} };
@@ -1074,7 +1138,9 @@ var SHEET = {
         else
           d.papers.push({ id: r.id || uid(), year: String(r.year || ""), title: r.title,
                           authors: r.authors, journal: r.journal, detail: r.detail,
-                          doi: r.doi, field: r.field, note: r.note });
+                          doi: r.doi, field: r.field, note: r.note,
+                          home: /^(y|yes|1|true|o|x|✓)$/i.test(String(r.home || "").trim()),
+                          image: r.image || "" });
       });
       return d;
     }
@@ -1118,14 +1184,14 @@ var SHEET = {
     }
   },
   news: {
-    cols: ["id","kind","home","image","when","headline","blurb","tag","source","outlet","title","url","video"],
+    cols: ["id","kind","home","image","when","headline","blurb","tag","source","doi","outlet","title","url","video"],
     rows: function (d) {
       var out = [];
       d.stories.forEach(function (s) {
         out.push({ id: s.id, kind: "story", home: s.home ? "yes" : "", image: s.image, when: s.when,
-                   headline: s.headline, blurb: s.blurb, tag: s.tag, source: s.source });
+                   headline: s.headline, blurb: s.blurb, tag: s.tag, source: s.source, doi: s.doi, url: s.url });
         (s.items || []).forEach(function (a) {
-          out.push({ id: a.id, kind: "article", outlet: a.outlet, title: a.title,
+          out.push({ id: a.id, kind: "article", home: a.home ? "yes" : "", outlet: a.outlet, title: a.title,
                      url: a.url, video: a.video ? "yes" : "" });
         });
       });
@@ -1137,10 +1203,10 @@ var SHEET = {
         if (r.kind === "article") {
           if (!cur) return;
           cur.items.push({ id: r.id || uid(), outlet: r.outlet, title: r.title,
-                           url: r.url, video: yes(r.video) });
+                           url: r.url, video: yes(r.video), home: yes(r.home) });
         } else {
           cur = { id: r.id || uid(), home: yes(r.home), image: r.image, when: r.when, headline: r.headline,
-                  blurb: r.blurb, tag: r.tag || "Energy", source: r.source, items: [] };
+                  blurb: r.blurb, tag: r.tag || "Energy", source: r.source, doi: r.doi || "", url: r.url || "", items: [] };
           d.stories.push(cur);
         }
       });
