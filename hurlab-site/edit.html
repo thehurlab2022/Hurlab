@@ -26,14 +26,14 @@
     --ink-3:     #7F8A95;
     --rule:      #E3E7EC;
 
-    --mech:      #1F6FB2;
-    --therm:     #BD5518;
-    --elec:      #6A47B5;
-    --accent:    var(--therm);
+    --mech:      #1E63B8;
+    --therm:     #C62D2D;
+    --elec:      #2A7D3F;
+    --accent:    var(--mech);
 
-    --mech-fill: rgba(31, 111, 178, 0.085);
-    --therm-fill:rgba(189, 85, 24, 0.085);
-    --elec-fill: rgba(106, 71, 181, 0.085);
+    --mech-fill: rgba(30, 99, 184, 0.085);
+    --therm-fill:rgba(198, 45, 45, 0.085);
+    --elec-fill: rgba(42, 125, 63, 0.085);
     --chip-bg:   #F1F3F6;
 
     --sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
@@ -44,6 +44,7 @@
   }
 
   * { box-sizing: border-box; }
+  [id] { scroll-margin-top: 88px; }
 
   body {
     background: var(--bg);
@@ -62,10 +63,16 @@
     outline-offset: 2px;
   }
 
-  .masthead { border-bottom: 1px solid var(--rule); }
+  .masthead {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(255, 255, 255, 0.94);
+    -webkit-backdrop-filter: saturate(1.4) blur(10px); backdrop-filter: saturate(1.4) blur(10px);
+    border-bottom: 1px solid var(--rule);
+    box-shadow: 0 1px 12px rgba(17, 22, 28, 0.04);
+  }
   .masthead .wrap {
-    display: flex; flex-wrap: wrap; align-items: baseline;
-    gap: 12px 28px; padding-top: 24px; padding-bottom: 24px;
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 12px 28px; min-height: 68px;
   }
   .wordmark {
     font-family: var(--serif); font-size: 1.4rem; font-weight: 500;
@@ -76,16 +83,50 @@
   .wordmark span {
     font-family: var(--mono); font-size: 0.62rem; font-weight: 400;
     letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--ink-3); margin-left: 10px; vertical-align: 2px;
+    color: var(--ink-3); margin-left: 4px;
   }
-  nav { display: flex; flex-wrap: wrap; gap: 22px; }
+  nav { display: flex; align-items: center; gap: 4px; }
   nav a {
-    font-size: 0.86rem; text-decoration: none; color: var(--ink-2);
-    padding-bottom: 2px; border-bottom: 1px solid transparent;
-    transition: color .15s ease, border-color .15s ease;
+    display: block; font-size: 0.9rem; font-weight: 500; text-decoration: none;
+    color: var(--ink-2); padding: 8px 12px; border-radius: 6px;
+    transition: color .15s ease, background .15s ease;
   }
-  nav a:hover { color: var(--ink); border-bottom-color: var(--accent); }
-  nav a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); }
+  nav a:hover { color: var(--ink); background: var(--surface); }
+  nav a[aria-current="page"] { color: var(--accent); }
+  nav a i { font-style: normal; font-size: 0.62rem; margin-left: 3px; color: var(--ink-3); }
+
+  .nav-drop { position: relative; }
+  .nav-menu {
+    position: absolute; top: 100%; left: 0; min-width: 250px; padding: 6px;
+    background: #FFFFFF; border: 1px solid var(--rule); border-radius: 10px;
+    box-shadow: 0 12px 32px rgba(17, 22, 28, 0.10);
+    opacity: 0; visibility: hidden; transform: translateY(4px);
+    transition: opacity .15s ease, transform .15s ease, visibility .15s;
+  }
+  .nav-drop:hover .nav-menu, .nav-drop:focus-within .nav-menu {
+    opacity: 1; visibility: visible; transform: none;
+  }
+  .nav-menu a { font-weight: 400; padding: 9px 12px; }
+
+  .nav-toggle, .nav-burger { display: none; }
+
+  @media (max-width: 820px) {
+    .nav-burger {
+      display: grid; gap: 5px; padding: 10px; cursor: pointer; margin-right: -10px;
+    }
+    .nav-burger span { display: block; width: 22px; height: 2px; background: var(--ink); border-radius: 2px; }
+    nav {
+      display: none; flex-basis: 100%; flex-direction: column; align-items: stretch;
+      padding: 4px 0 14px; gap: 0;
+    }
+    .nav-toggle:checked ~ nav { display: flex; }
+    nav a { padding: 11px 4px; border-radius: 0; border-bottom: 1px solid var(--rule); }
+    .nav-menu {
+      position: static; opacity: 1; visibility: visible; transform: none;
+      box-shadow: none; border: 0; padding: 0 0 0 14px; min-width: 0;
+    }
+    .nav-menu a { font-size: 0.84rem; color: var(--ink-3); }
+  }
 
   .pagehead { padding: 72px 0 40px; display: grid; gap: 20px; max-width: 46rem; }
   .eyebrow {
@@ -123,33 +164,17 @@
     --h-ink-2: rgba(17, 22, 28, 0.70);
     --h-ink-3: rgba(17, 22, 28, 0.50);
     --h-line:  rgba(17, 22, 28, 0.10);
-    --h-mech:  #1F6FB2;
-    --h-therm: #BD5518;
-    --h-elec:  #6A47B5;
+    --h-mech:  #1E63B8;
+    --h-therm: #C62D2D;
+    --h-elec:  #2A7D3F;
     --band-a:  #FAFCFE;
     --band-b:  #EFF4F9;
     --band-c:  #FFFFFF;
 
     position: relative;
     color: var(--h-ink);
-    background:
-      radial-gradient(760px 520px at 50% 42%, rgba(31, 111, 178, 0.10), transparent 68%),
-      radial-gradient(620px 460px at 16% 88%, rgba(189, 85, 24, 0.075), transparent 70%),
-      radial-gradient(620px 460px at 86% 20%, rgba(106, 71, 181, 0.075), transparent 70%),
-      linear-gradient(176deg, var(--band-a) 0%, var(--band-b) 52%, var(--band-c) 100%);
-    overflow: hidden;
-    border-bottom: 1px solid rgba(17, 22, 28, 0.08);
-  }
-  .hero::before, .pagehero::before {
-    content: "";
-    position: absolute; inset: 0;
-    background-image:
-      linear-gradient(to right, rgba(17, 22, 28, 0.045) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(17, 22, 28, 0.045) 1px, transparent 1px);
-    background-size: 46px 46px;
-    mask-image: radial-gradient(120% 90% at 50% 40%, #000 30%, transparent 78%);
-    -webkit-mask-image: radial-gradient(120% 90% at 50% 40%, #000 30%, transparent 78%);
-    pointer-events: none;
+    background: #FFFFFF;
+    border-bottom: 1px solid var(--rule);
   }
   .hero > *, .pagehero > * { position: relative; }
 
@@ -167,8 +192,8 @@
   .pagehero .lede { color: var(--h-ink-2); text-wrap: balance; }
   .pagehero .legend { justify-content: center; color: var(--h-ink-3); }
   .pagehero .legend b { color: var(--h-ink); }
-  .pagehero .legend .mk { color: var(--h-therm); }
-  .pagehero a { color: var(--h-therm); }
+  .pagehero .legend .mk { color: var(--h-mech); }
+  .pagehero a { color: var(--h-mech); }
 
   /* ================= Heckmann diagram ================= */
 
@@ -226,12 +251,6 @@
     --rule:    #E6EAEF;
     --chip-bg: #EFF2F6;
   }
-  :root:has(.pagehero) .pagehero {
-    --band-a: #F8FAFC;
-    --band-b: #F1F5F9;
-    --band-c: #FFFFFF;
-  }
-
   /* ---------- the mark, revealed left to right from the H ---------- */
   .hero-logo {
     width: min(230px, 52vw); height: auto; display: block;
@@ -314,6 +333,7 @@
   .b-preparation, .b-none { color: var(--ink-3); border-color: var(--rule); }
   .b-corr                 { color: var(--accent); border-color: var(--accent); }
   .b-transducers          { color: var(--mech);  border-color: var(--mech); }
+  .b-home                 { color: var(--accent); border-color: var(--accent); }
 
   .form { display: grid; gap: 12px; padding: 4px 0 22px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .form .full { grid-column: 1 / -1; }
@@ -339,6 +359,7 @@
   .subrow input { font: inherit; font-size: 0.84rem; color: var(--ink); background: var(--surface);
             border: 1px solid var(--rule); border-radius: 3px; padding: 6px 9px; width: 100%; }
   .subrow .x { justify-self: end; }
+  .subrow:has(input:nth-of-type(3)) { grid-template-columns: 1fr 1.4fr 1.4fr auto; }
 
   .empty { padding: 30px 0; color: var(--ink-3); font-family: var(--mono); font-size: 0.8rem; }
 
@@ -353,6 +374,12 @@
                 padding: 12px; width: 100%; min-height: 150px; resize: vertical; }
 
   .photo-row { display: flex; gap: 16px; align-items: flex-start; }
+  .formsec { grid-column: 1 / -1; margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--rule);
+             font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.14em;
+             text-transform: uppercase; color: var(--accent); }
+  .photo-prev.portrait { flex-basis: 72px; width: 72px; height: 96px; }
+  .photo-prev.card { flex-basis: 176px; width: 176px; height: 110px; }
+  .photo-prev.card .ini { font-size: 0.7rem; letter-spacing: 0.1em; text-align: center; padding: 0 8px; }
   .photo-prev { flex: 0 0 92px; width: 92px; height: 92px; border-radius: 3px; overflow: hidden;
                 background: var(--chip-bg); border: 1px solid var(--rule);
                 display: grid; place-items: center; }
@@ -530,70 +557,93 @@ function find(id) {
   return null;
 }
 
-/* ── portraits ────────────────────────────────────────────────────────────
+/* ── pictures ─────────────────────────────────────────────────────────────
    The picture itself cannot be committed from this page — there is no
-   server here. So we do the fiddly half: crop it square, shrink it, name
-   it correctly, and hand you a file to drop into images/ on GitHub.     */
+   server here. So we do the fiddly half: crop it to the right shape,
+   shrink it, name it, and hand you a file to drop into images/ on GitHub. */
 var PHOTO_DIR = "images/";
-var PHOTO_PX  = 480;
-var PHOTOS = {};          /* id -> { file, url } for photos picked this session */
+var SHAPES = {
+  portrait: { w: 480,  h: 640, key: "photo" },   /* People — 3:4, as the page shows it */
+  card:     { w: 1200, h: 750, key: "image" }    /* home-page cards — 16:10 */
+};
+var PHOTOS = {};          /* id -> { file, url, tab } for pictures picked this session */
 
-function slug(name, id) {
-  var s = String(name || "").replace(/,.*$/, "").normalize ?
-          String(name || "").replace(/,.*$/, "").normalize("NFKD") :
-          String(name || "").replace(/,.*$/, "");
+function slugBase(text, fallback) {
+  var s = String(text || "").replace(/,.*$/, "");
+  if (s.normalize) s = s.normalize("NFKD");
   s = s.replace(/[^\x20-\x7E]/g, "").trim().toLowerCase()
        .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-  return (s || "member-" + id) + ".jpg";
+  if (s.length > 40) s = s.slice(0, 40).replace(/-[^-]*$/, "");
+  return s || fallback;
+}
+function slug(name, id) { return slugBase(name, "member-" + id) + ".jpg"; }
+function picName(tab, item) {
+  if (tab === "people")   return slug(item.name, item.id);
+  if (tab === "research") return "research-" + slugBase(item.id, item.id) + ".jpg";
+  return "news-" + slugBase(item.headline, item.id) + ".jpg";
 }
 function initials(name) {
   var p = String(name || "").replace(/,.*$/, "").trim().split(/\s+/);
   return ((p[0] ? p[0][0] : "") + (p.length > 1 ? p[p.length - 1][0] : "")).toUpperCase();
 }
-function photoField(m) {
-  var picked = PHOTOS[m.id];
-  var src = picked ? picked.url : (m.photo || "");
-  var prev = src
-    ? '<img src="' + esc(src) + '" alt="">'
-    : '<span class="ini">' + esc(initials(m.name)) + "</span>";
+
+/* one widget for every picture: preview, choose, download, path */
+function picField(item, o) {
+  var shape = SHAPES[o.shape];
+  var picked = PHOTOS[item.id];
+  var cur = item[shape.key] || "";
+  var src = picked ? picked.url : cur;
+  var prev = src ? '<img src="' + esc(src) + '" alt="">'
+                 : '<span class="ini">' + esc(o.empty || "") + "</span>";
   var dl = picked
-    ? '<button class="btn sm primary" data-dl="' + m.id + '" type="button">⤓ ' + esc(picked.file.name) + "</button>"
+    ? '<button class="btn sm primary" data-dl="' + item.id + '" type="button">⤓ ' + esc(picked.file.name) + "</button>"
     : "";
   var note = picked
     ? "Ready. Download it, then upload it into <code>" + esc(FOLDER + PHOTO_DIR) +
       "</code> on GitHub. (" + Math.round(picked.file.size / 1024) + " KB)"
-    : (m.photo ? "Using <code>" + esc(m.photo) + "</code>." : "No photo — initials are shown instead.");
-  return '<div class="field full"><label>Photo</label><div class="photo-row">' +
-    '<div class="photo-prev">' + prev + "</div>" +
+    : (cur ? "Using <code>" + esc(cur) + "</code>." : (o.none || "No picture yet."));
+  return '<div class="field full"><label>' + esc(o.label) + '</label><div class="photo-row">' +
+    '<div class="photo-prev ' + o.shape + '">' + prev + "</div>" +
     '<div class="photo-ctl">' +
-      '<label class="btn sm" for="ph-' + m.id + '">Choose a photo…</label>' +
-      '<input id="ph-' + m.id + '" type="file" accept="image/*" data-photo="' + m.id + '" hidden>' +
+      '<label class="btn sm" for="ph-' + item.id + '">' + esc(o.button || "Choose a picture…") + "</label>" +
+      '<input id="ph-' + item.id + '" type="file" accept="image/*" data-photo="' + item.id +
+        '" data-shape="' + o.shape + '" hidden>' +
       dl +
-      '<div class="hint">' + note + "</div>" +
-      '<input class="photo-path" data-id="' + m.id + '" data-key="photo" value="' + esc(m.photo || "") +
+      '<div class="hint">' + note + (o.hint ? "<br>" + esc(o.hint) : "") + "</div>" +
+      '<input class="photo-path" data-id="' + item.id + '" data-key="' + shape.key + '" value="' + esc(cur) +
         '" placeholder="' + esc(PHOTO_DIR) + 'name.jpg">' +
     "</div></div></div>";
 }
-function makePhoto(id, file) {
+function photoField(m) {
+  return picField(m, { shape: "portrait", label: "Photo", button: "Choose a photo…",
+                       empty: initials(m.name), none: "No photo — initials are shown instead." });
+}
+
+function makePhoto(id, file, shapeName) {
   var found = find(id); if (!found) return;
+  var shape = SHAPES[shapeName] || SHAPES.portrait;
   var img = new Image();
   img.onload = function () {
-    var c = document.createElement("canvas");
-    c.width = c.height = PHOTO_PX;
+    /* centre-crop to the target shape, then shrink (never enlarge) */
+    var R = shape.w / shape.h, sw = img.width, sh = img.height, sx = 0, sy = 0;
+    if (sw / sh > R) { sw = Math.round(sh * R); sx = Math.round((img.width - sw) / 2); }
+    else             { sh = Math.round(sw / R); sy = Math.round((img.height - sh) / 2); }
+    var W = Math.min(shape.w, sw), H = Math.round(W / R);
+    var c = document.createElement("canvas"); c.width = W; c.height = H;
     var x = c.getContext("2d");
-    var s = Math.min(img.width, img.height);
-    x.drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, PHOTO_PX, PHOTO_PX);
+    x.fillStyle = "#FFFFFF"; x.fillRect(0, 0, W, H);          /* transparent PNGs → white */
+    x.drawImage(img, sx, sy, sw, sh, 0, 0, W, H);
     URL.revokeObjectURL(img.src);
-    var name = slug(found.item.name, id);
+    var name = picName(found.name, found.item);
     c.toBlob(function (b) {
       if (!b) { alert("Could not read that image."); return; }
       var out;
       try { out = new File([b], name, { type: "image/jpeg" }); }
       catch (_) { out = b; out.name = name; }
       if (PHOTOS[id]) URL.revokeObjectURL(PHOTOS[id].url);
-      PHOTOS[id] = { file: out, url: URL.createObjectURL(out) };
-      found.item.photo = PHOTO_DIR + name;
-      touch("people"); openRow = id; render();
+      PHOTOS[id] = { file: out, url: URL.createObjectURL(out), tab: found.name };
+      found.item[shape.key] = PHOTO_DIR + name;
+      touch(found.name); openRow = id; render();
     }, "image/jpeg", 0.85);
   };
   img.onerror = function () { alert("That file is not an image this browser can read."); };
@@ -604,7 +654,7 @@ document.addEventListener("change", function (e) {
   if (!el.dataset || !el.dataset.photo) return;
   var file = el.files && el.files[0];
   el.value = "";
-  if (file) makePhoto(el.dataset.photo, file);
+  if (file) makePhoto(el.dataset.photo, file, el.dataset.shape);
 });
 
 /* ── views ───────────────────────────────────────────────────────────── */
@@ -725,6 +775,10 @@ function viewNews() {
       function () {
         return f("Headline", s.id, "headline", s.headline, { full: true, area: true }) +
           f("When", s.id, "when", s.when, { hint: "e.g. 2027 · March" }) +
+          check("Show on the home page", s.id, "home", s.home) +
+          picField(s, { shape: "card", label: "Home-page card picture", empty: s.tag || "",
+            none: "No picture — a coloured panel is shown instead.",
+            hint: "Cropped to 16:10 for you. A wide photo works best." }) +
           f("Programme tag", s.id, "tag", s.tag, { select: [["Thermal","Thermal"],["Energy","Energy"],["Transducers","Transducers"]] }) +
           f("Summary", s.id, "blurb", s.blurb, { full: true, area: true }) +
           f("Paper behind it", s.id, "source", s.source, { full: true }) +
@@ -743,11 +797,26 @@ function viewNews() {
 }
 
 function viewResearch() {
-  var d = docs.research, h = "";
+  var d = docs.research;
+  var onHome = d.programmes.filter(function (p) { return p.home; }).length;
+  var h = '<section class="group">' + groupHead("<h2>Research fields</h2>",
+    d.programmes.length + " fields · " + onHome + " on the home page",
+    "+ Add research field", 'data-add="programme"') + "</section>";
   d.programmes.forEach(function (p) {
-    h += '<section class="group">' + rowShell(p.id, p.title, esc(p.coupling), "", function () {
+    if (!hit(p.title + " " + (p.keys || "") + " " + (p.tile || ""))) return;
+    h += '<section class="group">' + rowShell(p.id, p.title || "New research field", esc(p.coupling),
+      p.home ? '<span class="badge b-home">Home</span>' : "", function () {
       return f("Title", p.id, "title", p.title) +
         f("Coupling", p.id, "coupling", p.coupling, { hint: "e.g. Field → Entropy" }) +
+        '<div class="formsec">Home-page card</div>' +
+        check("Show on the home page", p.id, "home", p.home) +
+        f("Keywords", p.id, "keys", p.keys || "", { hint: "separate with · or , — each becomes a chip" }) +
+        picField(p, { shape: "card", label: "Card picture", empty: p.title || "",
+          none: "No picture — a coloured panel is shown instead.",
+          hint: "Cropped to 16:10 for you. The title is written over the bottom of it." }) +
+        f("Card text", p.id, "tile", p.tile || "", { full: true, area: true,
+          hint: "One or two sentences under the picture." }) +
+        '<div class="formsec">Research page</div>' +
         f("Opening paragraph", p.id, "lead", p.lead, { full: true, area: true }) +
         f("Second paragraph", p.id, "body", p.body, { full: true, area: true }) +
         '<div class="sub"><div class="sub-head"><h4>Funded work</h4>' +
@@ -767,10 +836,11 @@ function viewResearch() {
             '<input data-id="' + w.id + '" data-key="detail" value="' + esc(w.detail) + '" placeholder="2025, 145, 111410">' +
             '<button class="btn sm danger x" data-del="' + w.id + '" type="button">✕</button></div>';
         }).join("") + "</div>" +
-        '<div class="form-actions"><button class="btn ghost spacer" data-toggle="' + p.id + '" type="button">Close</button></div>';
+        actions(p.id, "Delete this field");
     }) + "</section>";
   });
-  return h + '<p class="empty">Research figures are images inside research.html — those still need Claude, or a hand edit.</p>';
+  return h + '<p class="empty">Only fields ticked “Show on the home page” drift across the home page. ' +
+    'The large figures on the Research page itself are built into research.html — those still need Claude.</p>';
 }
 
 var VIEWS = { publications: viewPublications, people: viewPeople, projects: viewProjects,
@@ -888,11 +958,15 @@ document.addEventListener("click", function (e) {
     else if (ds.add === "alum") { docs.people.alumni.unshift({ id: id, name: "", term: "", now: "" }); touch("people"); }
     else if (ds.add === "project") { docs.projects.projects.unshift({ id: id, title: "", funder: "",
       start: "", end: "", track: "thermal", done: false }); touch("projects"); }
-    else if (ds.add === "story") { docs.news.stories.unshift({ id: id, when: "", headline: "", blurb: "",
+    else if (ds.add === "story") { docs.news.stories.unshift({ id: id, home: true, when: "", headline: "", blurb: "",
       tag: "Energy", source: "", items: [] }); touch("news"); }
     else if (ds.add === "article") {
       var s = docs.news.stories.filter(function (x) { return x.id === ds.arg; })[0]; if (!s) return;
       s.items.push({ id: id, url: "", outlet: "", title: "", video: false }); touch("news"); render(); return; }
+    else if (ds.add === "programme") {
+      docs.research.programmes.push({ id: id, home: true, title: "", coupling: "", keys: "",
+        image: "", tile: "", lead: "", body: "", grants: [], works: [] });
+      touch("research"); }
     else if (ds.add === "grant") {
       var pg = docs.research.programmes.filter(function (x) { return x.id === ds.arg; })[0]; if (!pg) return;
       pg.grants.push({ id: id, title: "", meta: "", done: false }); touch("research"); render(); return; }
@@ -918,10 +992,10 @@ $("exportBtn").addEventListener("click", function () {
       "section of the site. Are you sure that is what you want?")) return;
   var path = FOLDER + "content/" + tab + ".js";
   var pend = [];
-  for (var _p in PHOTOS) pend.push(PHOTOS[_p].file.name);
+  for (var _p in PHOTOS) if (PHOTOS[_p].tab === tab) pend.push(PHOTOS[_p].file.name);
   $("exportNote").innerHTML = "<b>This is the whole of <code>" + esc(path) + "</code>.</b> " +
     "Copy it, open the file on GitHub, click the pencil, select everything, paste, and Commit." +
-    (tab === "people" && pend.length
+    (pend.length
       ? '<br><br><b style="color:var(--accent)">Do not forget the ' + pend.length + " photo" +
         (pend.length > 1 ? "s" : "") + ".</b> Download " + (pend.length > 1 ? "them" : "it") +
         " with the ⤓ button on each person, then upload " + (pend.length > 1 ? "them" : "it") +
@@ -1007,12 +1081,12 @@ var SHEET = {
     }
   },
   news: {
-    cols: ["id","kind","when","headline","blurb","tag","source","outlet","title","url","video"],
+    cols: ["id","kind","home","image","when","headline","blurb","tag","source","outlet","title","url","video"],
     rows: function (d) {
       var out = [];
       d.stories.forEach(function (s) {
-        out.push({ id: s.id, kind: "story", when: s.when, headline: s.headline,
-                   blurb: s.blurb, tag: s.tag, source: s.source });
+        out.push({ id: s.id, kind: "story", home: s.home ? "yes" : "", image: s.image, when: s.when,
+                   headline: s.headline, blurb: s.blurb, tag: s.tag, source: s.source });
         (s.items || []).forEach(function (a) {
           out.push({ id: a.id, kind: "article", outlet: a.outlet, title: a.title,
                      url: a.url, video: a.video ? "yes" : "" });
@@ -1028,8 +1102,8 @@ var SHEET = {
           cur.items.push({ id: r.id || uid(), outlet: r.outlet, title: r.title,
                            url: r.url, video: yes(r.video) });
         } else {
-          cur = { id: r.id || uid(), when: r.when, headline: r.headline, blurb: r.blurb,
-                  tag: r.tag || "Energy", source: r.source, items: [] };
+          cur = { id: r.id || uid(), home: yes(r.home), image: r.image, when: r.when, headline: r.headline,
+                  blurb: r.blurb, tag: r.tag || "Energy", source: r.source, items: [] };
           d.stories.push(cur);
         }
       });
@@ -1037,12 +1111,12 @@ var SHEET = {
     }
   },
   research: {
-    cols: ["id","kind","title","lead","coupling","body","meta","venue","detail","done"],
+    cols: ["id","kind","home","image","title","tile","keys","lead","coupling","body","meta","venue","detail","done"],
     rows: function (d) {
       var out = [];
       (d.programmes || []).forEach(function (p) {
-        out.push({ id: p.id, kind: "programme", title: p.title, lead: p.lead,
-                   coupling: p.coupling, body: p.body });
+        out.push({ id: p.id, kind: "programme", home: p.home ? "yes" : "", image: p.image, title: p.title,
+                   tile: p.tile, keys: p.keys, lead: p.lead, coupling: p.coupling, body: p.body });
         (p.grants || []).forEach(function (g) {
           out.push({ id: g.id, kind: "grant", title: g.title, meta: g.meta, done: g.done ? "yes" : "" }); });
         (p.works || []).forEach(function (w) {
@@ -1056,8 +1130,9 @@ var SHEET = {
         if (r.kind === "grant" && cur) cur.grants.push({ id: r.id || uid(), title: r.title, meta: r.meta, done: yes(r.done) });
         else if (r.kind === "work" && cur) cur.works.push({ id: r.id || uid(), title: r.title, venue: r.venue, detail: r.detail });
         else if (r.kind === "programme") {
-          cur = { id: r.id || uid(), title: r.title, lead: r.lead, coupling: r.coupling,
-                  body: r.body, grants: [], works: [] };
+          cur = { id: r.id || uid(), home: yes(r.home), image: r.image, title: r.title, tile: r.tile,
+                  keys: r.keys, lead: r.lead, coupling: r.coupling, body: r.body,
+                  grants: [], works: [] };
           d.programmes.push(cur);
         }
       });
