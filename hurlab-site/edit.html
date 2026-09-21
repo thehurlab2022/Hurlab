@@ -171,10 +171,32 @@
     color: var(--h-ink); background: #FFFFFF;
   }
 
-  /* the lab's colours: one thin band across the very top of every page */
-  .masthead::before {
-    content: ""; display: block; height: 5px;
-    background: linear-gradient(90deg, #9460C9 0%, #7C6ECB 34%, #6682CF 66%, #4D9AD3 100%);
+  /* the lab's colours: the whole bar across the top of every page */
+  .masthead {
+    background:
+      radial-gradient(ellipse 60% 140% at 100% 0%, rgba(255, 255, 255, 0.14), transparent 70%),
+      linear-gradient(90deg, #9460C9 0%, #7C6ECB 34%, #6682CF 66%, #4D9AD3 100%);
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+    border-bottom: 0; box-shadow: 0 2px 16px rgba(60, 40, 120, 0.18);
+  }
+  .masthead .wordmark { color: #FFFFFF; font-weight: 600; text-shadow: 0 1px 3px rgba(30, 15, 70, 0.28); }
+  .masthead .wordmark span { color: #FFFFFF; font-weight: 500; opacity: 0.9; }
+  .masthead nav > a, .masthead .nav-drop > a {
+    color: #FFFFFF; font-weight: 700; text-shadow: 0 1px 3px rgba(30, 15, 70, 0.28);
+  }
+  .masthead nav > a:hover, .masthead .nav-drop > a:hover { color: #FFFFFF; background: rgba(255, 255, 255, 0.16); }
+  .masthead nav > a[aria-current="page"], .masthead .nav-drop > a[aria-current="page"] {
+    color: #FFFFFF; background: rgba(255, 255, 255, 0.24); font-weight: 700;
+  }
+  .masthead nav a i { color: #FFFFFF; }
+  .masthead a:focus-visible { outline-color: #FFFFFF; }
+  .masthead .nav-burger span { background: #FFFFFF; }
+  @media (max-width: 820px) {
+    .masthead nav a { border-bottom-color: rgba(255, 255, 255, 0.22); }
+    .masthead nav > a:hover, .masthead .nav-drop > a:hover,
+    .masthead nav > a[aria-current="page"], .masthead .nav-drop > a[aria-current="page"] { background: transparent; }
+    .masthead .nav-menu { background: transparent; }
+    .masthead .nav-menu a { color: #FFFFFF; font-weight: 600; }
   }
   .hero > *, .pagehero > * { position: relative; }
 
@@ -699,11 +721,11 @@ function paperForm(p) {
     f("Research field", p.id, "field", p.field || "", { select: [["", "Automatic (from the title)"]]
       .concat(docs.research.programmes.map(function (g) { return [g.id, g.title || g.id]; }))
       .concat([["none", "None — keep off the Research page"]]),
-      hint: "The newest four papers of each field appear as Recent work on the Research page." }) +
+      hint: "The newest three papers of each field appear as Recent papers on the Research page." }) +
     '<div class="formsec">Home page</div>' +
     check("Show in Latest News on the home page", p.id, "home", p.home) +
     picField(p, { shape: "card", label: "Latest News picture", empty: p.journal || "",
-      none: "No picture — the picture of its research field is used.",
+      none: "No picture — a panel in the colour of its research field is shown.",
       hint: "Cropped to 16:10 for you. The paper title is written over it." }) +
     actions(p.id, "Delete paper");
 }
@@ -872,11 +894,11 @@ function viewResearch() {
         picField(p, { shape: "card", label: "Card picture", empty: p.title || "",
           none: "No picture — a coloured panel is shown instead.",
           hint: "Cropped to 16:10 for you. The title is written over the bottom of it." }) +
-        f("Card text", p.id, "tile", p.tile || "", { full: true, area: true,
-          hint: "One or two sentences under the picture." }) +
+        f("Short description", p.id, "tile", p.tile || "", { full: true, area: true,
+          hint: "One or two sentences. Shown on the home-page card and on the Research page card." }) +
         '<div class="formsec">Research page</div>' +
-        f("Opening paragraph", p.id, "lead", p.lead, { full: true, area: true }) +
-        f("Second paragraph", p.id, "body", p.body, { full: true, area: true }) +
+        f("Long description (not shown now)", p.id, "lead", p.lead, { full: true, area: true,
+          hint: "Kept for later. The Research page now shows the short description above." }) +
         '<div class="sub"><div class="sub-head"><h4>Funded work</h4>' +
         '<button class="btn sm" data-add="grant" data-arg="' + p.id + '" type="button">+ Add</button></div>' +
         p.grants.map(function (g) {

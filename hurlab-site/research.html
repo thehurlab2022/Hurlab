@@ -171,10 +171,32 @@
     color: var(--h-ink); background: #FFFFFF;
   }
 
-  /* the lab's colours: one thin band across the very top of every page */
-  .masthead::before {
-    content: ""; display: block; height: 5px;
-    background: linear-gradient(90deg, #9460C9 0%, #7C6ECB 34%, #6682CF 66%, #4D9AD3 100%);
+  /* the lab's colours: the whole bar across the top of every page */
+  .masthead {
+    background:
+      radial-gradient(ellipse 60% 140% at 100% 0%, rgba(255, 255, 255, 0.14), transparent 70%),
+      linear-gradient(90deg, #9460C9 0%, #7C6ECB 34%, #6682CF 66%, #4D9AD3 100%);
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+    border-bottom: 0; box-shadow: 0 2px 16px rgba(60, 40, 120, 0.18);
+  }
+  .masthead .wordmark { color: #FFFFFF; font-weight: 600; text-shadow: 0 1px 3px rgba(30, 15, 70, 0.28); }
+  .masthead .wordmark span { color: #FFFFFF; font-weight: 500; opacity: 0.9; }
+  .masthead nav > a, .masthead .nav-drop > a {
+    color: #FFFFFF; font-weight: 700; text-shadow: 0 1px 3px rgba(30, 15, 70, 0.28);
+  }
+  .masthead nav > a:hover, .masthead .nav-drop > a:hover { color: #FFFFFF; background: rgba(255, 255, 255, 0.16); }
+  .masthead nav > a[aria-current="page"], .masthead .nav-drop > a[aria-current="page"] {
+    color: #FFFFFF; background: rgba(255, 255, 255, 0.24); font-weight: 700;
+  }
+  .masthead nav a i { color: #FFFFFF; }
+  .masthead a:focus-visible { outline-color: #FFFFFF; }
+  .masthead .nav-burger span { background: #FFFFFF; }
+  @media (max-width: 820px) {
+    .masthead nav a { border-bottom-color: rgba(255, 255, 255, 0.22); }
+    .masthead nav > a:hover, .masthead .nav-drop > a:hover,
+    .masthead nav > a[aria-current="page"], .masthead .nav-drop > a[aria-current="page"] { background: transparent; }
+    .masthead .nav-menu { background: transparent; }
+    .masthead .nav-menu a { color: #FFFFFF; font-weight: 600; }
   }
   .hero > *, .pagehero > * { position: relative; }
 
@@ -395,6 +417,50 @@
     .prog-body { grid-template-columns: 1fr; gap: 28px; }
     .figstrip.one, .figstrip.wide { grid-template-columns: minmax(0, 1fr); }
   }
+
+  /* ---------- the three fields as tall cards ---------- */
+  .rsec-h { font-family: var(--sans); font-weight: 700; font-size: clamp(1.7rem, 3.2vw, 2.2rem);
+            text-align: center; margin: 56px 0 34px; letter-spacing: -0.01em; }
+  .rgrid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 26px;
+    width: min(1240px, calc(100vw - 56px)); margin-left: calc(50% - min(620px, 50vw - 28px));
+    align-items: stretch;
+  }
+  .rcard {
+    --edge: var(--mech); --edge-fill: var(--mech-fill);
+    display: flex; flex-direction: column; overflow: hidden;
+    background: #FFFFFF; border: 1px solid var(--rule); border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(17, 22, 28, 0.05);
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .rcard:hover { transform: translateY(-3px); box-shadow: 0 16px 34px rgba(17, 22, 28, 0.10); }
+  .rcard.t-therm { --edge: var(--therm); --edge-fill: var(--therm-fill); }
+  .rcard.t-elec  { --edge: var(--elec);  --edge-fill: var(--elec-fill); }
+  .rcard.t-mech  { --edge: var(--mech);  --edge-fill: var(--mech-fill); }
+  .r-img { position: relative; aspect-ratio: 4 / 5; overflow: hidden;
+           background: linear-gradient(135deg, var(--edge), color-mix(in srgb, var(--edge) 70%, #11161C)); }
+  .r-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .r-img::after { content: ""; position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(10,14,20,0.82) 0%, rgba(10,14,20,0.25) 45%, transparent 70%); }
+  .r-img h2 { position: absolute; left: 24px; right: 24px; bottom: 22px; z-index: 1; margin: 0;
+    font-family: var(--sans); font-weight: 700; font-size: 1.75rem; line-height: 1.15; color: #FFFFFF;
+    text-shadow: 0 1px 12px rgba(0,0,0,0.35); }
+  .r-img .coupling { position: absolute; left: 24px; top: 18px; z-index: 1;
+    color: #FFFFFF; border: 0; background: rgba(10,14,20,0.55); border-radius: 999px; padding: 5px 11px; }
+  .r-body { flex: 1; display: flex; flex-direction: column; gap: 18px; padding: 22px 24px 24px;
+            border-top: 4px solid var(--edge); }
+  .r-desc { margin: 0; font-size: 1rem; line-height: 1.6; color: var(--ink); }
+  .r-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .r-chips span { font-size: 0.78rem; font-weight: 500; color: var(--edge); background: var(--edge-fill);
+                  padding: 4px 10px; border-radius: 6px; }
+  .r-sec { display: grid; gap: 8px; }
+  .rcard .grants li { font-size: 0.86rem; line-height: 1.4; display: block; padding-left: 14px; position: relative; }
+  .rcard .grants li::before { content: ""; position: absolute; left: 0; top: 0.55em; width: 6px; height: 6px;
+                              border-radius: 50%; background: var(--edge); }
+  .rcard .works li { padding: 10px 0; }
+  .rcard .works .w-title { font-size: 0.95rem; }
+  .rcard .allpubs { margin-top: auto; padding-top: 6px; }
+  @media (max-width: 700px) { .r-img { aspect-ratio: 16 / 10; } }
 </style>
 
 <script src="content/research.js"></script>
@@ -602,7 +668,7 @@ var FIGURES = {
     return "";
   }
   function recentWork(p) {
-    var list = PUBS.filter(function (w) { return fieldOf(w) === p.id; }).slice(0, 4);
+    var list = PUBS.filter(function (w) { return fieldOf(w) === p.id; }).slice(0, 3);
     var items;
     if (list.length) {
       items = list.map(function (w) {
@@ -622,7 +688,7 @@ var FIGURES = {
       });
     }
     if (!items.length) return "";
-    return '<p class="sublabel">Recent work</p><ul class="works">' + items.join("") + "</ul>" +
+    return '<div class="r-sec"><p class="sublabel">Recent papers</p><ul class="works">' + items.join("") + "</ul></div>" +
       '<a class="allpubs" href="publications.html">All publications &rarr;</a>';
   }
 
@@ -637,24 +703,25 @@ var FIGURES = {
     }).join("") + "</div>";
   }
 
-  document.getElementById("programmes").innerHTML = D.programmes.map(function (p) {
-    return '<section class="programme" id="' + esc(p.id) + '">' +
-      '<div class="prog-head"><h2>' + esc(p.title) + "</h2>" +
-      '<span class="coupling">' + esc(p.coupling) + "</span></div>" +
-      '<div class="prog-body"><div class="prog-text">' +
-        '<p class="first">' + esc(p.lead) + "</p>" +
-        (p.body ? "<p>" + esc(p.body) + "</p>" : "") +
-        ((p.grants || []).length
-          ? '<p class="sublabel">Funded work</p><ul class="grants">' +
-            p.grants.map(function (g) {
-              return '<li class="' + (g.done ? "done" : "") + '">' + esc(g.title) +
-                '<span class="g-meta">' + esc(g.meta) + "</span></li>";
-            }).join("") + "</ul>"
-          : "") +
-      "</div><div>" +
-        recentWork(p) +
-      "</div></div>" + figures(p.id) + "</section>";
-  }).join("");
+  var TONES = ["t-therm", "t-elec", "t-mech"];
+  document.getElementById("programmes").innerHTML =
+    '<h2 class="rsec-h">Research Fields</h2><div class="rgrid">' +
+    D.programmes.map(function (p, i) {
+      var desc = p.tile || String(p.lead || "").split(/(?<=\.)\s/)[0];
+      var chips = String(p.keys || "").split(/\s*[·,]\s*/).filter(Boolean);
+      var grants = (p.grants || []).filter(function (g) { return !g.done; });
+      return '<section class="rcard ' + TONES[i % 3] + '" id="' + esc(p.id) + '">' +
+        '<div class="r-img">' + (p.image ? '<img src="' + esc(p.image) + '" alt="" loading="lazy">' : "") +
+          (p.coupling ? '<span class="coupling">' + esc(p.coupling) + "</span>" : "") +
+          "<h2>" + esc(p.title) + "</h2></div>" +
+        '<div class="r-body">' +
+          (desc ? '<p class="r-desc">' + esc(desc) + "</p>" : "") +
+          (chips.length ? '<div class="r-chips">' + chips.map(function (c) { return "<span>" + esc(c) + "</span>"; }).join("") + "</div>" : "") +
+          (grants.length ? '<div class="r-sec"><p class="sublabel">Funded work</p><ul class="grants">' +
+            grants.map(function (g) { return "<li>" + esc(g.title) + "</li>"; }).join("") + "</ul></div>" : "") +
+          recentWork(p) +
+        "</div></section>";
+    }).join("") + "</div>";
 })();
 </script>
 </body>

@@ -171,10 +171,32 @@
     color: var(--h-ink); background: #FFFFFF;
   }
 
-  /* the lab's colours: one thin band across the very top of every page */
-  .masthead::before {
-    content: ""; display: block; height: 5px;
-    background: linear-gradient(90deg, #9460C9 0%, #7C6ECB 34%, #6682CF 66%, #4D9AD3 100%);
+  /* the lab's colours: the whole bar across the top of every page */
+  .masthead {
+    background:
+      radial-gradient(ellipse 60% 140% at 100% 0%, rgba(255, 255, 255, 0.14), transparent 70%),
+      linear-gradient(90deg, #9460C9 0%, #7C6ECB 34%, #6682CF 66%, #4D9AD3 100%);
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+    border-bottom: 0; box-shadow: 0 2px 16px rgba(60, 40, 120, 0.18);
+  }
+  .masthead .wordmark { color: #FFFFFF; font-weight: 600; text-shadow: 0 1px 3px rgba(30, 15, 70, 0.28); }
+  .masthead .wordmark span { color: #FFFFFF; font-weight: 500; opacity: 0.9; }
+  .masthead nav > a, .masthead .nav-drop > a {
+    color: #FFFFFF; font-weight: 700; text-shadow: 0 1px 3px rgba(30, 15, 70, 0.28);
+  }
+  .masthead nav > a:hover, .masthead .nav-drop > a:hover { color: #FFFFFF; background: rgba(255, 255, 255, 0.16); }
+  .masthead nav > a[aria-current="page"], .masthead .nav-drop > a[aria-current="page"] {
+    color: #FFFFFF; background: rgba(255, 255, 255, 0.24); font-weight: 700;
+  }
+  .masthead nav a i { color: #FFFFFF; }
+  .masthead a:focus-visible { outline-color: #FFFFFF; }
+  .masthead .nav-burger span { background: #FFFFFF; }
+  @media (max-width: 820px) {
+    .masthead nav a { border-bottom-color: rgba(255, 255, 255, 0.22); }
+    .masthead nav > a:hover, .masthead .nav-drop > a:hover,
+    .masthead nav > a[aria-current="page"], .masthead .nav-drop > a[aria-current="page"] { background: transparent; }
+    .masthead .nav-menu { background: transparent; }
+    .masthead .nav-menu a { color: #FFFFFF; font-weight: 600; }
   }
   .hero > *, .pagehero > * { position: relative; }
 
@@ -390,7 +412,9 @@
   }
   /* no picture yet: a solid panel in the field's colour, title on top */
   .card-img:has(.noimg) {
-    background: linear-gradient(135deg, var(--tone, var(--mech)), color-mix(in srgb, var(--tone, var(--mech)) 62%, #0A0E14));
+    background:
+      radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.22), transparent 60%),
+      linear-gradient(135deg, var(--tone, var(--mech)), color-mix(in srgb, var(--tone, var(--mech)) 72%, #11161C));
   }
   .card-img:has(.noimg)::after { background: none !important; }
   .card-img:has(.noimg) .noimg { display: none; }
@@ -658,7 +682,7 @@
     for (var i = 0; i < RULES.length; i++) if (RULES[i][1].test(t)) return RULES[i][0];
     return "";
   };
-  var FTONE = { metrology: "t-mech", cooling: "t-therm", harvesting: "t-elec" };
+  var FTONE = { metrology: "t-therm", cooling: "t-elec", harvesting: "t-mech" };   /* same colours as the field cards */
   var progOf = function (id) { return R.filter(function (g) { return g.id === id; })[0]; };
   var yearOf = function (v) { var m = String(v || "").match(/\d{4}/); return m ? +m[0] : 0; };
 
@@ -693,7 +717,7 @@
     var href = doi ? "https://doi.org/" + String(doi).replace(/^https?:\/\/doi\.org\//i, "")
                    : (p.url || "publications.html");
     var ext = /^https?:/.test(href);
-    var pic = p.image || (g && g.image) || "";
+    var pic = p.image || "";            /* its own picture only — otherwise a panel in the field colour */
     return '<li class="card news paper ' + (FTONE[f] || "t-mech") + '">' +
       '<a href="' + esc(href) + '"' + (ext ? ' target="_blank" rel="noopener"' : "") + '>' +
         '<div class="card-img">' + img(pic, p.title, p.journal) +
