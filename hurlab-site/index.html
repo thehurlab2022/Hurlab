@@ -276,18 +276,16 @@
     --rule:    #E6EAEF;
     --chip-bg: #EFF2F6;
   }
-  /* ---------- the mark, revealed left to right from the H ---------- */
+  /* ---------- the mark: shown straight away ---------- */
   .hero-logo {
     width: min(230px, 52vw); height: auto; display: block;
     margin: 0 auto 4px;
-    clip-path: inset(0 100% 0 0);
-    animation: logo-wipe 1.15s cubic-bezier(.22,.72,.24,1) .15s forwards;
   }
   @keyframes logo-wipe {
     from { clip-path: inset(0 100% 0 0); }
     to   { clip-path: inset(0 -2% 0 0); }
   }
-  .hero-top > *:not(.hero-logo) { animation: hero-in .7s ease .95s both; }
+  .hero-top > *:not(.hero-logo) { animation: hero-in .6s ease .25s both; }   /* the logo is there at once; the words follow */
   @keyframes hero-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
   @media (prefers-reduced-motion: reduce) {
@@ -772,7 +770,7 @@
     }
     strip.classList.add("moving");
     el.style.setProperty("--dist", dist + "px");
-    el.style.setProperty("--dur", Math.max(12, Math.round(dist / 28)) + "s");   /* ~28 px a second */
+    el.style.setProperty("--dur", Math.max(8, Math.round(dist / 45)) + "s");    /* ~45 px a second */
   };
   fit();
   var t;
