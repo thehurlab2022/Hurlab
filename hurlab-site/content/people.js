@@ -148,16 +148,7 @@ window.PEOPLE = {
    "since": "2026–",
    "where": "KU-KIST Graduate School of Converging Science and Technology, Korea University",
    "photo": "images/subeen-park.jpg"
-  },
-  {
-   "id": "xmttlex49r8h3",
-   "group": "Integrated Ph.D. programme",
-   "name": "홍길동",
-   "since": "2026–",
-   "where": "",
-   "co": "",
-   "mail": ""
   }
  ],
- "updated": "2026-09-09"
+ "updated": "2026-09-21"
 };
