@@ -160,21 +160,20 @@
      Literal colours, so the band holds independently of the tokens. */
 
   .hero, .pagehero {
-    --h-ink:   #11161C;
-    --h-ink-2: rgba(17, 22, 28, 0.70);
-    --h-ink-3: rgba(17, 22, 28, 0.50);
-    --h-line:  rgba(17, 22, 28, 0.10);
-    --h-mech:  #1E63B8;
-    --h-therm: #C62D2D;
-    --h-elec:  #2A7D3F;
-    --band-a:  #FAFCFE;
-    --band-b:  #EFF4F9;
-    --band-c:  #FFFFFF;
+    /* the lab's colours: violet in the top-left corner, washing out to sky blue */
+    --h-ink:   #FFFFFF;
+    --h-ink-2: rgba(255, 255, 255, 0.88);
+    --h-ink-3: rgba(255, 255, 255, 0.72);
+    --h-line:  rgba(255, 255, 255, 0.30);
+    --h-mech:  #FFFFFF;
+    --h-therm: #FFFFFF;
+    --h-elec:  #FFFFFF;
 
-    position: relative;
+    position: relative; overflow: hidden;
     color: var(--h-ink);
-    background: #FFFFFF;
-    border-bottom: 1px solid var(--rule);
+    background:
+      radial-gradient(ellipse 70% 90% at 88% 110%, rgba(77, 154, 211, 0.55), transparent 70%),
+      radial-gradient(ellipse farthest-side at 0% 0%, #9460C9 0%, #7C6ECB 34%, #6682CF 66%, #4D9AD3 100%);
   }
   .hero > *, .pagehero > * { position: relative; }
 
@@ -192,12 +191,16 @@
   .pagehero .lede { color: var(--h-ink-2); text-wrap: balance; }
   .pagehero .legend { justify-content: center; color: var(--h-ink-3); }
   .pagehero .legend b { color: var(--h-ink); }
-  .pagehero .legend .mk { color: var(--h-mech); }
-  .pagehero a { color: var(--h-mech); }
+  .pagehero .legend .mk { color: #FFFFFF; font-weight: 600; }
+  .pagehero a { color: #FFFFFF; }
 
   /* ================= Heckmann diagram ================= */
 
-  .heckmann-band { padding: 26px 0 34px; display: grid; justify-items: center; gap: 22px; }
+  .heckmann-band {
+    --h-ink: #11161C; --h-ink-2: rgba(17, 22, 28, 0.70); --h-ink-3: rgba(17, 22, 28, 0.50);
+    --h-mech: #1E63B8; --h-therm: #C62D2D; --h-elec: #2A7D3F;
+    padding: 48px 0 20px; display: grid; justify-items: center; gap: 22px; color: var(--h-ink);
+  }
   .heckmann { width: 100%; max-width: 700px; height: auto; display: block; }
   .heck-cap {
     font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.12em;
@@ -403,7 +406,10 @@
     <h1>Research</h1>
     <p class="lede">Mechanical, thermal and electrical properties are not independent inside a solid. We measure how they couple — and turn each coupling into a device.</p>
   </div>
-  <div class="wrap heckmann-band">
+</section>
+
+<main class="wrap">
+  <div class="heckmann-band">
     <svg class="heckmann" viewBox="0 0 800 680" role="img"
          aria-label="Heckmann diagram. Three outer nodes — mechanical stress, electrical field and thermal temperature — each drive their conjugate inner variable: strain, electric displacement and entropy. Cross couplings link them: piezoelectric and converse piezoelectric effects, pyroelectric and electrocaloric effects, thermal expansion and the elastocaloric effect.">
       <defs>
@@ -476,9 +482,6 @@
 
     <p class="heck-cap">Every arrow is an effect we measure or build on. The three programmes below sit on them.</p>
   </div>
-</section>
-
-<main class="wrap">
   <div id="programmes"></div>
 
   <section class="outro">

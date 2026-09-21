@@ -160,21 +160,20 @@
      Literal colours, so the band holds independently of the tokens. */
 
   .hero, .pagehero {
-    --h-ink:   #11161C;
-    --h-ink-2: rgba(17, 22, 28, 0.70);
-    --h-ink-3: rgba(17, 22, 28, 0.50);
-    --h-line:  rgba(17, 22, 28, 0.10);
-    --h-mech:  #1E63B8;
-    --h-therm: #C62D2D;
-    --h-elec:  #2A7D3F;
-    --band-a:  #FAFCFE;
-    --band-b:  #EFF4F9;
-    --band-c:  #FFFFFF;
+    /* the lab's colours: violet in the top-left corner, washing out to sky blue */
+    --h-ink:   #FFFFFF;
+    --h-ink-2: rgba(255, 255, 255, 0.88);
+    --h-ink-3: rgba(255, 255, 255, 0.72);
+    --h-line:  rgba(255, 255, 255, 0.30);
+    --h-mech:  #FFFFFF;
+    --h-therm: #FFFFFF;
+    --h-elec:  #FFFFFF;
 
-    position: relative;
+    position: relative; overflow: hidden;
     color: var(--h-ink);
-    background: #FFFFFF;
-    border-bottom: 1px solid var(--rule);
+    background:
+      radial-gradient(ellipse 70% 90% at 88% 110%, rgba(77, 154, 211, 0.55), transparent 70%),
+      radial-gradient(ellipse farthest-side at 0% 0%, #9460C9 0%, #7C6ECB 34%, #6682CF 66%, #4D9AD3 100%);
   }
   .hero > *, .pagehero > * { position: relative; }
 
@@ -192,12 +191,16 @@
   .pagehero .lede { color: var(--h-ink-2); text-wrap: balance; }
   .pagehero .legend { justify-content: center; color: var(--h-ink-3); }
   .pagehero .legend b { color: var(--h-ink); }
-  .pagehero .legend .mk { color: var(--h-mech); }
-  .pagehero a { color: var(--h-mech); }
+  .pagehero .legend .mk { color: #FFFFFF; font-weight: 600; }
+  .pagehero a { color: #FFFFFF; }
 
   /* ================= Heckmann diagram ================= */
 
-  .heckmann-band { padding: 26px 0 34px; display: grid; justify-items: center; gap: 22px; }
+  .heckmann-band {
+    --h-ink: #11161C; --h-ink-2: rgba(17, 22, 28, 0.70); --h-ink-3: rgba(17, 22, 28, 0.50);
+    --h-mech: #1E63B8; --h-therm: #C62D2D; --h-elec: #2A7D3F;
+    padding: 48px 0 20px; display: grid; justify-items: center; gap: 22px; color: var(--h-ink);
+  }
   .heckmann { width: 100%; max-width: 700px; height: auto; display: block; }
   .heck-cap {
     font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.12em;
@@ -296,100 +299,87 @@
 
 <style>
   .legend {
-    display: flex; flex-wrap: wrap; gap: 10px 22px; margin: 0 0 26px;
+    display: flex; flex-wrap: wrap; gap: 10px 22px; margin: 44px 0 0;
     padding: 0; list-style: none;
     font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.08em;
     text-transform: uppercase; color: var(--ink-3);
   }
   .legend li { display: flex; align-items: center; gap: 8px; }
-  .swatch { width: 22px; height: 8px; border-radius: 1px; display: inline-block; }
+  .swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
   .sw-thermal     { background: var(--therm); }
   .sw-energy      { background: var(--elec); }
   .sw-transducers { background: var(--mech); }
-  .sw-none        { background: var(--ink-3); }
-
-  .chart { margin-bottom: 8px; }
-
-  .axis {
-    display: grid; grid-template-columns: 300px 1fr; gap: 0 24px;
-    position: sticky; top: 68px; z-index: 4;
-    background: var(--bg); padding: 10px 0 8px;
-    border-bottom: 1px solid var(--rule);
-  }
-  .ticks { position: relative; height: 16px; }
-  .ticks span {
-    position: absolute; top: 0;
-    font-family: var(--mono); font-size: 0.7rem; color: var(--ink-3);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .rows { position: relative; padding-top: 6px; }
-  .today {
-    position: absolute; top: 0; bottom: 12px;
-    left: calc(324px + (100% - 324px) * var(--now, 0.55));
-    border-left: 1px dashed var(--accent); pointer-events: none;
-  }
-  .today b {
-    position: absolute; top: -2px; left: 6px;
-    font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em;
-    text-transform: uppercase; color: var(--accent); font-weight: 500;
-    white-space: nowrap;
-  }
-
-  .prow {
-    display: grid; grid-template-columns: 300px 1fr; gap: 4px 24px;
-    align-items: center; padding: 11px 0;
-    border-bottom: 1px solid var(--rule);
-  }
-  .plabel { display: grid; gap: 2px; }
-  .plabel .t { font-size: 0.94rem; line-height: 1.35; }
-  .plabel .f {
-    font-family: var(--mono); font-size: 0.68rem; color: var(--ink-3);
-    font-variant-numeric: tabular-nums;
-  }
-  .track {
-    position: relative; height: 22px;
-    background: repeating-linear-gradient(to right,
-      var(--rule) 0 1px, transparent 1px calc(100% / var(--span, 12)));
-  }
-  .bar {
-    position: absolute; top: 6px; height: 10px; border-radius: 1px;
-    left: var(--s); width: var(--w); background: var(--c); min-width: 4px;
-  }
-  .b-thermal     { --c: var(--therm); }
-  .b-energy      { --c: var(--elec); }
-  .b-transducers { --c: var(--mech); }
-  .b-none        { --c: var(--ink-3); }
-  .prow.past .bar { opacity: 0.42; }
-  .prow.past .plabel .t { color: var(--ink-2); }
+  .sw-none        { background: #6B7580; }
 
   .subhead {
-    display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px;
-    margin: 40px 0 4px;
+    display: flex; align-items: baseline; gap: 12px; margin: 46px 0 20px;
   }
-  .subhead h2 {
-    font-family: var(--serif); font-weight: 400; font-size: 1.45rem;
-    margin: 0; line-height: 1.2;
-  }
+  .subhead h2 { font-family: var(--serif); font-weight: 400; font-size: 1.7rem; margin: 0; line-height: 1.2; }
   .subhead .n {
-    font-family: var(--mono); font-size: 0.72rem; color: var(--ink-3);
-    font-variant-numeric: tabular-nums;
+    font-family: var(--mono); font-size: 0.74rem; color: var(--ink-3);
+    background: var(--chip-bg); border-radius: 999px; padding: 2px 10px;
   }
 
+  .pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 22px; }
+  .pcard {
+    --c: #6B7580;
+    display: flex; flex-direction: column; overflow: hidden;
+    background: #FFFFFF; border: 1px solid var(--rule); border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(17,22,28,0.04);
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  }
+  .pcard:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(17,22,28,0.09); border-color: transparent; }
+  .t-thermal     { --c: var(--therm); }
+  .t-energy      { --c: var(--elec); }
+  .t-transducers { --c: var(--mech); }
+
+  .ptop {
+    position: relative; min-height: 118px; padding: 16px 18px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    color: #FFFFFF;
+    background:
+      radial-gradient(circle at 100% 0%, rgba(255,255,255,0.22), transparent 60%),
+      linear-gradient(135deg, var(--c), color-mix(in srgb, var(--c) 72%, #11161C));
+  }
+  .ptop.has-img { background-size: cover; background-position: center; }
+  .ptop.has-img::before { content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.55)); }
+  .ptop > * { position: relative; }
+  .ptop .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .tag {
+    font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.12em; text-transform: uppercase;
+    background: rgba(255,255,255,0.20); border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 999px; padding: 4px 10px; white-space: nowrap;
+  }
+  .state {
+    font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase;
+    background: #FFFFFF; color: var(--c); border-radius: 999px; padding: 4px 10px; font-weight: 500;
+  }
+  .ptop .funder { font-size: 0.86rem; font-weight: 500; line-height: 1.35; text-wrap: balance; }
+
+  .pbody { padding: 18px 18px 20px; display: grid; gap: 12px; flex: 1; align-content: start; }
+  .pbody h3 { font-family: var(--serif); font-weight: 400; font-size: 1.2rem; line-height: 1.3; margin: 0; text-wrap: pretty; }
+  .pbody .sum { margin: 0; font-size: 0.9rem; color: var(--ink-2); line-height: 1.55; }
+  .period { margin-top: auto; display: grid; gap: 7px; }
+  .period .dates {
+    display: flex; justify-content: space-between; gap: 8px;
+    font-family: var(--mono); font-size: 0.72rem; color: var(--ink-3); font-variant-numeric: tabular-nums;
+  }
+  .period .dates b { color: var(--ink-2); font-weight: 500; }
+  .prog { height: 6px; border-radius: 999px; background: var(--chip-bg); overflow: hidden; }
+  .prog i { display: block; height: 100%; width: var(--p); background: var(--c); border-radius: 999px; }
+
+  .pcard.past { background: var(--surface); }
+  .pcard.past .ptop { filter: saturate(0.35) brightness(1.05); min-height: 96px; }
+  .pcard.past h3 { color: var(--ink-2); }
+
   .readout {
-    margin-top: 44px; padding: 26px 30px;
+    margin-top: 52px; padding: 26px 30px; border-radius: 14px;
     background: var(--surface); border: 1px solid var(--rule);
     display: grid; gap: 10px;
   }
   .readout p { margin: 0; color: var(--ink-2); font-size: 0.95rem; max-width: 52rem; }
   .readout p b { color: var(--ink); font-weight: 600; }
-
-  @media (max-width: 780px) {
-    .axis { grid-template-columns: 1fr; }
-    .axis .spacer { display: none; }
-    .prow { grid-template-columns: 1fr; }
-    .today { display: none; }
-  }
 </style>
 
 <script src="content/projects.js"></script>
@@ -398,7 +388,7 @@
   <div class="wrap pagehead">
     <p class="eyebrow" id="projCount"></p>
     <h1>Projects</h1>
-    <p class="lede">Funded work drawn on one timeline. The colour of each bar says which research programme it belongs to.</p>
+    <p class="lede">Funded research, one card per project. The colour says which research programme it belongs to.</p>
   </div>
 </section>
 
@@ -406,15 +396,15 @@
 
   <ul class="legend">
     <li><span class="swatch sw-thermal"></span> Thermal</li>
-    <li><span class="swatch sw-energy"></span> Energy</li>
+    <li><span class="swatch sw-energy"></span> Energy harvesting</li>
     <li><span class="swatch sw-transducers"></span> Transducers</li>
     <li><span class="swatch sw-none"></span> Fellowship</li>
   </ul>
 
-  <div class="chart" id="chart"></div>
+  <div id="chart"></div>
 
   <section class="readout">
-    <p>Read left to right, the timeline shows a deliberate shift. Everything funded in <b>2020–2024</b> sits in energy harvesting and piezoelectric transducers; almost everything funded from <b>2025 onward</b> is thermal — switching, transistors, immersion cooling, electrocaloric refrigeration and the metrology to measure all of it.</p>
+    <p>Taken together, the projects show a deliberate shift. Everything funded in <b>2020–2024</b> sits in energy harvesting and piezoelectric transducers; almost everything funded from <b>2025 onward</b> is thermal — switching, transistors, immersion cooling, electrocaloric refrigeration and the metrology to measure all of it.</p>
     <p id="longest"></p>
   </section>
 
@@ -427,61 +417,54 @@
 
 <script>
 (function () {
-  var D = window.PROJECTS || { axisStart: 2020, axisEnd: 2032, projects: [] };
-  var A = Number(D.axisStart) || 2020, B = Number(D.axisEnd) || 2032, SPAN = B - A;
+  var D = window.PROJECTS || { projects: [] };
   var esc = function (s) {
     return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
       .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   };
-
-  /* "2026-07" -> fraction of the axis, 0..1. The end month counts in full,
-     so a project ending 2026-12 reaches 2027-01. */
-  function pos(ym, inclusive) {
-    var m = String(ym || "").match(/^(\d{4})-(\d{1,2})$/);
-    if (!m) return null;
-    var y = +m[1], mo = +m[2] - 1 + (inclusive ? 1 : 0);
-    return ((y + mo / 12) - A) / SPAN;
-  }
-  var pct = function (x) { return (Math.max(0, Math.min(1, x)) * 100).toFixed(2) + "%"; };
+  var TRACK = { thermal: "Thermal", energy: "Energy harvesting", transducers: "Transducers", none: "Fellowship" };
   var fmt = function (ym) { return String(ym || "").replace("-", "."); };
-
-  var now = new Date();
-  var nowFrac = Math.max(0, Math.min(1, ((now.getFullYear() + now.getMonth() / 12) - A) / SPAN));
-
-  var live = D.projects.filter(function (p) { return !p.done; });
-  var past = D.projects.filter(function (p) { return p.done; });
-  var bySt = function (a, b) { return String(a.start).localeCompare(String(b.start)); };
-  live.sort(bySt); past.sort(bySt);
-
-  function row(p) {
-    var s = pos(p.start, false), e = pos(p.end, true);
-    var bar = (s == null || e == null || e <= s) ? "" :
-      '<span class="bar b-' + esc(p.track || "none") + '" style="--s:' + pct(s) +
-      ";--w:" + pct(e - s) + '"></span>';
-    return '<div class="prow' + (p.done ? " past" : "") + '">' +
-      '<div class="plabel"><span class="t">' + esc(p.title) + "</span>" +
-      '<span class="f">' + esc(p.funder) + " · " + fmt(p.start) + " – " + fmt(p.end) + "</span></div>" +
-      '<div class="track">' + bar + "</div></div>";
+  function ym(v, endOfMonth) {
+    var m = String(v || "").match(/^(\d{4})-(\d{1,2})$/);
+    return m ? (+m[1]) * 12 + (+m[2] - 1) + (endOfMonth ? 1 : 0) : null;
   }
+  var now = new Date(), nowM = now.getFullYear() * 12 + now.getMonth();
 
-  var ticks = "";
-  for (var y = A; y <= B; y += 2) {
-    var at = ((y - A) / SPAN) * 100;
-    ticks += '<span style="' + (y === B ? "right:0" : "left:" + at.toFixed(2) + "%") + '">' + y + "</span>";
+  var projects = (D.projects || []).filter(function (p) { return p && p.title; });
+  var live = projects.filter(function (p) { return !p.done; });
+  var past = projects.filter(function (p) { return p.done; });
+  live.sort(function (a, b) { return String(b.start).localeCompare(String(a.start)); });
+  past.sort(function (a, b) { return String(b.end).localeCompare(String(a.end)); });
+
+  function card(p) {
+    var t = TRACK[p.track] ? p.track : "none";
+    var s = ym(p.start, false), e = ym(p.end, true);
+    var months = (s != null && e != null && e > s) ? e - s : null;
+    var prog = p.done ? 1 : (months ? Math.max(0, Math.min(1, (nowM - s) / months)) : 0);
+    var len = months == null ? "" : (months % 12 === 0 ? months / 12 + (months === 12 ? " yr" : " yrs")
+                                                     : (months / 12).toFixed(1) + " yrs");
+    var state = p.done ? "Completed" : (s != null && nowM < s ? "Upcoming" : "Active");
+    var img = p.image ? ' has-img" style="background-image:url(\'' + esc(p.image) + '\')' : "";
+    var sum = p.summary || p.desc || p.description || "";
+    return '<article class="pcard t-' + t + (p.done ? " past" : "") + '">' +
+      '<div class="ptop' + img + '"><div class="row"><span class="tag">' + esc(TRACK[t]) + '</span>' +
+        '<span class="state">' + state + '</span></div>' +
+        '<div class="funder">' + esc(p.funder || "") + '</div></div>' +
+      '<div class="pbody"><h3>' + esc(p.title) + '</h3>' +
+        (sum ? '<p class="sum">' + esc(sum) + '</p>' : "") +
+        '<div class="period"><div class="dates"><span><b>' + fmt(p.start) + '</b> – <b>' + fmt(p.end) + '</b></span>' +
+        '<span>' + len + '</span></div>' +
+        '<div class="prog" title="' + Math.round(prog * 100) + '% elapsed"><i style="--p:' + (prog * 100).toFixed(1) + '%"></i></div></div>' +
+      '</div></article>';
   }
 
   document.getElementById("chart").innerHTML =
-    '<div class="axis"><div class="spacer"></div><div class="ticks">' + ticks + "</div></div>" +
-    '<div class="subhead"><h2>Active</h2><span class="n">' + live.length + "</span></div>" +
-    '<div class="rows"><div class="today"><b>Today</b></div>' + live.map(row).join("") + "</div>" +
-    '<div class="subhead"><h2>Completed</h2><span class="n">' + past.length + "</span></div>" +
-    '<div class="rows">' + past.map(row).join("") + "</div>";
+    '<div class="subhead"><h2>Active</h2><span class="n">' + live.length + '</span></div>' +
+    '<div class="pgrid">' + live.map(card).join("") + '</div>' +
+    (past.length ? '<div class="subhead"><h2>Completed</h2><span class="n">' + past.length + '</span></div>' +
+    '<div class="pgrid">' + past.map(card).join("") + '</div>' : "");
 
-  document.documentElement.style.setProperty("--now", nowFrac.toFixed(4));
-  document.documentElement.style.setProperty("--span", String(SPAN));
-
-  document.getElementById("projCount").textContent =
-    live.length + " active · " + past.length + " completed";
+  document.getElementById("projCount").textContent = live.length + " active · " + past.length + " completed";
 
   var longest = live.slice().sort(function (a, b) { return String(b.end).localeCompare(String(a.end)); })[0];
   if (longest) {

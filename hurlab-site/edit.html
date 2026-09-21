@@ -160,21 +160,20 @@
      Literal colours, so the band holds independently of the tokens. */
 
   .hero, .pagehero {
-    --h-ink:   #11161C;
-    --h-ink-2: rgba(17, 22, 28, 0.70);
-    --h-ink-3: rgba(17, 22, 28, 0.50);
-    --h-line:  rgba(17, 22, 28, 0.10);
-    --h-mech:  #1E63B8;
-    --h-therm: #C62D2D;
-    --h-elec:  #2A7D3F;
-    --band-a:  #FAFCFE;
-    --band-b:  #EFF4F9;
-    --band-c:  #FFFFFF;
+    /* the lab's colours: violet in the top-left corner, washing out to sky blue */
+    --h-ink:   #FFFFFF;
+    --h-ink-2: rgba(255, 255, 255, 0.88);
+    --h-ink-3: rgba(255, 255, 255, 0.72);
+    --h-line:  rgba(255, 255, 255, 0.30);
+    --h-mech:  #FFFFFF;
+    --h-therm: #FFFFFF;
+    --h-elec:  #FFFFFF;
 
-    position: relative;
+    position: relative; overflow: hidden;
     color: var(--h-ink);
-    background: #FFFFFF;
-    border-bottom: 1px solid var(--rule);
+    background:
+      radial-gradient(ellipse 70% 90% at 88% 110%, rgba(77, 154, 211, 0.55), transparent 70%),
+      radial-gradient(ellipse farthest-side at 0% 0%, #9460C9 0%, #7C6ECB 34%, #6682CF 66%, #4D9AD3 100%);
   }
   .hero > *, .pagehero > * { position: relative; }
 
@@ -192,12 +191,16 @@
   .pagehero .lede { color: var(--h-ink-2); text-wrap: balance; }
   .pagehero .legend { justify-content: center; color: var(--h-ink-3); }
   .pagehero .legend b { color: var(--h-ink); }
-  .pagehero .legend .mk { color: var(--h-mech); }
-  .pagehero a { color: var(--h-mech); }
+  .pagehero .legend .mk { color: #FFFFFF; font-weight: 600; }
+  .pagehero a { color: #FFFFFF; }
 
   /* ================= Heckmann diagram ================= */
 
-  .heckmann-band { padding: 26px 0 34px; display: grid; justify-items: center; gap: 22px; }
+  .heckmann-band {
+    --h-ink: #11161C; --h-ink-2: rgba(17, 22, 28, 0.70); --h-ink-3: rgba(17, 22, 28, 0.50);
+    --h-mech: #1E63B8; --h-therm: #C62D2D; --h-elec: #2A7D3F;
+    padding: 48px 0 20px; display: grid; justify-items: center; gap: 22px; color: var(--h-ink);
+  }
   .heckmann { width: 100%; max-width: 700px; height: auto; display: block; }
   .heck-cap {
     font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.12em;
@@ -405,6 +408,24 @@
 <script src="content/publications.js"></script>
 <script src="content/projects.js"></script>
 <script src="content/news.js"></script>
+<script>
+/* Opened straight from the computer (C:\…\edit.html) there is no content/
+   folder beside this file. Read the live site's content instead, so the
+   editor works wherever it is opened. */
+(function () {
+  var LIVE = "https://thehurlab.com/hurlab-site/content/";
+  var need = { publications: "PUBLICATIONS", people: "PEOPLE", projects: "PROJECTS",
+               news: "NEWS", research: "RESEARCH" };
+  var miss = [];
+  for (var k in need) if (!window[need[k]]) miss.push(k);
+  if (!miss.length) return;
+  window.__FROM_LIVE = true;
+  var t = Date.now();
+  document.write(miss.map(function (k) {
+    return '<script src="' + LIVE + k + ".js?t=" + t + '"><\/script>';
+  }).join(""));
+})();
+</script>
 </head>
 <body>
 <div class="bar"><div class="wrap">
@@ -869,7 +890,8 @@ function halt() {
     "<b>erases that whole section of the site</b>. So the buttons are switched off.<br><br>" +
     "<b>Almost always the cause is that <code>edit.html</code> is in the wrong folder.</b> " +
     "It has to sit right next to <code>index.html</code> and the <code>content/</code> folder — " +
-    "in <code>" + esc(FOLDER || "the site root") + "</code>. Move it there and reload this page.";
+    "in <code>" + esc(FOLDER || "the site root") + "</code>. Or simply open " +
+    '<a href="https://thehurlab.com/hurlab-site/edit.html">thehurlab.com/hurlab-site/edit.html</a>.';
   document.querySelector(".intro").style.borderLeftColor = "#B3261E";
   $("exportBtn").disabled = true;
   $("xlsDown").disabled = true;
@@ -880,8 +902,17 @@ function halt() {
   $("tabs").innerHTML = "";
 }
 
+function liveNote() {
+  if (!window.__FROM_LIVE || document.getElementById("liveNote")) return;
+  var n = document.createElement("p");
+  n.id = "liveNote";
+  n.style.cssText = "margin:12px 0 0;font-size:0.84rem;color:var(--ink-3)";
+  n.innerHTML = "Opened from your computer — reading the content that is live on <b>thehurlab.com</b>.";
+  document.querySelector(".intro").appendChild(n);
+}
 function render() {
   if (MISSING.length) return halt();
+  liveNote();
   $("tabs").innerHTML = TABS.map(function (t) {
     return '<button class="tab" role="tab" data-tab="' + t[0] + '" aria-selected="' + (t[0] === tab) + '">' +
       esc(t[1]) + '<span class="c">' + counts(t[0]) + "</span>" +
