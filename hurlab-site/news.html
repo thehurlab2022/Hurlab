@@ -276,18 +276,16 @@
     --rule:    #E6EAEF;
     --chip-bg: #EFF2F6;
   }
-  /* ---------- the mark, revealed left to right from the H ---------- */
+  /* ---------- the mark: shown straight away ---------- */
   .hero-logo {
     width: min(230px, 52vw); height: auto; display: block;
     margin: 0 auto 4px;
-    clip-path: inset(0 100% 0 0);
-    animation: logo-wipe 1.15s cubic-bezier(.22,.72,.24,1) .15s forwards;
   }
   @keyframes logo-wipe {
     from { clip-path: inset(0 100% 0 0); }
     to   { clip-path: inset(0 -2% 0 0); }
   }
-  .hero-top > *:not(.hero-logo) { animation: hero-in .7s ease .95s both; }
+  .hero-top > *:not(.hero-logo) { animation: hero-in .6s ease .25s both; }   /* the logo is there at once; the words follow */
   @keyframes hero-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
   @media (prefers-reduced-motion: reduce) {
@@ -359,6 +357,37 @@
   .t-Energy      { --tone: var(--elec);  --tint: var(--elec-fill); }
   .t-Transducers { --tone: var(--mech);  --tint: var(--mech-fill); }
 
+  /* ---------- year groups ---------- */
+  .yblock { padding-top: 40px; }
+  .yhead {
+    display: flex; align-items: baseline; gap: 12px;
+    border-bottom: 2px solid var(--rule); padding-bottom: 10px; margin-bottom: 4px;
+  }
+  .yhead h2 {
+    font-family: var(--mono); font-size: 1.6rem; font-weight: 500; margin: 0;
+    letter-spacing: 0.04em; font-variant-numeric: tabular-nums;
+  }
+  .yhead .n { font-family: var(--mono); font-size: 0.74rem; color: var(--ink-3); }
+  .yhead .now {
+    margin-left: auto; font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: #FFFFFF; border-radius: 999px; padding: 4px 11px;
+    background: linear-gradient(90deg, #8D62C8, #4D9AD3);
+  }
+  .yblock .ngrid { padding-top: 22px; }
+  .ncard.new > button { border-color: var(--tone); }
+  .n-new {
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    color: #FFFFFF; background: var(--tone); border-radius: 6px; padding: 3px 9px;
+  }
+  .k-Award      { --tone: #B8860B; --tint: rgba(184, 134, 11, 0.10); }
+  .k-Talk       { --tone: var(--mech); --tint: var(--mech-fill); }
+  .k-Conference { --tone: #6B4FA8; --tint: rgba(107, 79, 168, 0.10); }
+  .k-Media      { --tone: var(--therm); --tint: var(--therm-fill); }
+  .k-Funding    { --tone: var(--elec);  --tint: var(--elec-fill); }
+  .k-Service    { --tone: #0E7C86; --tint: rgba(14, 124, 134, 0.10); }
+  .k-Lab        { --tone: #5A6572; --tint: rgba(90, 101, 114, 0.10); }
+  .k-Press      { --tone: var(--elec); --tint: var(--elec-fill); }
+
   /* ---------- the story, opened ---------- */
   dialog.story {
     width: min(760px, calc(100vw - 32px)); max-height: calc(100vh - 48px);
@@ -423,7 +452,7 @@
 </section>
 
 <main class="wrap">
-  <ul class="ngrid" id="stories"></ul>
+  <div id="stories"></div>
 
   <footer>
     <span>HUR Lab · Thermal Energy Materials &amp; Metrology</span>
@@ -470,6 +499,62 @@
     }).filter(Boolean);
   });
 
+  /* Dates and kinds for the stories in news.js, and the lab's activity —
+     awards, talks, conferences, media — carried over from the old site.
+     Anything set in news.js (date, kind) wins over what is written here. */
+  var DATES = { s2025: "2025-04-18", s2023: "2023-11-14", s2022: "2022-03-22", s2020: "2020-06-12",
+                xmttln8d5ashe: "2026-08-10" };
+  var KINDS = { s2025: "Press", s2023: "Press", s2022: "Press", s2020: "Press",
+                xmttln8d5ashe: "Funding" };
+  var ACTIVITY = [
+    { d: "2026-09-04", k: "Talk", h: "Invited talk at the Samsung Future Technology Forum — high-efficiency cooling for the power and heat problem of AI" },
+    { d: "2026-08-19", k: "Award", h: "So-min Song named Outstanding Graduate; Byoungjin Yoon receives the Outstanding Student Scholarship" },
+    { d: "2026-08-14", k: "Lab", h: "Joint workshop with Prof. Hyun-Cheol Song's group at Korea University" },
+    { d: "2026-07-16", k: "Media", h: "CBS radio discussion on solid-state cooling and heat pumps" },
+    { d: "2026-06-26", k: "Conference", h: "KIEEME Annual Summer Conference, Busan — invited talk, and Best Oral Presentation for Byeongjin Yoon" },
+    { d: "2026-06-12", k: "Conference", h: "International Conference on Nanogenerators and Piezotronics, SKKU — Wiley Best Poster Award for Byeongjin Yoon" },
+    { d: "2026-06-02", k: "Award", h: "Sunghoon Hur named a 2026 KIST Young Fellow" },
+    { d: "2026-05-27", k: "Conference", h: "E-MRS Spring Meeting, Strasbourg — and an invited talk at the Luxembourg Institute of Science and Technology" },
+    { d: "2026-05-08", k: "Conference", h: "Invited talk at the KSME Spring Conference — Best Poster Award for So-min Song" },
+    { d: "2026-04-24", k: "Conference", h: "Thermal Engineering Division Spring Conference" },
+    { d: "2026-02-10", k: "Talk", h: "Invited talk at the Korean Dielectrics Society winter conference, Muju" },
+    { d: "2025-12-17", k: "Lab", h: "Lab year-end party" },
+    { d: "2025-12-15", k: "Award", h: "Media Communication Award for Sunghoon Hur at the 2025 KIST Annual Operation Briefing" },
+    { d: "2025-12-10", k: "Conference", h: "KSME Annual Conference, Kangwon Land — presentation, and the NST recruitment booth" },
+    { d: "2025-11-27", k: "Conference", h: "8th International Conference on Advanced Electromaterials, Jeju — Best Poster Award for So-min Song" },
+    { d: "2025-10-02", k: "Media", h: "The low-voltage thermal switch featured in the Samsung Science & Technology Foundation newsletter" },
+    { d: "2025-09-25", k: "Talk", h: "Invited seminar, Department of Materials Science and Engineering, Gachon University" },
+    { d: "2025-09-10", k: "Talk", h: "Invited seminar, School of Materials Science and Engineering, Yeungnam University" },
+    { d: "2025-08-21", k: "Talk", h: "Invited seminar, Korean Society of Thermophysical Properties, Gangneung" },
+    { d: "2025-07-11", k: "Talk", h: "Invited seminar, Department of Mechanical Engineering, KAIST" },
+    { d: "2025-07-01", k: "Conference", h: "Invited oral presentation at the International Workshop on Piezoelectric Materials and Applications, Vilnius" },
+    { d: "2025-06-28", k: "Conference", h: "Invited oral presentation at the International Conference on Nanoenergy and Nanosystems, Beijing" },
+    { d: "2025-06-17", k: "Conference", h: "Global Conference of Innovation Materials, Jeju — Best Oral Presentation for Byoungjin Yoon and Seungbum Kim" },
+    { d: "2025-06-12", k: "Talk", h: "Lecture on thermal and energy property measurement at Sungkyunkwan University" },
+    { d: "2025-06-09", k: "Media", h: "Ultrasound wireless energy transfer covered by YTN Science News" },
+    { d: "2025-05-30", k: "Talk", h: "Talk on why thermal energy matters, Yeouido High School" },
+    { d: "2025-04-18", k: "Media", h: "Live broadcast on thermal energy at the 2025 Korea Science Festival" },
+    { d: "2025-04-16", k: "Conference", h: "Korean Ceramic Society Spring Meeting, Yeosu — invited talk, with presentations by Seungbum Kim and So-min Song" },
+    { d: "2025-04-10", k: "Lab", h: "Group picnic under the cherry blossoms" },
+    { d: "2025-03-08", k: "Media", h: "A YouTube video on the lab's thermal and energy research" },
+    { d: "2025-01-16", k: "Conference", h: "CES, Las Vegas — introducing ultrasound wireless energy transfer" },
+    { d: "2024-12-16", k: "Lab", h: "Year-end gathering at a steakhouse" },
+    { d: "2024-12-01", k: "Funding", h: "The thermal transistor proposal selected for the 2024 Samsung Future Technology Incubation Program" },
+    { d: "2024-08-22", k: "Service", h: "Sunghoon Hur joins the editorial board of Communications Engineering (Nature Portfolio)" },
+    { d: "2024-07-22", k: "Conference", h: "International Workshop on Piezoelectric Materials and Applications, Hannover — invited oral presentation" },
+    { d: "2024-06-13", k: "Conference", h: "Global Conference of Innovation Materials, Jeju — invited talk, and Best Poster Award for Byoungjin Yoon" },
+    { d: "2024-05-17", k: "Lab", h: "Walking tour from Seoul Station to Namsan Park" },
+    { d: "2024-04-09", k: "Lab", h: "Group picnic under the cherry blossoms" },
+    { d: "2024-02-01", k: "Media", h: "The lab's research ranked 4th most read among government-funded institute results, with 1.3 million views" },
+    { d: "2023-11-15", k: "Conference", h: "7th International Conference on Advanced Electromaterials, Jeju — oral presentation by Dr. Ko" },
+    { d: "2023-10-11", k: "Conference", h: "2023 Fall Conference of the Korean Sensors Society, Yeosu — two posters by Seung-Bum Kim" },
+    { d: "2023-08-24", k: "Conference", h: "MCARE 2023, Bellevue — invited speaker and session chair" },
+    { d: "2023-06-10", k: "Conference", h: "Global Conference of Innovation Materials, Jeju" },
+    { d: "2022-10-13", k: "Conference", h: "2022 IEEE International Ultrasonics Symposium, Venice" },
+    { d: "2022-07-01", k: "Award", h: "Sunghoon Hur promoted to Senior Research Scientist" },
+    { d: "2022-04-17", k: "Media", h: "Wireless energy transfer research covered by YTN Science News" }
+  ];
+
   var esc = function (s) {
     return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
       .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -481,32 +566,75 @@
     return d ? "https://doi.org/" + String(d).replace(/^https?:\/\/doi\.org\//i, "") : "";
   };
 
+  S.forEach(function (st) {
+    if (!st.date && DATES[st.id]) st.date = DATES[st.id];
+    if (!st.kind) st.kind = KINDS[st.id] || (st.items.length || st.doi ? "Press" : "Lab");
+  });
+  ACTIVITY.forEach(function (a) {
+    S.push({ id: "a" + a.d.replace(/-/g, ""), date: a.d, kind: a.k, headline: a.h,
+             blurb: "", tag: "", source: "", items: [] });
+  });
+  var yearOf = function (st) {
+    var m = String(st.date || st.when || "").match(/\d{4}/);
+    return m ? m[0] : "";
+  };
+  var key = function (st) { return st.date || (yearOf(st) ? yearOf(st) + "-00-00" : "0000-00-00"); };
+  S.sort(function (a, b) { return key(b).localeCompare(key(a)); });
+
+  var MONTHS = ["January","February","March","April","May","June",
+                "July","August","September","October","November","December"];
+  function shown(st) {
+    if (st.date) {
+      var m = st.date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (m) return +m[3] + " " + MONTHS[+m[2] - 1] + " " + m[1];
+      var m2 = st.date.match(/^(\d{4})-(\d{2})$/);
+      if (m2) return MONTHS[+m2[2] - 1] + " " + m2[1];
+    }
+    return dec(st.when || "");
+  }
+
   var total = S.reduce(function (a, s) { return a + s.items.length; }, 0);
   document.getElementById("newsCount").textContent =
-    S.length + " stories" + (total ? " · " + total + " articles" : "");
+    S.length + " entries" + (total ? " · " + total + " press articles" : "");
 
-  document.getElementById("stories").innerHTML = S.map(function (s, i) {
-    var n = s.items.length;
-    return '<li class="ncard t-' + esc(s.tag || "Energy") + '">' +
+  var years = [];
+  S.forEach(function (st) { var y = yearOf(st) || "Earlier"; if (years.indexOf(y) < 0) years.push(y); });
+
+  function card(st, i, isNewest) {
+    var n = st.items.length;
+    return '<li class="ncard k-' + esc(st.kind || "Lab") + (isNewest ? " new" : "") + '">' +
       '<button type="button" data-i="' + i + '">' +
-        (s.image ? '<div class="n-img"><img src="' + esc(s.image) + '" alt="" loading="lazy"></div>' : "") +
+        (st.image ? '<div class="n-img"><img src="' + esc(st.image) + '" alt="" loading="lazy"></div>' : "") +
         '<div class="n-body">' +
-          (s.when ? '<span class="n-date">' + esc(dec(s.when)) + "</span>" : "") +
-          '<h2 class="n-title">' + esc(dec(s.headline)) + "</h2>" +
-          (s.blurb ? '<p class="n-text">' + esc(dec(s.blurb)) + "</p>" : "") +
+          '<span class="n-date">' + esc(shown(st)) + "</span>" +
+          '<h2 class="n-title">' + esc(dec(st.headline)) + "</h2>" +
+          (st.blurb ? '<p class="n-text">' + esc(dec(st.blurb)) + "</p>" : "") +
           '<div class="n-foot">' +
-            (s.tag ? '<span class="tagb tone">' + esc(s.tag) + "</span>" : "") +
-            (s.doi ? '<span class="tagb">Paper</span>' : "") +
+            (isNewest ? '<span class="n-new">Newest</span>' : "") +
+            (st.kind ? '<span class="tagb tone">' + esc(st.kind) + "</span>" : "") +
+            (st.tag ? '<span class="tagb">' + esc(st.tag) + "</span>" : "") +
+            (st.doi ? '<span class="tagb">Paper</span>' : "") +
             (n ? '<span class="tagb">' + n + (n === 1 ? " article" : " articles") + "</span>" : "") +
             '<span class="n-more">Open &rarr;</span>' +
           "</div></div></button></li>";
+  }
+
+  document.getElementById("stories").innerHTML = years.map(function (y, yi) {
+    var rows = [];
+    S.forEach(function (st, i) { if ((yearOf(st) || "Earlier") === y) rows.push([st, i]); });
+    return '<section class="yblock"><div class="yhead"><h2>' + esc(y) + "</h2>" +
+      '<span class="n">' + rows.length + (rows.length === 1 ? " entry" : " entries") + "</span>" +
+      (yi === 0 ? '<span class="now">This year · latest</span>' : "") + "</div>" +
+      '<ul class="ngrid">' + rows.map(function (r, ri) {
+        return card(r[0], r[1], yi === 0 && ri === 0);
+      }).join("") + "</ul></section>";
   }).join("");
 
   /* ---- open a story ---- */
   var dlg = document.getElementById("story"), body = document.getElementById("storyBody");
   function open(i, push) {
     var s = S[i]; if (!s) return;
-    dlg.className = "story t-" + (s.tag || "Energy");
+    dlg.className = "story k-" + (s.kind || "Lab");
     var links = [];
     if (s.doi || s.link) links.push('<a href="' + esc(s.doi ? doiUrl(s.doi) : s.link) +
       '" target="_blank" rel="noopener">Read the paper &#8599;</a>');
@@ -514,8 +642,9 @@
     body.innerHTML =
       (s.image ? '<div class="d-img"><img src="' + esc(s.image) + '" alt=""></div>' : "") +
       '<div class="d-body">' +
-        '<div class="d-meta">' + (s.when ? "<span>" + esc(dec(s.when)) + "</span>" : "") +
-          (s.tag ? '<span class="tagb tone">' + esc(s.tag) + "</span>" : "") + "</div>" +
+        '<div class="d-meta"><span>' + esc(shown(s)) + "</span>" +
+          (s.kind ? '<span class="tagb tone">' + esc(s.kind) + "</span>" : "") +
+          (s.tag ? '<span class="tagb">' + esc(s.tag) + "</span>" : "") + "</div>" +
         '<h2 id="storyTitle">' + esc(dec(s.headline)) + "</h2>" +
         (s.blurb ? "<p>" + esc(dec(s.blurb)) + "</p>" : "") +
         (s.source ? '<div class="d-src">' + esc(dec(s.source)) + "</div>" : "") +

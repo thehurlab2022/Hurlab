@@ -276,18 +276,16 @@
     --rule:    #E6EAEF;
     --chip-bg: #EFF2F6;
   }
-  /* ---------- the mark, revealed left to right from the H ---------- */
+  /* ---------- the mark: shown straight away ---------- */
   .hero-logo {
     width: min(230px, 52vw); height: auto; display: block;
     margin: 0 auto 4px;
-    clip-path: inset(0 100% 0 0);
-    animation: logo-wipe 1.15s cubic-bezier(.22,.72,.24,1) .15s forwards;
   }
   @keyframes logo-wipe {
     from { clip-path: inset(0 100% 0 0); }
     to   { clip-path: inset(0 -2% 0 0); }
   }
-  .hero-top > *:not(.hero-logo) { animation: hero-in .7s ease .95s both; }
+  .hero-top > *:not(.hero-logo) { animation: hero-in .6s ease .25s both; }   /* the logo is there at once; the words follow */
   @keyframes hero-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
   @media (prefers-reduced-motion: reduce) {
@@ -385,6 +383,11 @@
             border: 1px solid var(--rule); border-radius: 3px; padding: 6px 9px; width: 100%; }
   .subrow .x { justify-self: end; }
   .subrow:has(input:nth-of-type(3)) { grid-template-columns: 1fr 1.4fr 1.4fr auto; }
+  .qhome { display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+           font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase;
+           color: var(--ink-3); border: 1px solid var(--rule); border-radius: 3px; padding: 3px 8px; background: #FFF; }
+  .qhome.on { color: var(--accent); border-color: var(--accent); }
+  .qhome input { width: auto; margin: 0; }
   .subrow.art:has(input:nth-of-type(3)) { grid-template-columns: 0.9fr 1.4fr 1.3fr auto auto; }
   .subrow .check { font-size: 0.78rem; white-space: nowrap; }
 
@@ -515,6 +518,9 @@ var GLOBALS = { publications: "PUBLICATIONS", people: "PEOPLE", projects: "PROJE
                 news: "NEWS", research: "RESEARCH" };
 var STATUSES = [["preparation","In preparation"],["submitted","Submitted"],
                 ["revision","In revision"],["accepted","Accepted"]];
+var KINDS = [["Press","Press coverage"],["Award","Award"],["Talk","Invited talk / seminar"],
+             ["Conference","Conference"],["Media","Media / broadcast"],["Funding","New project / funding"],
+             ["Service","Service / appointment"],["Lab","Lab life"]];
 var TRACKS = [["thermal","Thermal"],["energy","Energy"],["transducers","Transducers"],["none","Fellowship / other"]];
 var GROUPS = ["Post-doctoral researcher","Integrated Ph.D. programme","M.S. programme"];
 
@@ -526,6 +532,14 @@ var docs = {
   research:     window.RESEARCH     || { programmes: [] }
 };
 var tab = "publications", openRow = null, filter = "";
+(function () {                                   /* dates and kinds the News page already assumes */
+  var D = { s2025: "2025-04-18", s2023: "2023-11-14", s2022: "2022-03-22", s2020: "2020-06-12",
+            xmttln8d5ashe: "2026-08-10" };
+  (docs.news.stories || []).forEach(function (s) {
+    if (!s.date && D[s.id]) s.date = D[s.id];
+    if (!s.kind) s.kind = ((s.items && s.items.length) || s.doi) ? "Press" : "Lab";
+  });
+})();
 (function () {
   var P = docs.publications.papers || [];
   if (!P.some(function (p) { return "home" in p; }))
@@ -730,7 +744,8 @@ function paperForm(p) {
     actions(p.id, "Delete paper");
 }
 function paperBadges(p) {
-  return (p.home ? '<span class="badge b-home">Home</span>' : "") +
+  return '<label class="qhome' + (p.home ? " on" : "") + '" title="Show in Latest News on the home page">' +
+    '<input type="checkbox" data-id="' + p.id + '" data-key="home"' + (p.home ? " checked" : "") + '> Home</label>' +
     (isCorr(p.authors) ? '<span class="badge b-corr">Corresponding</span>' : "");
 }
 
@@ -744,10 +759,11 @@ function viewPublications() {
     d.pipeline.length + " items", "+ Add", 'data-add="pipe"');
   h += d.pipeline.length ? d.pipeline.map(function (it) {
     var label = (STATUSES.filter(function (s) { return s[0] === it.status; })[0] || ["", it.status])[1];
-    return rowShell(it.id, it.title, "", '<span class="badge b-' + esc(it.status) + '">' + esc(label) + "</span>",
+    return rowShell(it.id, it.title, "", paperBadges(it) + '<span class="badge b-' + esc(it.status) + '">' + esc(label) + "</span>",
       function () {
         return f("Title", it.id, "title", it.title, { full: true, area: true }) +
           f("Status", it.id, "status", it.status, { select: STATUSES }) +
+          check("Show in Latest News on the home page", it.id, "home", it.home) +
           '<div class="field"><label>When it is published</label><button class="btn" data-promote="' +
             it.id + '" type="button">Move to Published →</button></div>' + actions(it.id);
       });
@@ -840,15 +856,20 @@ function viewNews() {
     "+ Add news", 'data-add="story"') + "</section>";
   h += '<p class="empty" style="padding:0 0 12px">Every news item and every press article has its own ' +
     '“Home” tick. Each ticked one becomes its own card in Latest News on the home page, newest first.</p>';
-  d.stories.forEach(function (s) {
+  d.stories.slice().sort(function (a, b) {
+    return String(b.date || b.when || "").localeCompare(String(a.date || a.when || ""));
+  }).forEach(function (s) {
     if (!hit(s.headline + " " + s.when + " " + s.items.map(function (i) { return i.outlet + i.title; }).join(" "))) return;
     h += '<section class="group">' + rowShell(s.id, s.headline,
-      esc(s.when) + (s.items.length ? " · " + s.items.length + " press articles" : ""),
+      esc(s.date || s.when) + (s.items.length ? " · " + s.items.length + " press articles" : ""),
       (s.home ? '<span class="badge b-home">Home</span>' : "") +
-      '<span class="badge b-' + (s.tag === "Thermal" ? "thermal" : "energy") + '">' + esc(s.tag) + "</span>",
+      '<span class="badge">' + esc(s.kind || "Lab") + "</span>",
       function () {
         return f("Headline", s.id, "headline", s.headline, { full: true, area: true }) +
-          f("When", s.id, "when", s.when, { hint: "e.g. 2027 · March" }) +
+          f("Date", s.id, "date", s.date || "", { type: "date",
+            hint: "The News page groups by the year of this date, newest first." }) +
+          f("Kind", s.id, "kind", s.kind || "Lab", { select: KINDS,
+            hint: "Award, talk, conference, media, new project — it colours the card." }) +
           check("Show in Latest News on the home page", s.id, "home", s.home) +
           f("Link", s.id, "url", s.url || "", { full: true,
             hint: "Optional. A web page for this news (e.g. the KIST press release). The card opens it directly." }) +
@@ -999,6 +1020,7 @@ document.addEventListener("input", function (e) {
   found.item[el.dataset.key] = el.type === "checkbox" ? el.checked : el.value;
   touch(found.name);
   var k = el.dataset.key;
+  if (k === "home" && el.type === "checkbox") { render(); return; }
   if ((k === "title" || k === "name" || k === "headline") && el.closest(".form") && !el.closest(".sub")) {
     var t = el.closest(".row").querySelector(".r-title");
     if (t) t.textContent = el.value || "Untitled";
@@ -1011,6 +1033,7 @@ document.addEventListener("change", function (e) {
   found.item[el.dataset.key] = el.value; touch(found.name); render();
 });
 document.addEventListener("click", function (e) {
+  if (e.target.closest(".qhome")) return;          /* the quick Home tick on a row: don't open the row */
   var t = e.target.closest("[data-tab],[data-toggle],[data-del],[data-add],[data-promote],[data-graduate],[data-dl]");
   if (!t) return;
   var ds = t.dataset;
@@ -1037,7 +1060,7 @@ document.addEventListener("click", function (e) {
     if (!it) return;
     var nid = uid();
     docs.publications.papers.unshift({ id: nid, year: String(new Date().getFullYear()),
-      authors: "", title: it.title, journal: "", detail: "" });
+      authors: "", title: it.title, journal: "", detail: "", home: !!it.home });
     docs.publications.pipeline.splice(docs.publications.pipeline.indexOf(it), 1);
     openRow = nid; touch("publications"); render(); return;
   }
@@ -1063,7 +1086,8 @@ document.addEventListener("click", function (e) {
     else if (ds.add === "alum") { docs.people.alumni.unshift({ id: id, name: "", term: "", now: "" }); touch("people"); }
     else if (ds.add === "project") { docs.projects.projects.unshift({ id: id, title: "", funder: "",
       start: "", end: "", track: "thermal", done: false }); touch("projects"); }
-    else if (ds.add === "story") { docs.news.stories.unshift({ id: id, home: true, when: "", headline: "", blurb: "",
+    else if (ds.add === "story") { docs.news.stories.unshift({ id: id, home: true,
+      date: new Date().toISOString().slice(0, 10), kind: "Lab", when: "", headline: "", blurb: "",
       tag: "Energy", source: "", items: [] }); touch("news"); }
     else if (ds.add === "article") {
       var s = docs.news.stories.filter(function (x) { return x.id === ds.arg; })[0]; if (!s) return;
@@ -1206,11 +1230,11 @@ var SHEET = {
     }
   },
   news: {
-    cols: ["id","kind","home","image","when","headline","blurb","tag","source","doi","outlet","title","url","video"],
+    cols: ["id","kind","home","date","newskind","image","when","headline","blurb","tag","source","doi","outlet","title","url","video"],
     rows: function (d) {
       var out = [];
       d.stories.forEach(function (s) {
-        out.push({ id: s.id, kind: "story", home: s.home ? "yes" : "", image: s.image, when: s.when,
+        out.push({ id: s.id, kind: "story", home: s.home ? "yes" : "", date: s.date, newskind: s.kind, image: s.image, when: s.when,
                    headline: s.headline, blurb: s.blurb, tag: s.tag, source: s.source, doi: s.doi, url: s.url });
         (s.items || []).forEach(function (a) {
           out.push({ id: a.id, kind: "article", home: a.home ? "yes" : "", outlet: a.outlet, title: a.title,
@@ -1227,7 +1251,8 @@ var SHEET = {
           cur.items.push({ id: r.id || uid(), outlet: r.outlet, title: r.title,
                            url: r.url, video: yes(r.video), home: yes(r.home) });
         } else {
-          cur = { id: r.id || uid(), home: yes(r.home), image: r.image, when: r.when, headline: r.headline,
+          cur = { id: r.id || uid(), home: yes(r.home), date: r.date || "", kind: r.newskind || "Lab",
+                  image: r.image, when: r.when, headline: r.headline,
                   blurb: r.blurb, tag: r.tag || "Energy", source: r.source, doi: r.doi || "", url: r.url || "", items: [] };
           d.stories.push(cur);
         }

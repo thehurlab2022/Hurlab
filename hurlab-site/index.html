@@ -622,6 +622,10 @@
     .filter(function (p) { return String(p.title || "").trim(); });
   var anySet = PAPERS.some(function (p) { return "home" in p; });
   var papers = anySet ? PAPERS.filter(function (p) { return p.home; }) : PAPERS.slice(0, 3);
+  /* in press / under review, ticked in the editor */
+  var STATUS = { accepted: "Accepted", revision: "In revision", submitted: "Submitted", preparation: "In preparation" };
+  var pipe = ((window.PUBLICATIONS && window.PUBLICATIONS.pipeline) || [])
+    .filter(function (p) { return p.home && String(p.title || "").trim(); });
   var DOIS = {
 "w1": "10.1088/2631-7990/ae8aca",
 "w2": "10.1007/s42114-026-01782-y",
@@ -699,13 +703,14 @@
       if (!it.home) return;
       var u = unamp(it.url), k = it.outlet + "|" + u;
       if (Object.prototype.hasOwnProperty.call(FIX, k)) u = FIX[k];
-      if (u && String(it.title || "").trim()) articles.push({ kind: "article", y: yearOf(s.when), s: s, it: it, url: u });
+      if (u && String(it.title || "").trim()) articles.push({ kind: "article", y: yearOf(s.date || s.when), s: s, it: it, url: u });
     });
   });
 
-  var items = picked.map(function (s) { return { kind: "story", y: yearOf(s.when), s: s }; })
+  var items = picked.map(function (s) { return { kind: "story", y: yearOf(s.date || s.when), s: s }; })
     .concat(articles)
-    .concat(papers.map(function (p) { return { kind: "paper", y: yearOf(p.year), p: p }; }));
+    .concat(papers.map(function (p) { return { kind: "paper", y: yearOf(p.year), p: p }; }))
+    .concat(pipe.map(function (p) { return { kind: "pipe", y: new Date().getFullYear() + 1, p: p }; }));   /* newest of all */
   items.sort(function (a, b) { return b.y - a.y; });          /* newest first; ties keep their order */
   if (!items.length) { el.closest(".home-sec").hidden = true; return; }
 
@@ -740,6 +745,18 @@
             "<span>Read the article &#8599;</span></div>" +
         "</div></a></li>";
   }
+  function pipeCard(p) {
+    var f = fieldOf(p);
+    return '<li class="card news paper ' + (FTONE[f] || "t-mech") + '">' +
+      '<a href="publications.html">' +
+        '<div class="card-img">' + img(p.image, p.title, "") +
+          '<span class="when">' + esc(STATUS[p.status] || "In press") + "</span>" +
+          "<h3>" + esc(p.title) + "</h3></div>" +
+        '<div class="card-body"><p>' + esc(STATUS[p.status] === "Accepted" ? "Accepted for publication." : "Coming soon.") + "</p>" +
+          '<div class="foot"><span class="badge">' + esc((progOf(f) || {}).title || "Paper") + "</span>" +
+            "<span>Publications &rarr;</span></div>" +
+        "</div></a></li>";
+  }
   function storyCard(s) {
     var n = (s.items || []).length;
     var tone = TAGTONE[s.tag] || "t-elec";
@@ -757,7 +774,7 @@
         "</div></a></li>";
   }
   el.innerHTML = items.map(function (it) {
-    return it.kind === "paper" ? paperCard(it.p) : it.kind === "article" ? articleCard(it) : storyCard(it.s);
+    return it.kind === "pipe" ? pipeCard(it.p) : it.kind === "paper" ? paperCard(it.p) : it.kind === "article" ? articleCard(it) : storyCard(it.s);
   }).join("");
 
   var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
