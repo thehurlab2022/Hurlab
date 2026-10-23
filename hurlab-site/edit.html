@@ -484,7 +484,7 @@
 <body>
 <div class="bar"><div class="wrap">
     <div class="bar-top">
-      <h1 class="brand">사이트 편집기 <span>HUR Lab</span></h1>
+      <h1 class="brand">사이트 편집기 <span>HUR Lab · v3</span></h1>
       <input id="q" type="search" placeholder="검색…" aria-label="검색">
       <button class="btn primary" id="exportBtn" type="button">코드 받기</button>
       <button class="btn" id="xlsDown" type="button">엑셀로 내려받기</button>
@@ -1177,6 +1177,24 @@ function halt() {
   $("tabs").innerHTML = "";
 }
 
+/* 지금 어떤 내용을 들고 있는지 한 줄로 보여 줍니다 */
+function stampNote() {
+  var el = document.getElementById("stamp");
+  if (!el) {
+    el = document.createElement("p");
+    el.id = "stamp";
+    el.style.cssText = "margin:12px 0 0;font-size:0.84rem;color:var(--ink-3)";
+    document.querySelector(".intro").appendChild(el);
+  }
+  var bits = [];
+  for (var k in docs) {
+    var n = counts(k);
+    if (k === "photos") continue;
+    bits.push(k + " " + n + (docs[k].updated ? " (" + docs[k].updated + ")" : ""));
+  }
+  el.innerHTML = "지금 불러온 내용: " + bits.join(" · ") +
+    " — 숫자가 홈페이지와 다르면 <b>Ctrl+Shift+R</b>로 새로고침하세요.";
+}
 function liveNote() {
   if (!window.__FROM_LIVE || document.getElementById("liveNote")) return;
   var n = document.createElement("p");
@@ -1193,6 +1211,7 @@ function render() {
       esc(t[1]) + '<span class="c">' + counts(t[0]) + "</span>" +
       (dirty[t[0]] ? '<span class="dirty">●</span>' : "") + "</button>";
   }).join("");
+  stampNote();
   if (tab === "photos") picLoadActivity();
   $("view").innerHTML = VIEWS[tab]();
   if (tab === "photos") picDraw();
