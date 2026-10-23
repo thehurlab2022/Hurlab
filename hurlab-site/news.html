@@ -510,7 +510,7 @@
   /* Dates and kinds for the stories in news.js, and the lab's activity —
      awards, talks, conferences, media — carried over from the old site.
      Anything set in news.js (date, kind) wins over what is written here. */
-  var DATES = { s2025: "2025-04-18", s2023: "2023-11-14", s2022: "2022-03-22", s2020: "2020-06-12",
+  var DATES = { s2025: "2025-04-20", s2023: "2023-11-14", s2022: "2022-03-22", s2020: "2020-06-12",
                 xmttln8d5ashe: "2026-08-10" };
   var KINDS = { s2025: "Press", s2023: "Press", s2022: "Press", s2020: "Press",
                 xmttln8d5ashe: "Funding" };
@@ -576,6 +576,7 @@
 
   S.forEach(function (st) {
     if (!st.date && DATES[st.id]) st.date = DATES[st.id];
+    st.shots = [];
     if (!st.kind) st.kind = KINDS[st.id] || (st.items.length || st.doi ? "Press" : "Lab");
   });
   ACTIVITY.forEach(function (a) {
@@ -644,10 +645,11 @@
 
   /* ---- the optional pictures ---- */
   S.forEach(function (st, i) {
-    if (!st.maybe || !st.image) return;
-    var base = st.image.replace(/\.jpg$/, "");
+    var base = st.maybe ? st.image.replace(/\.jpg$/, "")
+                        : (st.date ? "images/news-" + st.date : "");
+    if (!base) return;
     for (var k = 1; k <= 8; k++) (function (k) {
-      var src = k === 1 ? st.image : base + "-" + k + ".jpg";
+      var src = k === 1 ? base + ".jpg" : base + "-" + k + ".jpg";
       var im = new Image();
       im.onload = function () {
         st.shots.push({ n: k, src: src });
@@ -656,6 +658,12 @@
         var btn = document.querySelector('button[data-i="' + i + '"]');
         if (!btn) return;
         var box = btn.querySelector(".n-img");
+        if (box && !st.maybe) {                     /* it already has its own cover */
+          var tag0 = box.querySelector(".more-n");
+          if (!tag0) { tag0 = document.createElement("span"); tag0.className = "more-n"; box.appendChild(tag0); }
+          tag0.textContent = "+" + st.shots.length;
+          return;
+        }
         if (!box) {
           box = document.createElement("div");
           box.className = "n-img";
@@ -683,12 +691,15 @@
       '" target="_blank" rel="noopener">Read the paper &#8599;</a>');
     if (s.url) links.push('<a href="' + esc(unamp(s.url)) + '" target="_blank" rel="noopener">Read more &#8599;</a>');
     body.innerHTML =
-      (s.maybe
-        ? (s.shots && s.shots.length
-            ? '<div class="d-shots">' + s.shots.map(function (p) {
-                return '<img src="' + esc(p.src) + '" alt="">'; }).join("") + "</div>"
-            : "")
-        : (s.image ? '<div class="d-img"><img src="' + esc(s.image) + '" alt=""></div>' : "")) +
+      (function () {
+        var list = (s.image && !s.maybe ? [s.image] : [])
+          .concat((s.shots || []).map(function (p) { return p.src; }));
+        if (!list.length) return "";
+        if (list.length === 1 && !s.maybe)
+          return '<div class="d-img"><img src="' + esc(list[0]) + '" alt=""></div>';
+        return '<div class="d-shots">' + list.map(function (u) {
+          return '<img src="' + esc(u) + '" alt="">'; }).join("") + "</div>";
+      })() +
       '<div class="d-body">' +
         '<div class="d-meta"><span>' + esc(shown(s)) + "</span>" +
           (s.kind ? '<span class="tagb tone">' + esc(s.kind) + "</span>" : "") +
