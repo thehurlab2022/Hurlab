@@ -453,11 +453,15 @@
   }
 </style>
 
-<script src="content/research.js"></script>
-<script src="content/people.js"></script>
-<script src="content/publications.js"></script>
-<script src="content/projects.js"></script>
-<script src="content/news.js"></script>
+<script>
+/* 브라우저가 들고 있는 낡은 사본이 아니라, 지금 올라가 있는 내용을 읽습니다 */
+(function () {
+  var t = Date.now();
+  document.write(["research", "people", "publications", "projects", "news"].map(function (k) {
+    return '<script src="content/' + k + ".js?t=" + t + '"><\/script>';
+  }).join(""));
+})();
+</script>
 <script>
 /* Opened straight from the computer (C:\…\edit.html) there is no content/
    folder beside this file. Read the live site's content instead, so the
