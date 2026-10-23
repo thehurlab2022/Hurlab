@@ -276,18 +276,16 @@
     --rule:    #E6EAEF;
     --chip-bg: #EFF2F6;
   }
-  /* ---------- the mark, revealed left to right from the H ---------- */
+  /* ---------- the mark: shown straight away ---------- */
   .hero-logo {
     width: min(230px, 52vw); height: auto; display: block;
     margin: 0 auto 4px;
-    clip-path: inset(0 100% 0 0);
-    animation: logo-wipe 1.15s cubic-bezier(.22,.72,.24,1) .15s forwards;
   }
   @keyframes logo-wipe {
     from { clip-path: inset(0 100% 0 0); }
     to   { clip-path: inset(0 -2% 0 0); }
   }
-  .hero-top > *:not(.hero-logo) { animation: hero-in .7s ease .95s both; }
+  .hero-top > *:not(.hero-logo) { animation: hero-in .6s ease .25s both; }   /* the logo is there at once; the words follow */
   @keyframes hero-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
   @media (prefers-reduced-motion: reduce) {
@@ -318,7 +316,6 @@
     </nav>
   </div>
 </header>
-
 <style>
   .legend {
     display: flex; flex-wrap: wrap; gap: 8px 22px;
@@ -412,11 +409,32 @@
            font-family: var(--mono); font-size: 0.84rem; }
   mark { background: color-mix(in srgb, var(--accent) 34%, transparent); color: inherit; border-radius: 2px; }
 
+  /* ---------- the paper's own figure, when images/pub-<id>.jpg is there ---------- */
+  .entries li.has-fig { grid-template-columns: 190px 1fr; column-gap: 22px; align-items: start; }
+  .entries li.has-fig > .p-title,
+  .entries li.has-fig > .p-authors,
+  .entries li.has-fig > .p-venue { grid-column: 2; }
+  .p-fig {
+    grid-column: 1; grid-row: 1 / span 3; align-self: start;
+    border: 1px solid var(--rule); border-radius: 10px; overflow: hidden;
+    background: var(--surface); display: block;
+  }
+  .p-fig img {
+    width: 100%; height: auto; display: block;
+    transition: transform .35s ease;
+  }
+  .p-fig:hover img { transform: scale(1.04); }
+
   @media (max-width: 700px) {
     .yearblock { grid-template-columns: 1fr; gap: 0; }
     .yearmark { position: static; padding-top: 30px; padding-bottom: 6px; }
     .yearmark b { display: inline; margin-right: 8px; }
     .count { margin-left: 0; }
+    .entries li.has-fig { grid-template-columns: 1fr; }
+    .entries li.has-fig > .p-title,
+    .entries li.has-fig > .p-authors,
+    .entries li.has-fig > .p-venue { grid-column: 1; }
+    .p-fig { grid-row: auto; max-width: 320px; }
   }
 </style>
 
@@ -534,6 +552,42 @@
     D.papers.forEach(function (p) { if (set.indexOf(p.year) < 0) set.push(p.year); });
     return set.sort(function (a, b) { return String(b).localeCompare(String(a), undefined, { numeric: true }); });
   }
+  function hrefOf(p) {
+    var doi = p.doi || DOIS[p.id] || "";
+    return doi ? "https://doi.org/" + String(doi).replace(/^https?:\/\/doi\.org\//i, "") : (p.url || "");
+  }
+
+  /* ---- the figure of a paper ----------------------------------------------
+     Upload images/pub-<id>.jpg (e.g. images/pub-w15.jpg) and it appears beside
+     that paper. Nothing is shown while the file is not there. A figure named in
+     content/publications.js (image: "images/…") wins.                        */
+  var FIGS = {};                       /* id -> src, once the browser has it */
+  function figSrc(p) { return p.image || "images/pub-" + p.id + ".jpg"; }
+  function placeFigs() {
+    D.papers.forEach(function (p) {
+      var src = FIGS[p.id];
+      if (!src) return;
+      var li = document.querySelector('.entries li[data-id="' + p.id + '"]');
+      if (!li || li.querySelector(".p-fig")) return;
+      var href = hrefOf(p);
+      var box = document.createElement(href ? "a" : "div");
+      box.className = "p-fig";
+      if (href) { box.href = href; box.target = "_blank"; box.rel = "noopener"; }
+      var im = document.createElement("img");
+      im.src = src; im.alt = ""; im.loading = "lazy";
+      box.appendChild(im);
+      li.insertBefore(box, li.firstChild);
+      li.classList.add("has-fig");
+    });
+  }
+  function findFigs() {
+    D.papers.forEach(function (p) {
+      var src = figSrc(p);
+      var probe = new Image();
+      probe.onload = function () { FIGS[p.id] = src; placeFigs(); };
+      probe.src = src;
+    });
+  }
 
   var listEl = document.getElementById("list"), pipeEl = document.getElementById("pipe");
   var countEl = document.getElementById("count"), emptyEl = document.getElementById("empty");
@@ -563,12 +617,10 @@
       html += '<section class="yearblock"><div class="yearmark"><b>' + esc(y) + "</b>" +
         ((corrOnly || term) ? rows.length + " shown" : esc(note)) + '</div><ul class="entries">';
       rows.forEach(function (p) {
-        var doi = p.doi || DOIS[p.id] || "";
-        var href = doi ? "https://doi.org/" + String(doi).replace(/^https?:\/\/doi\.org\//i, "")
-                       : (p.url || "");
+        var href = hrefOf(p);
         var t = esc(p.title);
         if (href) t = '<a href="' + esc(href) + '" target="_blank" rel="noopener">' + t + "</a>";
-        html += highlight('<li><h3 class="p-title">' + t +
+        html += highlight('<li data-id="' + esc(p.id) + '"><h3 class="p-title">' + t +
           (isCorr(p.authors) ? '<span class="corr-flag">Corresponding</span>' : "") + "</h3>" +
           '<p class="p-authors">' + markPI(esc(p.authors)) + "</p>" +
           '<p class="p-venue"><em>' + esc(p.journal) + "</em>" +
@@ -580,6 +632,7 @@
     listEl.innerHTML = html;
     emptyEl.hidden = shown > 0;
     countEl.textContent = shown === total ? total + " publications" : shown + " of " + total + " publications";
+    placeFigs();
   }
 
   qEl.addEventListener("input", render);
@@ -588,6 +641,7 @@
     render();
   });
   render();
+  findFigs();
 
   var ys = years();
   if (ys.length) {
