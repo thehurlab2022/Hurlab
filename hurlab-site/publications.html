@@ -399,6 +399,12 @@
     font-variant-numeric: tabular-nums;
   }
   .p-venue em { font-style: normal; color: var(--accent); }
+  .p-id {
+    font-family: var(--mono); font-size: 0.66rem; color: var(--ink-3);
+    background: var(--chip-bg); border-radius: 4px; padding: 1px 6px; margin-left: 10px;
+    opacity: 0.55;
+  }
+  .entries li:hover .p-id { opacity: 1; }
   .corr-flag {
     display: inline-block; font-family: var(--mono); font-size: 0.62rem;
     letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent);
@@ -562,7 +568,7 @@
      that paper. Nothing is shown while the file is not there. A figure named in
      content/publications.js (image: "images/…") wins.                        */
   var FIGS = {};                       /* id -> src, once the browser has it */
-  function figSrc(p) { return p.image || "images/pub-" + p.id + ".jpg"; }
+  var EXT = [".jpg", ".jpeg", ".png", ".JPG", ".JPEG", ".PNG"];
   function placeFigs() {
     D.papers.forEach(function (p) {
       var src = FIGS[p.id];
@@ -582,11 +588,16 @@
   }
   function findFigs() {
     D.papers.forEach(function (p) {
-      var src = figSrc(p);
+      if (p.image) { look(p, p.image, EXT.length); return; }   /* named in publications.js */
+      look(p, "images/pub-" + p.id, 0);
+    });
+    function look(p, stem, ei) {
+      var src = ei >= EXT.length ? stem : stem + EXT[ei];
       var probe = new Image();
       probe.onload = function () { FIGS[p.id] = src; placeFigs(); };
+      probe.onerror = function () { if (ei < EXT.length) look(p, stem, ei + 1); };
       probe.src = src;
-    });
+    }
   }
 
   var listEl = document.getElementById("list"), pipeEl = document.getElementById("pipe");
@@ -624,7 +635,9 @@
           (isCorr(p.authors) ? '<span class="corr-flag">Corresponding</span>' : "") + "</h3>" +
           '<p class="p-authors">' + markPI(esc(p.authors)) + "</p>" +
           '<p class="p-venue"><em>' + esc(p.journal) + "</em>" +
-          (p.detail ? " &nbsp;" + esc(p.detail) : "") + "</p></li>", term);
+          (p.detail ? " &nbsp;" + esc(p.detail) : "") +
+          '<span class="p-id" title="Its figure is images/pub-' + esc(p.id) + '.jpg">' +
+          esc(p.id) + "</span></p></li>", term);
       });
       html += "</ul></section>";
     });

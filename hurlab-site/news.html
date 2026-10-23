@@ -396,6 +396,12 @@
   }
   dialog.story::backdrop { background: rgba(10, 14, 20, 0.45); }
   .d-shots { display: grid; gap: 10px; background: var(--surface); padding: 12px; }
+  .d-shots video { width: 100%; max-height: 70vh; display: block; border-radius: 8px; background: #000; }
+  .n-img .play {
+    position: absolute; left: 10px; bottom: 10px; display: inline-flex; align-items: center; gap: 5px;
+    font-family: var(--mono); font-size: 0.66rem; color: #FFFFFF;
+    background: rgba(10, 14, 20, 0.6); border-radius: 999px; padding: 3px 9px;
+  }
   .d-shots img { width: 100%; max-height: 70vh; object-fit: contain; display: block;
                  border-radius: 8px; background: #FFFFFF; }
   .n-img .more-n {
@@ -643,42 +649,68 @@
       }).join("") + "</ul></section>";
   }).join("");
 
-  /* ---- the optional pictures ---- */
+  /* ---- the optional pictures ------------------------------------------
+     Upload images/news-YYYY-MM-DD.jpg for an entry (and -2, -3 … for more of
+     them). .jpeg and .png work too. Nothing shows while the file is not there. */
+  var EXT = [".jpg", ".jpeg", ".png", ".JPG", ".JPEG", ".PNG"];
   S.forEach(function (st, i) {
     var base = st.maybe ? st.image.replace(/\.jpg$/, "")
                         : (st.date ? "images/news-" + st.date : "");
     if (!base) return;
-    for (var k = 1; k <= 8; k++) (function (k) {
-      var src = k === 1 ? base + ".jpg" : base + "-" + k + ".jpg";
+
+    function show(k, src) {
+      st.shots.push({ n: k, src: src });
+      st.shots.sort(function (a, b) { return a.n - b.n; });
+      st.ok = true;
+      var btn = document.querySelector('button[data-i="' + i + '"]');
+      if (!btn) return;
+      var box = btn.querySelector(".n-img");
+      if (box && !st.maybe) {                       /* the entry already has a cover */
+        tagMore(box, st.shots.length);
+        return;
+      }
+      if (!box) {
+        box = document.createElement("div");
+        box.className = "n-img";
+        box.appendChild(document.createElement("img"));
+        btn.insertBefore(box, btn.firstChild);
+      }
+      box.querySelector("img").src = st.shots[0].src;   /* the first one is the cover */
+      if (st.shots.length > 1) tagMore(box, st.shots.length - 1);
+    }
+    function tagMore(box, n) {
+      var tag = box.querySelector(".more-n");
+      if (!tag) { tag = document.createElement("span"); tag.className = "more-n"; box.appendChild(tag); }
+      tag.textContent = "+" + n;
+    }
+    function look(stem, k, ei) {
+      if (ei >= EXT.length) return;
       var im = new Image();
-      im.onload = function () {
-        st.shots.push({ n: k, src: src });
-        st.shots.sort(function (a, b) { return a.n - b.n; });
-        st.ok = true;
-        var btn = document.querySelector('button[data-i="' + i + '"]');
-        if (!btn) return;
-        var box = btn.querySelector(".n-img");
-        if (box && !st.maybe) {                     /* it already has its own cover */
-          var tag0 = box.querySelector(".more-n");
-          if (!tag0) { tag0 = document.createElement("span"); tag0.className = "more-n"; box.appendChild(tag0); }
-          tag0.textContent = "+" + st.shots.length;
-          return;
-        }
-        if (!box) {
-          box = document.createElement("div");
-          box.className = "n-img";
-          box.appendChild(document.createElement("img"));
-          btn.insertBefore(box, btn.firstChild);
-        }
-        box.querySelector("img").src = st.shots[0].src;       /* the first one is the cover */
-        var tag = box.querySelector(".more-n");
-        if (st.shots.length > 1) {
-          if (!tag) { tag = document.createElement("span"); tag.className = "more-n"; box.appendChild(tag); }
-          tag.textContent = "+" + (st.shots.length - 1);
-        }
-      };
-      im.src = src;
-    })(k);
+      im.onload = function () { show(k, im.src); };
+      im.onerror = function () { look(stem, k, ei + 1); };
+      im.src = stem + EXT[ei];
+    }
+    for (var k = 1; k <= 8; k++) look(k === 1 ? base : base + "-" + k, k, 0);
+
+    /* a film of the same name — images/news-YYYY-MM-DD.mp4 — plays inside the entry */
+    var VEXT = [".mp4", ".webm", ".MP4", ".mov", ".MOV"];
+    var vid = document.createElement("video");
+    vid.preload = "metadata";
+    vid.onerror = function () { if (++vi < VEXT.length) vid.src = base + VEXT[vi]; };
+    vid.onloadedmetadata = function () {
+      st.film = vid.src;
+      var btn = document.querySelector('button[data-i="' + i + '"]');
+      if (!btn) return;
+      var box = btn.querySelector(".n-img");
+      if (box && !box.querySelector(".play")) {
+        var tag = document.createElement("span");
+        tag.className = "play";
+        tag.textContent = "\u25B6 Film";
+        box.appendChild(tag);
+      }
+    };
+    var vi = 0;
+    vid.src = base + VEXT[vi];
   });
 
   /* ---- open a story ---- */
@@ -694,6 +726,10 @@
       (function () {
         var list = (s.image && !s.maybe ? [s.image] : [])
           .concat((s.shots || []).map(function (p) { return p.src; }));
+        if (s.film) {
+          return '<div class="d-shots"><video src="' + esc(s.film) + '" controls playsinline preload="metadata"></video>' +
+            list.map(function (u) { return '<img src="' + esc(u) + '" alt="">'; }).join("") + "</div>";
+        }
         if (!list.length) return "";
         if (list.length === 1 && !s.maybe)
           return '<div class="d-img"><img src="' + esc(list[0]) + '" alt=""></div>';

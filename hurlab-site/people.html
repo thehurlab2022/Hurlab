@@ -276,18 +276,16 @@
     --rule:    #E6EAEF;
     --chip-bg: #EFF2F6;
   }
-  /* ---------- the mark, revealed left to right from the H ---------- */
+  /* ---------- the mark: shown straight away ---------- */
   .hero-logo {
     width: min(230px, 52vw); height: auto; display: block;
     margin: 0 auto 4px;
-    clip-path: inset(0 100% 0 0);
-    animation: logo-wipe 1.15s cubic-bezier(.22,.72,.24,1) .15s forwards;
   }
   @keyframes logo-wipe {
     from { clip-path: inset(0 100% 0 0); }
     to   { clip-path: inset(0 -2% 0 0); }
   }
-  .hero-top > *:not(.hero-logo) { animation: hero-in .7s ease .95s both; }
+  .hero-top > *:not(.hero-logo) { animation: hero-in .6s ease .25s both; }   /* the logo is there at once; the words follow */
   @keyframes hero-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
   @media (prefers-reduced-motion: reduce) {
@@ -318,7 +316,6 @@
     </nav>
   </div>
 </header>
-
 <style>
   .pi {
     border-top: 2px solid var(--accent);
@@ -539,14 +536,46 @@
     var b = parts.length > 1 ? parts[parts.length - 1][0] : "";
     return (a + b).toUpperCase();
   }
+
+  /* ---- a photo is found by name, even if content/people.js has no path ----
+     "Gimin Park, Ph.D." → images/gimin-park.jpg. A path written in people.js
+     still wins; .jpeg and .png are tried as well. Nothing shows while the
+     file is not there — the initials stay instead. */
+  function slug(name) {
+    var s = String(name || "").replace(/,.*$/, "");
+    if (s.normalize) s = s.normalize("NFKD");
+    s = s.replace(/[^\x20-\x7E]/g, "").trim().toLowerCase()
+         .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    if (s.length > 40) s = s.slice(0, 40).replace(/-[^-]*$/, "");
+    return s;
+  }
+  var EXT = [".jpg", ".jpeg", ".png", ".JPG", ".PNG"];
+  function findPhoto(p, box) {
+    if (p.photo || !slug(p.name)) return;
+    var stem = "images/" + slug(p.name), i = 0;
+    (function look() {
+      if (i >= EXT.length) return;
+      var im = new Image();
+      im.onload = function () {
+        im.alt = p.name; im.loading = "lazy";
+        box.className = "portrait";
+        box.removeAttribute("style");
+        box.innerHTML = "";
+        box.appendChild(im);
+      };
+      im.onerror = function () { i++; look(); };
+      im.src = stem + EXT[i];
+    })();
+  }
+
   var tintIndex = 0;
-  function portrait(p) {
+  function portrait(p, i) {
     if (p.photo) {
       return '<div class="portrait"><img src="' + esc(p.photo) + '" alt="' + esc(p.name) + '" loading="lazy"></div>';
     }
     var t = TINTS[tintIndex++ % TINTS.length];
-    return '<div class="portrait empty" style="--tint: ' + t[0] + '; --tone: ' + t[1] + '" role="img" ' +
-      'aria-label="Portrait of ' + esc(p.name) + ' not yet supplied"><span class="mono">' +
+    return '<div class="portrait empty" data-who="' + i + '" style="--tint: ' + t[0] + '; --tone: ' + t[1] + '" role="img" ' +
+      'aria-label="Portrait of ' + esc(p.name) + '"><span class="mono">' +
       esc(initials(p.name)) + "</span></div>";
   }
 
@@ -558,7 +587,7 @@
     return '<section class="group"><div class="group-head"><h2>' + esc(g) + "</h2>" +
       '<span class="n">' + people.length + "</span></div><ul class=\"roster\">" +
       people.map(function (p) {
-        return "<li>" + portrait(p) + '<div class="r-body">' +
+        return "<li>" + portrait(p, D.members.indexOf(p)) + '<div class="r-body">' +
           '<span class="r-name">' + esc(p.name) + "</span>" +
           '<span class="r-since">' + esc(p.since) + "</span>" +
           '<span class="r-where">' + esc(p.where) + "</span>" +
@@ -568,6 +597,12 @@
           "</li>";
       }).join("") + "</ul></section>";
   }).join("");
+
+  /* every portrait still showing initials goes looking for its own file */
+  [].slice.call(document.querySelectorAll(".portrait.empty[data-who]")).forEach(function (box) {
+    var p = D.members[+box.dataset.who];
+    if (p) findPhoto(p, box);
+  });
 
   document.getElementById("alumniCount").textContent = D.alumni.length;
   document.getElementById("alumniList").innerHTML = D.alumni.map(function (a) {

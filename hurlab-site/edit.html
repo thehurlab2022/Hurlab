@@ -575,6 +575,8 @@ var tab = "publications", openRow = null, filter = "";
     P.forEach(function (p, i) { p.home = i < 3; });
 })();
 var dirty = {};
+/* 처음 불러온 내용을 그대로 복사해 둡니다. 코드 받기 전에 무엇이 사라지는지 비교합니다. */
+var ORIG = JSON.parse(JSON.stringify(docs));
 
 /* ── safety catch ─────────────────────────────────────────────────────────
    If the content/ files did not load, every tab would look empty — and
@@ -1340,13 +1342,67 @@ function picDownload() {
 }
 
 /* ── the code to paste ───────────────────────────────────────────────── */
+/* 엑셀에는 없던 항목(사진 경로, DOI, 기사 목록 …)을 id로 찾아 되살립니다 */
+function keepMissing(fresh, old) {
+  var was = {};
+  (function walk(o) {
+    for (var k in o) if (Array.isArray(o[k])) o[k].forEach(function (it) {
+      if (it && it.id) { was[it.id] = it; walk(it); }
+    });
+  })(old || {});
+  (function walk(o) {
+    for (var k in o) if (Array.isArray(o[k])) o[k].forEach(function (it) {
+      if (!it || !it.id || !was[it.id]) return;
+      var before = was[it.id];
+      for (var f in before) {
+        if (before[f] === undefined || before[f] === "") continue;
+        var gone = !(f in it) || (Array.isArray(it[f]) && !it[f].length && before[f].length);
+        if (gone) it[f] = before[f];          /* 비운 칸은 비운 대로 두고, 통째로 빠진 것만 되살립니다 */
+      }
+      walk(it);
+    });
+  })(fresh || {});
+}
+
+/* 처음 불러온 내용과 견주어, 지금 코드를 받으면 사라질 것들을 세어 봅니다 */
+var LOSS_KO = { photo: "사람 사진", image: "사진", doi: "DOI 링크", url: "링크",
+                items: "언론 기사", works: "대표 논문", grants: "과제" };
+function lossReport(name) {
+  function tally(o, into) {
+    for (var k in o) if (Array.isArray(o[k])) o[k].forEach(function (it) {
+      if (!it || typeof it !== "object") return;
+      into.rows = (into.rows || 0) + 1;
+      for (var f in it) {
+        var v = it[f];
+        if (Array.isArray(v)) { into[f] = (into[f] || 0) + v.length; tally(it, into); }
+        else if (v !== "" && v != null && LOSS_KO[f]) into[f] = (into[f] || 0) + 1;
+      }
+    });
+    return into;
+  }
+  var before = tally(ORIG[name] || {}, {}), after = tally(docs[name] || {}, {}), lost = [];
+  if ((after.rows || 0) < (before.rows || 0))
+    lost.push("항목 " + ((before.rows || 0) - (after.rows || 0)) + "개");
+  for (var f in LOSS_KO) {
+    var d = (before[f] || 0) - (after[f] || 0);
+    if (d > 0) lost.push(LOSS_KO[f] + " " + d + "개");
+  }
+  return lost;
+}
+
 function contentFile(name) {
+  keepMissing(docs[name], ORIG[name]);     /* 건드리지 않은 내용은 그대로 둡니다 */
   var copy = JSON.parse(JSON.stringify(docs[name]));
   copy.updated = new Date().toISOString().slice(0, 10);
   return "/* " + name + " — the text of the site. Edit here or in the Site editor. */\n" +
          "window." + GLOBALS[name] + " = " + JSON.stringify(copy, null, 1) + ";\n";
 }
 function showExport(name) {
+  var lost = lossReport(name);
+  if (lost.length && !confirm(
+      "잠깐만요.\n\n이 코드를 올리면 " + lost.join(", ") + "가 사라집니다.\n" +
+      "일부러 지우신 것이면 확인을 누르세요.\n취소를 누르면 아무 일도 일어나지 않습니다."))
+    return;
   var path = FOLDER + "content/" + name + ".js";
   var pend = [];
   for (var _p in PHOTOS) if (PHOTOS[_p].tab === name) pend.push(PHOTOS[_p].file.name);
@@ -1432,15 +1488,19 @@ var SHEET = {
       }).concat(d.alumni.map(function (a) {
         return { id: a.id, kind: "alumni", name: a.name, term: a.term, now: a.now }; }));
     },
-    build: function (rows) {
+    build: function (rows, old) {
       var d = { members: [], alumni: [] };
+      var was = {};                       /* 엑셀에 사진 칸이 없어도 기존 사진을 지키기 위해 */
+      ((old && old.members) || []).forEach(function (m) { if (m.photo) was[m.id] = m.photo; });
       rows.forEach(function (r) {
         if (r.kind === "alumni")
           d.alumni.push({ id: r.id || uid(), name: r.name, term: r.term, now: r.now });
         else {
-          var m = { id: r.id || uid(), group: r.group || GROUPS[1], name: r.name,
+          var id = r.id || uid();
+          var m = { id: id, group: r.group || GROUPS[1], name: r.name,
                     since: r.since, where: r.where, co: r.co, mail: r.mail };
-          if (r.photo) m.photo = r.photo;
+          var photo = r.photo || was[id];
+          if (photo) m.photo = photo;
           d.members.push(m);
         }
       });
@@ -1564,9 +1624,10 @@ function applySheet(name, grid) {
   });
   var old = docs[name];
   var built = SHEET[name].build(objs, old);
+  keepMissing(built, old);           /* 엑셀에 칸이 없던 내용(사진 등)은 그대로 둡니다 */
   var n = 0; for (var k in built) if (Array.isArray(built[k])) n += built[k].length;
-  if (!confirm("Replace the " + name + " tab with " + objs.length + " rows from this file?\n\n" +
-               "Anything not in the file is removed. Nothing is published until you press Get the code."))
+  if (!confirm("이 파일의 " + objs.length + "줄로 지금 탭을 바꿀까요?\n\n" +
+               "파일에 없는 항목은 사라집니다. 코드 받기를 누르기 전까지는 홈페이지에 반영되지 않습니다."))
     return;
   docs[name] = built;
   touch(name); openRow = null; render();
