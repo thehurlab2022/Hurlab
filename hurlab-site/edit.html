@@ -403,6 +403,29 @@
                 background: var(--bg); border: 1px solid var(--rule); border-radius: 3px;
                 padding: 12px; width: 100%; min-height: 150px; resize: vertical; }
 
+  .pic-help { margin: 0 0 18px; font-size: 0.9rem; color: var(--ink-2); }
+  .pic-step { display: flex; gap: 14px; padding: 16px 0; border-top: 1px solid var(--rule); }
+  .pic-step:first-of-type { border-top: 0; }
+  .pic-step > div { flex: 1; min-width: 0; }
+  .pic-n { flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
+           background: var(--accent); color: #FFFFFF; font-family: var(--mono); font-size: 0.74rem; }
+  .pic-t { font-weight: 600; margin-bottom: 10px; }
+  .pic-kind { display: flex; gap: 18px; margin-bottom: 10px; }
+  #picTarget { width: 100%; }
+  .pic-drop { border: 2px dashed var(--rule); border-radius: 10px; padding: 24px; text-align: center;
+              color: var(--ink-3); font-size: 0.92rem; cursor: pointer; display: grid; gap: 4px;
+              transition: border-color .15s ease, background .15s ease, color .15s ease; }
+  .pic-drop span { font-size: 0.8rem; }
+  .pic-drop.over { border-color: var(--accent); background: rgba(30, 99, 184, 0.05); color: var(--accent); }
+  .pic-row { display: flex; gap: 12px; align-items: center; margin-top: 10px;
+             border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; }
+  .pic-row img, .pic-vid { width: 76px; height: 50px; object-fit: cover; border-radius: 5px;
+                           background: var(--surface); flex: none; }
+  .pic-vid { display: grid; place-items: center; font-family: var(--mono); font-size: 0.7rem; color: var(--ink-3); }
+  .pic-name { font-family: var(--mono); font-size: 0.8rem; color: var(--elec); font-weight: 500; word-break: break-all; }
+  .pic-was { font-size: 0.74rem; color: var(--ink-3); word-break: break-all; }
+  .pic-row .x { margin-left: auto; }
+
   .photo-row { display: flex; gap: 16px; align-items: flex-start; }
   .formsec { grid-column: 1 / -1; margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--rule);
              font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.14em;
@@ -457,13 +480,13 @@
 <body>
 <div class="bar"><div class="wrap">
     <div class="bar-top">
-      <h1 class="brand">Site editor <span>HUR Lab</span></h1>
-      <input id="q" type="search" placeholder="Filter…" aria-label="Filter">
-      <button class="btn primary" id="exportBtn" type="button">Get the code</button>
-      <button class="btn" id="xlsDown" type="button">Excel ↓</button>
-      <label class="btn" for="xlsUp" id="xlsUpLabel">Excel ↑</label>
+      <h1 class="brand">사이트 편집기 <span>HUR Lab</span></h1>
+      <input id="q" type="search" placeholder="검색…" aria-label="검색">
+      <button class="btn primary" id="exportBtn" type="button">코드 받기</button>
+      <button class="btn" id="xlsDown" type="button">엑셀로 내려받기</button>
+      <label class="btn" for="xlsUp" id="xlsUpLabel">엑셀 불러오기</label>
       <input id="xlsUp" type="file" accept=".csv,.xlsx,.xls" hidden>
-      <a class="btn" href="index.html">← Back to site</a>
+      <a class="btn" href="index.html">← 홈페이지로</a>
     </div>
     <div class="tabs" id="tabs" role="tablist"></div>
   </div>
@@ -471,18 +494,19 @@
 
 <main class="wrap">
   <div class="intro">
-    <b>Nothing here saves by itself.</b> Edit with the forms, press <b>Get the code</b>,
-    and paste the result into the matching file on GitHub.
+    <b>이 창에서 고친 내용은 저절로 저장되지 않습니다.</b> 고친 뒤 <b>코드 받기</b>를 누르고,
+    나온 코드를 GitHub의 해당 파일에 붙여넣어야 홈페이지가 바뀝니다.
     <ol>
-      <li>Change what you need on this page</li>
-      <li><b>Get the code</b> → <b>Copy</b></li>
-      <li><b>Open on GitHub</b> → pencil icon → select all → paste → <b>Commit changes</b></li>
-      <li>Wait a minute, then hard-refresh the site (Ctrl/Cmd + Shift + R)</li>
+      <li>탭을 오가며 필요한 내용을 모두 고칩니다 (고친 탭에는 ● 표시가 붙습니다)</li>
+      <li><b>코드 받기</b> → <b>복사</b></li>
+      <li><b>GitHub에서 열기</b> → 연필 버튼 → 전체 선택 → 붙여넣기 → <b>Commit changes</b></li>
+      <li>1~2분 뒤 홈페이지에서 <b>Ctrl+Shift+R</b>로 새로고침</li>
     </ol>
-    <p style="margin:12px 0 0"><b>Prefer a spreadsheet?</b> <b>Excel ↓</b> saves this tab as a
-    <code>.csv</code> you can open in Excel. Edit it there, save, then <b>Excel ↑</b> reads it back
-    in — keep the header row and the <code>id</code> column untouched, and leave <code>id</code>
-    blank on any row you add. Then carry on from step 2.</p>
+    <p style="margin:12px 0 0"><b>사진과 영상</b>은 맨 오른쪽 <b>사진·영상</b> 탭에서 올리세요.
+    이름을 자동으로 붙여 주고, 받은 파일을 <code>images/</code> 폴더에 올리면 끝입니다.</p>
+    <p style="margin:10px 0 0"><b>엑셀이 편하시면</b> <b>엑셀로 내려받기</b>로 지금 탭을 <code>.csv</code>로
+    저장해 엑셀에서 고치고, <b>엑셀 불러오기</b>로 다시 읽어 올 수 있습니다. 첫 줄(머리글)과
+    <code>id</code> 칸은 건드리지 마시고, 새로 추가한 줄은 <code>id</code>를 비워 두세요. 그다음은 2번부터 똑같습니다.</p>
   </div>
 
   <div id="view"></div>
@@ -491,14 +515,14 @@
     <p id="exportNote"></p>
     <textarea id="exportCode" readonly spellcheck="false"></textarea>
     <div class="form-actions">
-      <button class="btn primary" id="copyCode" type="button">Copy</button>
-      <a class="btn" id="ghLink" target="_blank" rel="noopener">Open on GitHub →</a>
-      <button class="btn ghost spacer" id="closeExport" type="button">Close</button>
+      <button class="btn primary" id="copyCode" type="button">복사</button>
+      <a class="btn" id="ghLink" target="_blank" rel="noopener">GitHub에서 열기 →</a>
+      <button class="btn ghost spacer" id="closeExport" type="button">닫기</button>
     </div>
   </div>
 
   <footer>
-    <span>HUR Lab · this page only generates text — it cannot change the site on its own</span>
+    <span>HUR Lab · 이 페이지는 코드만 만들어 줍니다. 홈페이지는 GitHub에 올려야 바뀝니다.</span>
     <span id="repo"></span>
   </footer>
 </main>
@@ -512,17 +536,22 @@ var BRANCH = "main";
 var FOLDER = "hurlab-site/";
 /* ───────────────────────────────────────────────────────────────────────── */
 
-var TABS = [["publications","Publications"],["people","People"],["projects","Projects"],
-            ["news","News"],["research","Research"]];
+var TABS = [["publications","논문"],["people","구성원"],["projects","과제"],
+            ["news","뉴스"],["research","연구 분야"],["photos","사진·영상"]];
 var GLOBALS = { publications: "PUBLICATIONS", people: "PEOPLE", projects: "PROJECTS",
                 news: "NEWS", research: "RESEARCH" };
-var STATUSES = [["preparation","In preparation"],["submitted","Submitted"],
-                ["revision","In revision"],["accepted","Accepted"]];
-var KINDS = [["Press","Press coverage"],["Award","Award"],["Talk","Invited talk / seminar"],
-             ["Conference","Conference"],["Media","Media / broadcast"],["Funding","New project / funding"],
-             ["Service","Service / appointment"],["Lab","Lab life"]];
-var TRACKS = [["thermal","Thermal"],["energy","Energy"],["transducers","Transducers"],["none","Fellowship / other"]];
+var STATUSES = [["preparation","준비 중"],["submitted","투고함"],
+                ["revision","수정 중"],["accepted","게재 확정"]];
+var KINDS = [["Press","언론 보도"],["Award","수상"],["Talk","초청 강연 · 세미나"],
+             ["Conference","학회"],["Media","방송 · 매체"],["Funding","과제 선정"],
+             ["Service","위촉 · 봉사"],["Lab","연구실 생활"]];
+var TRACKS = [["thermal","열"],["energy","에너지"],["transducers","트랜스듀서"],["none","펠로십 · 기타"]];
+/* 저장되는 값은 그대로 두고(홈페이지가 이 값으로 묶습니다) 화면에만 한글을 보여 줍니다 */
 var GROUPS = ["Post-doctoral researcher","Integrated Ph.D. programme","M.S. programme"];
+var GROUP_KO = { "Post-doctoral researcher": "박사후연구원",
+                 "Integrated Ph.D. programme": "석박사통합과정",
+                 "M.S. programme": "석사과정" };
+var groupKo = function (g) { return GROUP_KO[g] || g; };
 
 var docs = {
   publications: window.PUBLICATIONS || { papers: [], pipeline: [], yearNotes: {} },
@@ -583,8 +612,8 @@ function check(label, id, key, value) {
 }
 function actions(id, delLabel) {
   return '<div class="form-actions"><button class="btn danger" data-del="' + id + '" type="button">' +
-    esc(delLabel || "Delete") + '</button><button class="btn ghost spacer" data-toggle="' + id +
-    '" type="button">Close</button></div>';
+    esc(delLabel || "삭제") + '</button><button class="btn ghost spacer" data-toggle="' + id +
+    '" type="button">닫기</button></div>';
 }
 function rowShell(id, title, sub, badges, form) {
   var open = openRow === id;
@@ -666,11 +695,11 @@ function picField(item, o) {
   var note = picked
     ? "Ready. Download it, then upload it into <code>" + esc(FOLDER + PHOTO_DIR) +
       "</code> on GitHub. (" + Math.round(picked.file.size / 1024) + " KB)"
-    : (cur ? "Using <code>" + esc(cur) + "</code>." : (o.none || "No picture yet."));
+    : (cur ? "Using <code>" + esc(cur) + "</code>." : (o.none || "아직 사진이 없습니다."));
   return '<div class="field full"><label>' + esc(o.label) + '</label><div class="photo-row">' +
     '<div class="photo-prev ' + o.shape + '">' + prev + "</div>" +
     '<div class="photo-ctl">' +
-      '<label class="btn sm" for="ph-' + item.id + '">' + esc(o.button || "Choose a picture…") + "</label>" +
+      '<label class="btn sm" for="ph-' + item.id + '">' + esc(o.button || "사진 고르기…") + "</label>" +
       '<input id="ph-' + item.id + '" type="file" accept="image/*" data-photo="' + item.id +
         '" data-shape="' + o.shape + '" hidden>' +
       dl +
@@ -680,8 +709,8 @@ function picField(item, o) {
     "</div></div></div>";
 }
 function photoField(m) {
-  return picField(m, { shape: "portrait", label: "Photo", button: "Choose a photo…",
-                       empty: initials(m.name), none: "No photo — initials are shown instead." });
+  return picField(m, { shape: "portrait", label: "사진", button: "사진 고르기…",
+                       empty: initials(m.name), none: "사진 없음 — 이름 머리글자가 대신 보입니다." });
 }
 
 function makePhoto(id, file, shapeName) {
@@ -701,7 +730,7 @@ function makePhoto(id, file, shapeName) {
     URL.revokeObjectURL(img.src);
     var name = picName(found.name, found.item);
     c.toBlob(function (b) {
-      if (!b) { alert("Could not read that image."); return; }
+      if (!b) { alert("이 사진을 읽을 수 없습니다."); return; }
       var out;
       try { out = new File([b], name, { type: "image/jpeg" }); }
       catch (_) { out = b; out.name = name; }
@@ -711,7 +740,7 @@ function makePhoto(id, file, shapeName) {
       touch(found.name); openRow = id; render();
     }, "image/jpeg", 0.85);
   };
-  img.onerror = function () { alert("That file is not an image this browser can read."); };
+  img.onerror = function () { alert("브라우저가 읽을 수 없는 파일입니다."); };
   img.src = URL.createObjectURL(file);
 }
 document.addEventListener("change", function (e) {
@@ -724,27 +753,27 @@ document.addEventListener("change", function (e) {
 
 /* ── views ───────────────────────────────────────────────────────────── */
 function paperForm(p) {
-  return f("Title", p.id, "title", p.title, { full: true, area: true }) +
-    f("Authors", p.id, "authors", p.authors, { full: true, area: true,
+  return f("제목", p.id, "title", p.title, { full: true, area: true }) +
+    f("저자", p.id, "authors", p.authors, { full: true, area: true,
       hint: "¹ equal contribution, * corresponding author. S. Hur is bolded automatically." }) +
-    f("Journal", p.id, "journal", p.journal) +
-    f("Volume, pages", p.id, "detail", p.detail, { hint: "e.g. 45, 3, 117851" }) +
-    f("Year", p.id, "year", p.year) +
-    f("DOI or link", p.id, "doi", p.doi || "", { full: true,
+    f("저널", p.id, "journal", p.journal) +
+    f("권·페이지", p.id, "detail", p.detail, { hint: "e.g. 45, 3, 117851" }) +
+    f("연도", p.id, "year", p.year) +
+    f("DOI 또는 링크", p.id, "doi", p.doi || "", { full: true,
       hint: "e.g. 10.1016/j.nanoen.2025.111410 — the title becomes a link. Leave blank for none." }) +
-    f("Research field", p.id, "field", p.field || "", { select: [["", "Automatic (from the title)"]]
+    f("연구 분야", p.id, "field", p.field || "", { select: [["", "자동 (제목으로 판단)"]]
       .concat(docs.research.programmes.map(function (g) { return [g.id, g.title || g.id]; }))
-      .concat([["none", "None — keep off the Research page"]]),
+      .concat([["none", "없음 — Research 페이지에 안 보임"]]),
       hint: "The newest three papers of each field appear as Recent papers on the Research page." }) +
-    '<div class="formsec">Home page</div>' +
-    check("Show in Latest News on the home page", p.id, "home", p.home) +
-    picField(p, { shape: "card", label: "Latest News picture", empty: p.journal || "",
+    '<div class="formsec">메인 화면</div>' +
+    check("메인 Latest News에 표시", p.id, "home", p.home) +
+    picField(p, { shape: "card", label: "Latest News 사진", empty: p.journal || "",
       none: "No picture — a panel in the colour of its research field is shown.",
-      hint: "Cropped to 16:10 for you. The paper title is written over it." }) +
-    actions(p.id, "Delete paper");
+      hint: "16:10으로 잘라 드립니다. 논문 제목이 위에 얹힙니다." }) +
+    actions(p.id, "이 논문 삭제");
 }
 function paperBadges(p) {
-  return '<label class="qhome' + (p.home ? " on" : "") + '" title="Show in Latest News on the home page">' +
+  return '<label class="qhome' + (p.home ? " on" : "") + '" title="메인 Latest News에 표시">' +
     '<input type="checkbox" data-id="' + p.id + '" data-key="home"' + (p.home ? " checked" : "") + '> Home</label>' +
     (isCorr(p.authors) ? '<span class="badge b-corr">Corresponding</span>' : "");
 }
@@ -755,30 +784,30 @@ function viewPublications() {
   d.papers.forEach(function (p) { if (years.indexOf(p.year) < 0) years.push(p.year); });
   years.sort(function (a, b) { return String(b).localeCompare(String(a), undefined, { numeric: true }); });
 
-  var h = '<section class="group">' + groupHead("<h2>In press &amp; under review</h2>",
-    d.pipeline.length + " items", "+ Add", 'data-add="pipe"');
+  var h = '<section class="group">' + groupHead("<h2>투고 중 · 심사 중</h2>",
+    d.pipeline.length + "건", "+ 추가", 'data-add="pipe"');
   h += d.pipeline.length ? d.pipeline.map(function (it) {
     var label = (STATUSES.filter(function (s) { return s[0] === it.status; })[0] || ["", it.status])[1];
     return rowShell(it.id, it.title, "", paperBadges(it) + '<span class="badge b-' + esc(it.status) + '">' + esc(label) + "</span>",
       function () {
-        return f("Title", it.id, "title", it.title, { full: true, area: true }) +
-          f("Status", it.id, "status", it.status, { select: STATUSES }) +
-          check("Show in Latest News on the home page", it.id, "home", it.home) +
-          '<div class="field"><label>When it is published</label><button class="btn" data-promote="' +
-            it.id + '" type="button">Move to Published →</button></div>' + actions(it.id);
+        return f("제목", it.id, "title", it.title, { full: true, area: true }) +
+          f("상태", it.id, "status", it.status, { select: STATUSES }) +
+          check("메인 Latest News에 표시", it.id, "home", it.home) +
+          '<div class="field"><label>출판되면</label><button class="btn" data-promote="' +
+            it.id + '" type="button">출판됨으로 옮기기 →</button></div>' + actions(it.id);
       });
-  }).join("") : '<p class="empty">Nothing under review.</p>';
+  }).join("") : '<p class="empty">심사 중인 논문이 없습니다.</p>';
   h += "</section>";
 
   var shown = d.papers.filter(function (p) { return hit(p.title + " " + p.authors + " " + p.journal); });
-  h += '<section class="group">' + groupHead("<h2>Published</h2>",
-    (filter ? shown.length + " of " : "") + d.papers.length + " papers",
-    "+ Add year", 'data-add="year"') + "</section>";
+  h += '<section class="group">' + groupHead("<h2>출판된 논문</h2>",
+    (filter ? shown.length + " / " : "") + d.papers.length + "편",
+    "+ 연도 추가", 'data-add="year"') + "</section>";
   years.forEach(function (y) {
     var rows = shown.filter(function (p) { return p.year === y; });
     if (!rows.length) return;
     h += '<section class="group">' + groupHead("<h3>" + esc(y) + "</h3>", rows.length,
-      "+ Add paper", 'data-add="paper" data-arg="' + esc(y) + '"');
+      "+ 논문 추가", 'data-add="paper" data-arg="' + esc(y) + '"');
     h += rows.map(function (p) {
       return rowShell(p.id, p.title, esc(p.journal || "—") + (p.detail ? " · " + esc(p.detail) : ""),
         paperBadges(p), function () {
@@ -793,30 +822,30 @@ function viewPeople() {
   var d = docs.people, h = "";
   GROUPS.forEach(function (g) {
     var rows = d.members.filter(function (m) { return m.group === g && hit(m.name + " " + m.where); });
-    h += '<section class="group">' + groupHead("<h2>" + esc(g) + "</h2>", rows.length,
-      "+ Add", 'data-add="member" data-arg="' + esc(g) + '"');
+    h += '<section class="group">' + groupHead("<h2>" + esc(groupKo(g)) + "</h2>", rows.length,
+      "+ 추가", 'data-add="member" data-arg="' + esc(g) + '"');
     h += rows.length ? rows.map(function (m) {
       return rowShell(m.id, m.name, esc(m.since) + " · " + esc(m.where), "", function () {
-        return f("Name", m.id, "name", m.name) +
-          f("Since", m.id, "since", m.since, { hint: "e.g. 2027–" }) +
-          f("University · department", m.id, "where", m.where, { full: true }) +
-          f("Co-advisor", m.id, "co", m.co, { full: true, hint: "Leave blank if none" }) +
-          f("Email", m.id, "mail", m.mail) +
-          f("Group", m.id, "group", m.group, { select: GROUPS.map(function (x) { return [x, x]; }) }) +
+        return f("이름", m.id, "name", m.name) +
+          f("시작", m.id, "since", m.since, { hint: "e.g. 2027–" }) +
+          f("대학 · 학과", m.id, "where", m.where, { full: true }) +
+          f("공동지도", m.id, "co", m.co, { full: true, hint: "없으면 비워 두세요" }) +
+          f("이메일", m.id, "mail", m.mail) +
+          f("소속 구분", m.id, "group", m.group, { select: GROUPS.map(function (x) { return [x, groupKo(x)]; }) }) +
           photoField(m) +
-          '<div class="field"><label>When they graduate</label><button class="btn" data-graduate="' +
-            m.id + '" type="button">Move to Alumni →</button></div>' + actions(m.id);
+          '<div class="field"><label>졸업하면</label><button class="btn" data-graduate="' +
+            m.id + '" type="button">졸업생으로 옮기기 →</button></div>' + actions(m.id);
       });
-    }).join("") : '<p class="empty">Nobody here.</p>';
+    }).join("") : '<p class="empty">아직 없습니다.</p>';
     h += "</section>";
   });
   var al = d.alumni.filter(function (a) { return hit(a.name + " " + a.now); });
-  h += '<section class="group">' + groupHead("<h2>Alumni</h2>", al.length, "+ Add", 'data-add="alum"');
+  h += '<section class="group">' + groupHead("<h2>졸업생</h2>", al.length, "+ 추가", 'data-add="alum"');
   h += al.map(function (a) {
     return rowShell(a.id, a.name, esc(a.term) + (a.now ? " · now at " + esc(a.now) : ""), "", function () {
-      return f("Name", a.id, "name", a.name) +
-        f("Term", a.id, "term", a.term, { hint: "e.g. M.S. · 2024–2026" }) +
-        f("Now at", a.id, "now", a.now, { full: true }) + actions(a.id);
+      return f("이름", a.id, "name", a.name) +
+        f("재학 기간", a.id, "term", a.term, { hint: "e.g. M.S. · 2024–2026" }) +
+        f("현재 소속", a.id, "now", a.now, { full: true }) + actions(a.id);
     });
   }).join("");
   return h + "</section>";
@@ -829,69 +858,69 @@ function viewProjects() {
       '<span class="badge b-' + esc(p.track) + '">' +
       esc((TRACKS.filter(function (t) { return t[0] === p.track; })[0] || ["", p.track])[1]) + "</span>",
       function () {
-        return f("Title", p.id, "title", p.title, { full: true, area: true }) +
-          f("Funder", p.id, "funder", p.funder, { full: true }) +
-          f("Start", p.id, "start", p.start, { type: "month" }) +
-          f("End", p.id, "end", p.end, { type: "month" }) +
-          f("Programme", p.id, "track", p.track, { select: TRACKS }) +
-          check("Finished", p.id, "done", p.done) + actions(p.id);
+        return f("제목", p.id, "title", p.title, { full: true, area: true }) +
+          f("지원 기관", p.id, "funder", p.funder, { full: true }) +
+          f("시작일", p.id, "start", p.start, { type: "month" }) +
+          f("종료일", p.id, "end", p.end, { type: "month" }) +
+          f("연구 분야", p.id, "track", p.track, { select: TRACKS }) +
+          check("종료됨", p.id, "done", p.done) + actions(p.id);
       });
   };
   var live = d.projects.filter(function (p) { return !p.done && hit(p.title + " " + p.funder); });
   var past = d.projects.filter(function (p) { return p.done && hit(p.title + " " + p.funder); });
-  return '<section class="group">' + groupHead("<h2>Active</h2>", live.length, "+ Add project", 'data-add="project"') +
-    (live.length ? live.map(row).join("") : '<p class="empty">None.</p>') + "</section>" +
-    '<section class="group">' + groupHead("<h2>Completed</h2>", past.length) +
-    (past.length ? past.map(row).join("") : '<p class="empty">None.</p>') + "</section>" +
-    '<p class="empty">Bar positions and the Today line are worked out from the months — you never calculate them.</p>';
+  return '<section class="group">' + groupHead("<h2>진행 중</h2>", live.length, "+ 과제 추가", 'data-add="project"') +
+    (live.length ? live.map(row).join("") : '<p class="empty">없습니다.</p>') + "</section>" +
+    '<section class="group">' + groupHead("<h2>종료</h2>", past.length) +
+    (past.length ? past.map(row).join("") : '<p class="empty">없습니다.</p>') + "</section>" +
+    '<p class="empty">시작·종료 월만 적으면 Projects 페이지의 진행 막대가 알아서 그려집니다.</p>';
 }
 
 function viewNews() {
   var d = docs.news;
   var onHome = d.stories.filter(function (s) { return s.home; }).length +
     d.stories.reduce(function (a, s) { return a + s.items.filter(function (i) { return i.home; }).length; }, 0);
-  var h = '<section class="group">' + groupHead("<h2>News</h2>",
-    d.stories.length + " news · " + d.stories.reduce(function (a, s) { return a + s.items.length; }, 0) +
-    " press articles · " + onHome + " in Latest News",
-    "+ Add news", 'data-add="story"') + "</section>";
-  h += '<p class="empty" style="padding:0 0 12px">Every news item and every press article has its own ' +
-    '“Home” tick. Each ticked one becomes its own card in Latest News on the home page, newest first.</p>';
+  var h = '<section class="group">' + groupHead("<h2>뉴스</h2>",
+    d.stories.length + "건 · 기사 " + d.stories.reduce(function (a, s) { return a + s.items.length; }, 0) +
+    "건 · 메인 표시 " + onHome + "건",
+    "+ 뉴스 추가", 'data-add="story"') + "</section>";
+  h += '<p class="empty" style="padding:0 0 12px">뉴스마다, 그리고 언론 기사 한 줄마다 ' +
+    '“Home” 체크가 있습니다. 체크한 것은 메인 화면 Latest News에 각각 카드로 올라갑니다 (최신순).</p>';
   d.stories.slice().sort(function (a, b) {
     return String(b.date || b.when || "").localeCompare(String(a.date || a.when || ""));
   }).forEach(function (s) {
     if (!hit(s.headline + " " + s.when + " " + s.items.map(function (i) { return i.outlet + i.title; }).join(" "))) return;
     h += '<section class="group">' + rowShell(s.id, s.headline,
-      esc(s.date || s.when) + (s.items.length ? " · " + s.items.length + " press articles" : ""),
+      esc(s.date || s.when) + (s.items.length ? " · 기사 " + s.items.length + "건" : ""),
       (s.home ? '<span class="badge b-home">Home</span>' : "") +
       '<span class="badge">' + esc(s.kind || "Lab") + "</span>",
       function () {
-        return f("Headline", s.id, "headline", s.headline, { full: true, area: true }) +
-          f("Date", s.id, "date", s.date || "", { type: "date",
-            hint: "The News page groups by the year of this date, newest first." }) +
-          f("Kind", s.id, "kind", s.kind || "Lab", { select: KINDS,
-            hint: "Award, talk, conference, media, new project — it colours the card." }) +
-          check("Show in Latest News on the home page", s.id, "home", s.home) +
-          f("Link", s.id, "url", s.url || "", { full: true,
+        return f("제목", s.id, "headline", s.headline, { full: true, area: true }) +
+          f("날짜", s.id, "date", s.date || "", { type: "date",
+            hint: "News 페이지가 이 날짜의 연도로 묶습니다. 최신순입니다." }) +
+          f("종류", s.id, "kind", s.kind || "Lab", { select: KINDS,
+            hint: "수상·강연·학회·방송·과제 — 카드 색이 달라집니다." }) +
+          check("메인 Latest News에 표시", s.id, "home", s.home) +
+          f("링크", s.id, "url", s.url || "", { full: true,
             hint: "Optional. A web page for this news (e.g. the KIST press release). The card opens it directly." }) +
-          picField(s, { shape: "card", label: "Home-page card picture", empty: s.tag || "",
-            none: "No picture — a coloured panel is shown instead.",
-            hint: "Cropped to 16:10 for you. A wide photo works best." }) +
-          f("Programme tag", s.id, "tag", s.tag, { select: [["Thermal","Thermal"],["Energy","Energy"],["Transducers","Transducers"]] }) +
-          f("Summary", s.id, "blurb", s.blurb, { full: true, area: true }) +
-          f("Paper behind it", s.id, "source", s.source, { full: true }) +
-          f("Paper DOI or link", s.id, "doi", s.doi || "", { full: true,
+          picField(s, { shape: "card", label: "메인 카드 사진", empty: s.tag || "",
+            none: "사진 없음 — 색 판이 대신 보입니다.",
+            hint: "16:10으로 잘라 드립니다. 가로로 긴 사진이 좋습니다." }) +
+          f("분야 태그", s.id, "tag", s.tag, { select: [["Thermal","Thermal"],["Energy","Energy"],["Transducers","Transducers"]] }) +
+          f("요약", s.id, "blurb", s.blurb, { full: true, area: true }) +
+          f("관련 논문", s.id, "source", s.source, { full: true }) +
+          f("논문 DOI 또는 링크", s.id, "doi", s.doi || "", { full: true,
             hint: "e.g. 10.1002/adma.202419264 — adds a Read the paper button to the story." }) +
-          '<div class="sub"><div class="sub-head"><h4>Press coverage — ' + s.items.length + ' articles</h4>' +
-          '<button class="btn sm" data-add="article" data-arg="' + s.id + '" type="button">+ Add article</button></div>' +
+          '<div class="sub"><div class="sub-head"><h4>Press coverage — ' + s.items.length + ' 건</h4>' +
+          '<button class="btn sm" data-add="article" data-arg="' + s.id + '" type="button">+ 기사 추가</button></div>' +
           s.items.map(function (it) {
             return '<div class="subrow art">' +
-              '<input data-id="' + it.id + '" data-key="outlet" value="' + esc(it.outlet) + '" placeholder="Outlet">' +
-              '<input data-id="' + it.id + '" data-key="title" value="' + esc(it.title) + '" placeholder="Headline">' +
+              '<input data-id="' + it.id + '" data-key="outlet" value="' + esc(it.outlet) + '" placeholder="언론사">' +
+              '<input data-id="' + it.id + '" data-key="title" value="' + esc(it.title) + '" placeholder="기사 제목">' +
               '<input data-id="' + it.id + '" data-key="url" value="' + esc(it.url) + '" placeholder="https://">' +
-              '<label class="check" title="Its own card in Latest News"><input type="checkbox" data-id="' + it.id +
+              '<label class="check" title="Latest News에 따로 카드로 표시"><input type="checkbox" data-id="' + it.id +
                 '" data-key="home"' + (it.home ? " checked" : "") + '> Home</label>' +
               '<button class="btn sm danger x" data-del="' + it.id + '" type="button">✕</button></div>';
-          }).join("") + "</div>" + actions(s.id, "Delete news");
+          }).join("") + "</div>" + actions(s.id, "이 뉴스 삭제");
       }) + "</section>";
   });
   return h;
@@ -900,58 +929,57 @@ function viewNews() {
 function viewResearch() {
   var d = docs.research;
   var onHome = d.programmes.filter(function (p) { return p.home; }).length;
-  var h = '<section class="group">' + groupHead("<h2>Research fields</h2>",
-    d.programmes.length + " fields · " + onHome + " on the home page",
-    "+ Add research field", 'data-add="programme"') + "</section>";
+  var h = '<section class="group">' + groupHead("<h2>연구 분야</h2>",
+    d.programmes.length + "개 · 메인 표시 " + onHome + "개",
+    "+ 연구 분야 추가", 'data-add="programme"') + "</section>";
   d.programmes.forEach(function (p) {
     if (!hit(p.title + " " + (p.keys || "") + " " + (p.tile || ""))) return;
-    h += '<section class="group">' + rowShell(p.id, p.title || "New research field", esc(p.coupling),
+    h += '<section class="group">' + rowShell(p.id, p.title || "새 연구 분야", esc(p.coupling),
       p.home ? '<span class="badge b-home">Home</span>' : "", function () {
-      return f("Title", p.id, "title", p.title) +
-        f("Coupling", p.id, "coupling", p.coupling, { hint: "e.g. Field → Entropy" }) +
-        '<div class="formsec">Home-page card</div>' +
-        check("Show on the home page", p.id, "home", p.home) +
-        f("Keywords", p.id, "keys", p.keys || "", { hint: "separate with · or , — each becomes a chip" }) +
-        picField(p, { shape: "card", label: "Card picture", empty: p.title || "",
-          none: "No picture — a coloured panel is shown instead.",
-          hint: "Cropped to 16:10 for you. The title is written over the bottom of it." }) +
-        f("Short description", p.id, "tile", p.tile || "", { full: true, area: true,
+      return f("제목", p.id, "title", p.title) +
+        f("키워드 한 줄", p.id, "coupling", p.coupling, { hint: "e.g. Field → Entropy" }) +
+        '<div class="formsec">메인 화면 카드</div>' +
+        check("메인 화면에 표시", p.id, "home", p.home) +
+        f("키워드", p.id, "keys", p.keys || "", { hint: "separate with · or , — each becomes a chip" }) +
+        picField(p, { shape: "card", label: "카드 사진", empty: p.title || "",
+          none: "사진 없음 — 색 판이 대신 보입니다.",
+          hint: "16:10으로 잘라 드립니다. 제목이 아래쪽에 얹힙니다." }) +
+        f("짧은 설명", p.id, "tile", p.tile || "", { full: true, area: true,
           hint: "One or two sentences. Shown on the home-page card and on the Research page card." }) +
-        '<div class="formsec">Research page</div>' +
-        f("Long description (not shown now)", p.id, "lead", p.lead, { full: true, area: true,
+        '<div class="formsec">Research 페이지</div>' +
+        f("긴 설명 (지금은 화면에 안 나옴)", p.id, "lead", p.lead, { full: true, area: true,
           hint: "Kept for later. The Research page now shows the short description above." }) +
-        '<div class="sub"><div class="sub-head"><h4>Funded work</h4>' +
+        '<div class="sub"><div class="sub-head"><h4>진행 중인 과제</h4>' +
         '<button class="btn sm" data-add="grant" data-arg="' + p.id + '" type="button">+ Add</button></div>' +
         p.grants.map(function (g) {
           return '<div class="subrow">' +
-            '<input data-id="' + g.id + '" data-key="title" value="' + esc(g.title) + '" placeholder="Project">' +
+            '<input data-id="' + g.id + '" data-key="title" value="' + esc(g.title) + '" placeholder="과제명">' +
             '<input data-id="' + g.id + '" data-key="meta" value="' + esc(g.meta) + '" placeholder="NRF · 2026–2031">' +
             '<button class="btn sm danger x" data-del="' + g.id + '" type="button">✕</button></div>';
         }).join("") + "</div>" +
-        '<div class="sub"><div class="sub-head"><h4>Representative work</h4>' +
+        '<div class="sub"><div class="sub-head"><h4>대표 논문</h4>' +
         '<button class="btn sm" data-add="work" data-arg="' + p.id + '" type="button">+ Add</button></div>' +
         p.works.map(function (w) {
           return '<div class="subrow">' +
-            '<input data-id="' + w.id + '" data-key="title" value="' + esc(w.title) + '" placeholder="Paper title">' +
-            '<input data-id="' + w.id + '" data-key="venue" value="' + esc(w.venue) + '" placeholder="Journal">' +
+            '<input data-id="' + w.id + '" data-key="title" value="' + esc(w.title) + '" placeholder="논문 제목">' +
+            '<input data-id="' + w.id + '" data-key="venue" value="' + esc(w.venue) + '" placeholder="저널">' +
             '<input data-id="' + w.id + '" data-key="detail" value="' + esc(w.detail) + '" placeholder="2025, 145, 111410">' +
             '<button class="btn sm danger x" data-del="' + w.id + '" type="button">✕</button></div>';
         }).join("") + "</div>" +
-        actions(p.id, "Delete this field");
+        actions(p.id, "이 분야 삭제");
     }) + "</section>";
   });
-  h += '<p class="empty">Only fields ticked “Show on the home page” appear on the home page. ' +
-    'The large figures on the Research page itself are built into research.html — those still need Claude.</p>';
+  h += '<p class="empty">“메인 화면에 표시”를 체크한 분야만 메인에 나옵니다.</p>';
 
   /* every paper, one at a time — newest first. They live in publications.js. */
   var P = docs.publications.papers;
   var rows = P.filter(function (p) { return hit(p.title + " " + p.authors + " " + p.journal); });
   var onNews = P.filter(function (p) { return p.home; }).length;
-  h += '<section class="group">' + groupHead("<h2>Research papers — one by one</h2>",
-    (filter ? rows.length + " of " : "") + P.length + " papers · " + onNews + " in Latest News",
-    "+ Add paper", 'data-add="paper" data-arg="' + new Date().getFullYear() + '"');
-  h += '<p class="empty" style="padding:4px 0 14px">Tick “Show in Latest News” on a paper to put it on the home page. ' +
-    'These are saved in <code>content/publications.js</code> — Get the code will show that file too.</p>';
+  h += '<section class="group">' + groupHead("<h2>논문 하나씩 보기</h2>",
+    (filter ? rows.length + " / " : "") + P.length + "편 · Latest News 표시 " + onNews + "편",
+    "+ 논문 추가", 'data-add="paper" data-arg="' + new Date().getFullYear() + '"');
+  h += '<p class="empty" style="padding:4px 0 14px">논문의 “Latest News에 표시”를 체크하면 메인 화면에 올라갑니다. ' +
+    '이 내용은 <code>content/publications.js</code>에 저장되며, 코드 받기가 그 파일도 보여 줍니다.</p>';
   h += rows.map(function (p) {
     return rowShell(p.id, p.title, esc(p.year || "") + " · " + esc(p.journal || "—"), paperBadges(p),
       function () { return paperForm(p); });
@@ -959,10 +987,162 @@ function viewResearch() {
   return h;
 }
 
+/* ── 사진·영상 탭 ───────────────────────────────────────────────────────
+   홈페이지는 파일 이름으로 사진을 찾습니다. 뉴스는 images/news-날짜.jpg,
+   논문은 images/pub-번호.jpg, 같은 곳에 여러 장이면 -2, -3 … 입니다.
+   여기서 파일을 끌어다 놓으면 그 이름으로 바꾸고 크기도 줄여 줍니다.   */
+var SITE = window.__FROM_LIVE ? "https://thehurlab.com/" + FOLDER : "";
+var PIC = { kind: "news", id: null, files: [], ready: [], acts: null };
+
+function viewPhotos() {
+  var rows = picTargets();
+  var opts = rows.map(function (r, i) {
+    return '<option value="' + i + '"' + (String(i) === String(PIC.id) ? " selected" : "") + ">" +
+      esc(r.label) + "</option>";
+  }).join("");
+  var cur = rows[+PIC.id] || rows[0];
+  return '<section class="group"><div class="group-head"><h2>사진 · 영상 올리기</h2></div>' +
+    '<p class="pic-help">파일을 끌어다 놓으면 홈페이지가 알아보는 이름으로 바꿔 드립니다. ' +
+    '사진은 크기도 알아서 줄입니다. 받은 파일을 GitHub의 <code>' + esc(FOLDER + PHOTO_DIR) + '</code> ' +
+    '폴더에 올리면 그 소식(또는 논문)에 바로 붙습니다.</p>' +
+
+    '<div class="pic-step"><span class="pic-n">1</span><div>' +
+      '<div class="pic-t">어디에 넣을까요?</div>' +
+      '<div class="pic-kind">' +
+        '<label class="check"><input type="radio" name="pickind" value="news"' +
+          (PIC.kind === "news" ? " checked" : "") + "> 뉴스</label>" +
+        '<label class="check"><input type="radio" name="pickind" value="pub"' +
+          (PIC.kind === "pub" ? " checked" : "") + "> 논문 그림</label>" +
+      "</div>" +
+      '<select id="picTarget">' + opts + "</select>" +
+      (cur ? '<p class="hint">파일 이름은 <code>' + esc(picStem(cur)) + '.jpg</code> 로 시작합니다. ' +
+        "이미 올라간 사진이 있으면 뒤에 번호가 이어집니다.</p>" : "") +
+    "</div></div>" +
+
+    '<div class="pic-step"><span class="pic-n">2</span><div>' +
+      '<div class="pic-t">사진이나 영상을 넣어 주세요</div>' +
+      '<div class="pic-drop" id="picDrop">여기로 끌어다 놓거나, 눌러서 고르세요' +
+        '<span>jpg · png · mp4 · mov — 여러 개 한꺼번에 가능합니다</span></div>' +
+      '<input id="picFile" type="file" accept="image/*,video/*" multiple hidden>' +
+      '<div id="picList"></div>' +
+      '<div class="form-actions"><button class="btn primary" id="picDl" type="button">이름 바꿔서 내려받기</button>' +
+      '<button class="btn" id="picClear" type="button">비우기</button>' +
+      '<span class="hint" id="picMsg" style="margin:0"></span></div>' +
+    "</div></div>" +
+
+    '<div class="pic-step"><span class="pic-n">3</span><div>' +
+      '<div class="pic-t">GitHub에 올리기</div>' +
+      '<p class="hint" style="margin:0 0 10px">받은 파일을 <code>' + esc(FOLDER + PHOTO_DIR) + '</code> 폴더에 ' +
+      "올리고 <b>Commit changes</b>. 1~2분 뒤 홈페이지에서 <b>Ctrl+Shift+R</b>.</p>" +
+      '<a class="btn" href="https://github.com/' + REPO + "/upload/" + BRANCH + "/" + FOLDER + PHOTO_DIR +
+      '" target="_blank" rel="noopener">GitHub 사진 폴더 열기 →</a>' +
+    "</div></div></section>";
+}
+
+/* 어디에 붙일 수 있는지: 뉴스(날짜가 있는 것) 또는 논문 */
+function picTargets() {
+  if (PIC.kind === "pub") {
+    return (docs.publications.papers || []).map(function (p) {
+      return { stem: "pub-" + p.id,
+               label: p.id + "  ·  " + (p.year || "") + "  ·  " + String(p.title || "").slice(0, 60) };
+    });
+  }
+  var out = (docs.news.stories || []).filter(function (s) {
+    return s.date && String(s.headline || "").trim();
+  }).map(function (s) {
+    return { stem: "news-" + s.date, date: s.date, label: s.date + "  ·  " + String(s.headline).slice(0, 60) };
+  });
+  (PIC.acts || []).forEach(function (a) {
+    out.push({ stem: "news-" + a.d, date: a.d, label: a.d + "  ·  " + String(a.h).slice(0, 60) });
+  });
+  out.sort(function (a, b) { return String(b.date).localeCompare(String(a.date)); });
+  return out;
+}
+var picStem = function (t) { return PHOTO_DIR + t.stem; };
+
+/* news.html 안에 들어 있는 지난 소식 목록도 함께 고를 수 있게 읽어 둡니다 */
+function picLoadActivity() {
+  if (PIC.acts || !window.fetch) return;
+  PIC.acts = [];
+  fetch(SITE + "news.html").then(function (r) { return r.text(); }).then(function (t) {
+    var block = t.match(/var ACTIVITY = \[([\s\S]*?)\n  \];/);
+    if (!block) return;
+    var re = /\{\s*d:\s*"(\d{4}-\d{2}-\d{2})",\s*k:\s*"([^"]*)",\s*h:\s*"((?:[^"\\]|\\.)*)"/g, m, out = [];
+    while ((m = re.exec(block[1]))) { try { out.push({ d: m[1], h: JSON.parse('"' + m[3] + '"') }); } catch (e) {} }
+    PIC.acts = out;
+    if (tab === "photos") render();
+  }, function () {});
+}
+
+/* 이미 올라가 있는 번호는 건너뜁니다 */
+function picTaken(stem, done) {
+  var EXT = [".jpg", ".jpeg", ".png"], used = [], left = 8;
+  for (var k = 1; k <= 8; k++) (function (k) {
+    var i = 0;
+    (function look() {
+      if (i >= EXT.length) { if (!--left) done(used); return; }
+      var im = new Image();
+      im.onload = function () { used.push(k); if (!--left) done(used); };
+      im.onerror = function () { i++; look(); };
+      im.src = SITE + (k === 1 ? stem : stem + "-" + k) + EXT[i];
+    })();
+  })(k);
+}
+
+function picRenumber() {
+  var rows = picTargets(), t = rows[+PIC.id] || rows[0];
+  if (!t || !PIC.files.length) { PIC.ready = []; picDraw(); return; }
+  picTaken(picStem(t), function (used) {
+    var n = 1, out = [];
+    PIC.files.forEach(function (f) {
+      while (used.indexOf(n) >= 0) n++;
+      used.push(n);
+      var ext = f.video ? (f.file.name.match(/\.[^.]+$/) || [".mp4"])[0].toLowerCase() : ".jpg";
+      out.push({ f: f, name: (n === 1 ? t.stem : t.stem + "-" + n) + ext });
+      n++;
+    });
+    PIC.ready = out; picDraw();
+  });
+}
+function picDraw() {
+  var el = $("picList"); if (!el) return;
+  el.innerHTML = PIC.ready.map(function (r, i) {
+    return '<div class="pic-row">' +
+      (r.f.url ? '<img src="' + r.f.url + '" alt="">' : '<div class="pic-vid">영상</div>') +
+      '<div><div class="pic-name">' + esc(r.name) + "</div>" +
+      '<div class="pic-was">' + esc(r.f.file.name) + "</div></div>" +
+      '<button class="btn sm danger x" data-picdel="' + i + '" type="button">✕</button></div>';
+  }).join("");
+  var b = $("picDl"); if (b) b.disabled = !PIC.ready.length;
+}
+function picAdd(list) {
+  [].slice.call(list).forEach(function (file) {
+    var v = /^video\//.test(file.type) || /\.(mp4|mov|m4v|webm)$/i.test(file.name);
+    PIC.files.push({ file: file, video: v, url: v ? "" : URL.createObjectURL(file) });
+  });
+  picRenumber();
+}
+function picShrink(file, done) {
+  var im = new Image();
+  im.onload = function () {
+    var w = im.width, h = im.height;
+    if (w > 1600) { h = Math.round(h * 1600 / w); w = 1600; }
+    if (h > 2200) { w = Math.round(w * 2200 / h); h = 2200; }
+    var c = document.createElement("canvas"); c.width = w; c.height = h;
+    var x = c.getContext("2d");
+    x.fillStyle = "#FFFFFF"; x.fillRect(0, 0, w, h);
+    x.drawImage(im, 0, 0, w, h);
+    c.toBlob(function (b) { done(b || file); }, "image/jpeg", 0.85);
+  };
+  im.onerror = function () { done(file); };
+  im.src = URL.createObjectURL(file);
+}
+
 var VIEWS = { publications: viewPublications, people: viewPeople, projects: viewProjects,
-              news: viewNews, research: viewResearch };
+              news: viewNews, research: viewResearch, photos: viewPhotos };
 
 function counts(n) {
+  if (n === "photos") return PIC.files.length || "";
   var d = docs[n];
   if (n === "publications") return d.papers.length;
   if (n === "people") return d.members.length;
@@ -1007,7 +1187,12 @@ function render() {
       esc(t[1]) + '<span class="c">' + counts(t[0]) + "</span>" +
       (dirty[t[0]] ? '<span class="dirty">●</span>' : "") + "</button>";
   }).join("");
+  if (tab === "photos") picLoadActivity();
   $("view").innerHTML = VIEWS[tab]();
+  if (tab === "photos") picDraw();
+  ["q", "exportBtn", "xlsDown", "xlsUpLabel"].forEach(function (id) {
+    $(id).style.display = tab === "photos" ? "none" : "";
+  });
   $("repo").textContent = REPO;
 }
 
@@ -1023,17 +1208,25 @@ document.addEventListener("input", function (e) {
   if (k === "home" && el.type === "checkbox") { render(); return; }
   if ((k === "title" || k === "name" || k === "headline") && el.closest(".form") && !el.closest(".sub")) {
     var t = el.closest(".row").querySelector(".r-title");
-    if (t) t.textContent = el.value || "Untitled";
+    if (t) t.textContent = el.value || "제목 없음";
   }
 });
 document.addEventListener("change", function (e) {
   var el = e.target;
+  if (el.id === "picTarget") { PIC.id = el.value; PIC.files = []; PIC.ready = []; render(); return; }
+  if (el.name === "pickind") { PIC.kind = el.value; PIC.id = 0; PIC.files = []; PIC.ready = []; render(); return; }
+  if (el.id === "picFile") { picAdd(el.files); el.value = ""; return; }
   if (el.tagName !== "SELECT" || !el.dataset.id) return;
   var found = find(el.dataset.id); if (!found) return;
   found.item[el.dataset.key] = el.value; touch(found.name); render();
 });
 document.addEventListener("click", function (e) {
-  if (e.target.closest(".qhome")) return;          /* the quick Home tick on a row: don't open the row */
+  if (e.target.closest("#picDrop")) { $("picFile").click(); return; }
+  var pd = e.target.closest("[data-picdel]");
+  if (pd) { PIC.files.splice(+pd.dataset.picdel, 1); picRenumber(); return; }
+  if (e.target.id === "picClear") { PIC.files = []; PIC.ready = []; picDraw(); $("picMsg").textContent = ""; return; }
+  if (e.target.id === "picDl") { picDownload(); return; }
+  if (e.target.closest(".qhome")) return;          /* 행의 Home 체크: 행을 펼치지 않습니다 */
   var t = e.target.closest("[data-tab],[data-toggle],[data-del],[data-add],[data-promote],[data-graduate],[data-dl]");
   if (!t) return;
   var ds = t.dataset;
@@ -1050,7 +1243,7 @@ document.addEventListener("click", function (e) {
   if (ds.del) {
     var found = find(ds.del); if (!found) return;
     var label = found.item.title || found.item.name || found.item.headline || "this entry";
-    if (!confirm("Delete “" + label + "”?")) return;
+    if (!confirm("삭제할까요: “" + label + "”?")) return;
     found.list.splice(found.list.indexOf(found.item), 1);
     if (openRow === ds.del) openRow = null;
     touch(found.name); render(); return;
@@ -1079,7 +1272,7 @@ document.addEventListener("click", function (e) {
     var id = uid(), y;
     if (ds.add === "pipe") { docs.publications.pipeline.unshift({ id: id, title: "", status: "submitted" }); touch("publications"); }
     else if (ds.add === "paper") { docs.publications.papers.unshift({ id: id, year: ds.arg, authors: "", title: "", journal: "", detail: "" }); touch("publications"); }
-    else if (ds.add === "year") { y = prompt("Year (e.g. 2027)"); if (!y) return;
+    else if (ds.add === "year") { y = prompt("연도 (예: 2027)"); if (!y) return;
       docs.publications.papers.unshift({ id: id, year: y.trim(), authors: "", title: "", journal: "", detail: "" }); touch("publications"); }
     else if (ds.add === "member") { docs.people.members.push({ id: id, group: ds.arg, name: "",
       since: new Date().getFullYear() + "–", where: "", co: "", mail: "" }); touch("people"); }
@@ -1106,6 +1299,45 @@ document.addEventListener("click", function (e) {
     setTimeout(function () { var el = document.querySelector('[data-id="' + id + '"]'); if (el) el.focus(); }, 0);
   }
 });
+
+document.addEventListener("dragover", function (e) {
+  var d = e.target.closest ? e.target.closest("#picDrop") : null;
+  if (!d) return;
+  e.preventDefault(); d.classList.add("over");
+});
+document.addEventListener("dragleave", function (e) {
+  var d = e.target.closest ? e.target.closest("#picDrop") : null;
+  if (d) d.classList.remove("over");
+});
+document.addEventListener("drop", function (e) {
+  var d = e.target.closest ? e.target.closest("#picDrop") : null;
+  if (!d) return;
+  e.preventDefault(); d.classList.remove("over");
+  if (e.dataTransfer && e.dataTransfer.files) picAdd(e.dataTransfer.files);
+});
+
+function picDownload() {
+  if (!PIC.ready.length) return;
+  $("picDl").disabled = true;
+  $("picMsg").textContent = "만드는 중…";
+  var i = 0;
+  (function next() {
+    if (i >= PIC.ready.length) {
+      $("picMsg").innerHTML = '<b style="color:var(--elec)">' + PIC.ready.length +
+        "개 받았습니다. images/ 폴더에 올리세요.</b>";
+      $("picDl").disabled = false;
+      return;
+    }
+    var r = PIC.ready[i++];
+    var go = function (blob) {
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob); a.download = r.name;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(next, 400);
+    };
+    if (r.f.video) go(r.f.file); else picShrink(r.f.file, go);
+  })();
+}
 
 /* ── the code to paste ───────────────────────────────────────────────── */
 function contentFile(name) {
@@ -1156,7 +1388,7 @@ $("exportNote").addEventListener("click", function (e) {
 $("closeExport").addEventListener("click", function () { $("exportPanel").hidden = true; });
 $("copyCode").addEventListener("click", function () {
   var el = $("exportCode"); el.focus(); el.select();
-  var done = function () { $("copyCode").textContent = "Copied"; setTimeout(function () { $("copyCode").textContent = "Copy"; }, 1600); };
+  var done = function () { $("copyCode").textContent = "복사됨"; setTimeout(function () { $("copyCode").textContent = "Copy"; }, 1600); };
   if (navigator.clipboard) navigator.clipboard.writeText(el.value).then(done, function () { try { document.execCommand("copy"); done(); } catch (_) {} });
   else { try { document.execCommand("copy"); done(); } catch (_) {} }
 });
@@ -1320,7 +1552,7 @@ function parseCSV(text) {
   return rows.filter(function (r) { return r.some(function (x) { return String(x).trim() !== ""; }); });
 }
 function applySheet(name, grid) {
-  if (!grid.length) throw new Error("The file is empty.");
+  if (!grid.length) throw new Error("파일이 비어 있습니다.");
   var head = grid[0].map(function (h) { return String(h).trim().toLowerCase(); });
   var need = SHEET[name].cols;
   if (head.indexOf("kind") < 0)
@@ -1338,7 +1570,7 @@ function applySheet(name, grid) {
     return;
   docs[name] = built;
   touch(name); openRow = null; render();
-  alert("Loaded. Check it over, then press Get the code.");
+  alert("불러왔습니다. 내용을 확인한 뒤 코드 받기를 누르세요.");
 }
 $("xlsDown").addEventListener("click", function () {
   var blob = new Blob([toCSV(tab)], { type: "text/csv;charset=utf-8;" });
