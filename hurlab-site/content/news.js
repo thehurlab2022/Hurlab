@@ -2,6 +2,32 @@
 window.NEWS = {
  "stories": [
   {
+   "id": "xmwaa82ihqa82",
+   "home": false,
+   "date": "2026-11-06",
+   "kind": "Talk",
+   "when": "",
+   "headline": "Dr. presented an invited seminar at A3 symposium (KAIST) with a title of \"Probing the Coupled Electro-Thermal Characteristics in Ferroelectrics\"",
+   "blurb": "",
+   "tag": "Thermal",
+   "source": "",
+   "items": [],
+   "image": "images/news-dr-presented-an-invited-seminar-at-a3.jpg"
+  },
+  {
+   "id": "xmwaa4xz9a0pi",
+   "home": true,
+   "date": "2026-11-05",
+   "kind": "Talk",
+   "when": "",
+   "headline": "At the Samsung Future Technology Forum, Dr. Hur presented a project titled 'Development of Thermal Transistors for All-Solid-State Cooling' at Energy & Environment Session.",
+   "blurb": "",
+   "tag": "Thermal",
+   "source": "",
+   "items": [],
+   "image": "images/news-at-the-samsung-future-technology-forum.jpg"
+  },
+  {
    "id": "xmwa7sby9i350",
    "home": true,
    "date": "2026-09-30",
