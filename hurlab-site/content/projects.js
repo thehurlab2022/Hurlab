@@ -1,9 +1,17 @@
-/* projects — edited in the HUR Lab Editor, or by hand right here.
-   Change a value, save, commit. The page reads this file. */
+/* projects — the text of the site. Edit here or in the Site editor. */
 window.PROJECTS = {
  "axisEnd": 2032,
  "axisStart": 2020,
  "projects": [
+  {
+   "id": "xmwa9v96cd0pz",
+   "title": "Development of TGG-Based Piezoelectric Actuators and Pilot Valves",
+   "funder": "Korea Technology and information Promotion Agency",
+   "start": "2026-09",
+   "end": "2028-08",
+   "track": "energy",
+   "done": false
+  },
   {
    "done": false,
    "end": "2027-12",
@@ -74,7 +82,7 @@ window.PROJECTS = {
    "id": "j8",
    "start": "2020-09",
    "title": "Hard piezoelectric materials and TGG-based ultrasonic transducers",
-   "track": "transducers"
+   "track": "energy"
   },
   {
    "done": true,
@@ -104,5 +112,5 @@ window.PROJECTS = {
    "track": "energy"
   }
  ],
- "updated": "2026-09-04"
+ "updated": "2026-11-10"
 };
