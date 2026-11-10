@@ -2,22 +2,56 @@
 window.PUBLICATIONS = {
  "papers": [
   {
-   "id": "xmwa5fengccfv",
+   "id": "xmwa6owltgwek",
    "year": "2026",
-   "authors": "",
-   "title": "Indirect and Direct Electrocaloric Metrology",
-   "journal": "",
+   "authors": "M.-S. Kim¹, R. Ning¹, K.Y. Huh, B.H. Kim, S.W. An, H. Choi, J.W. Choi, J.Y. Lee, B.-H. Lee, S.-M. Song, J.S. Park, S.Y. Jung, H.-J. Choi, D.-H. Han, J.-H. Han, J.D. Song, D. Park, C.-Y. Kang, S. Hur, S.O. Won, H.W. Jang, J.H. Lee, H.-Y. Lee, H.J. Chang, S.M. Yang, T.H. Kim*, S. Kim*, B.C. Lee*, S.-H. Baek*",
+   "title": "BEOL-compatible monolithic integration of property-tunable complex oxide single crystals on Si for advancing the more-than-Moore paradigm",
+   "journal": "Materials Today",
+   "detail": "101, 103567",
+   "doi": "10.1016/j.mattod.2026.103567"
+  },
+  {
+   "id": "xmwa6jr8qvgzo",
+   "year": "2026",
+   "authors": "D.-H. Kim, X. Wang, T.K. Yoon, J.Y. Park, H.-J. Yoo, Y. Shim, D.-J. Lee, H.-C. Song, S.J. Kwon, K. Choi, H. Park*, S. Hur*, J.M.Baik*",
+   "title": "Triboelectric DC generation via dielectric polarization coupling for self-powered IoT systems",
+   "journal": "Energy and Environmental Science",
    "detail": "",
-   "home": false
+   "doi": "https://doi.org/10.1039/d6ee05333e",
+   "field": "harvesting",
+   "home": true
+  },
+  {
+   "id": "xmwa6fsr669p8",
+   "year": "2027",
+   "authors": "H. Song¹, X. Liu¹, S.-B. Kim, Y. Yoon, Y.-R. Choi, B.-J. Min, S.-H. Choi, J.-H. Kim, Y. Yan, J.-H. Lee, H. Kang, K.-H. Cho, S. Hur*, D.-Y. Jeong*, J. Ryu*, H.-C. Song*",
+   "title": "Magnetoelectric voltage-tunable inductors: Mechanisms, key performance characteristics, figure-of-merit, design strategies, and applications",
+   "journal": "Nano Energy",
+   "detail": "161, 112527",
+   "doi": "10.1016/j.nanoen.2026.112527",
+   "field": "harvesting"
+  },
+  {
+   "id": "xmwa6av6nn57f",
+   "year": "2026",
+   "authors": "M. Lee , S. Park. S.Y. Kim. J.G. Son*, J.-S. Jang*, S. Hur*",
+   "title": "Hydrovoltaic-Driven Self-Powered Sensors for IoT and Healthcare Applications: A Review",
+   "journal": "Journal of Sensor Science and Technology",
+   "detail": "35, 5, 402-419",
+   "home": false,
+   "doi": "10.46670/JSST.2026.35.5.402",
+   "field": "harvesting"
   },
   {
    "id": "xmwa5c3nwsxu2",
    "year": "2026",
-   "authors": "",
+   "authors": "D.-G Lee¹ , H.-M. Yu¹ , Y. Shim¹ , B.-J. Min, Y.-R. Choi, H. Song, S. Cho, B.C. Park, Y. Yan, H.Y. Kim, J.H. Lee, J.M. Baik, W. Jung*, S. Hur*, H.-C. Song*",
    "title": "Ultrasound-Driven Piezocatalytic Hydrogen Peroxide Generation and Application",
-   "journal": "",
-   "detail": "",
-   "home": false
+   "journal": "Advanced Energy Materials",
+   "detail": "e71488",
+   "home": true,
+   "doi": "https://doi.org/10.1002/aenm.71488",
+   "field": "harvesting"
   },
   {
    "authors": "S.-M. Jang, J. You, S.-S. Lee, J. Baik, S. Hur*, C.-Y. Kang*",
@@ -27,7 +61,7 @@ window.PUBLICATIONS = {
    "note": "12 papers",
    "title": "Advances in Piezoelectric Ceramic-Polymer Composites for Vat Photopolymerization-Based Additive Manufacturing",
    "year": "2026",
-   "home": true
+   "home": false
   },
   {
    "authors": "S.-M. Song¹, H. S. Kim¹, J. Y. Jeong¹, D.-G. Lee, G. R. Nam, J. Park, S.-B. Kim, S. B. Chun, C.-W. Lee, B. Yoon, H. Song, J. S. Han, H. Kim, J. Ryu, J. M. Baik, S. Chung, M. Kim, Y. Yan, H. M. Seung*, H.-C. Song*, S. Hur*",
@@ -47,7 +81,7 @@ window.PUBLICATIONS = {
    "note": "12 papers",
    "title": "Ferroelectric field gating-assisted thermoelectric energy conversion",
    "year": "2026",
-   "home": true
+   "home": false
   },
   {
    "authors": "I. M. Imani¹, E. Kim, T. Kim, B.-J. Min, H. Song, J.-H. Hwang, S.-B. Kim, Y. Kim, B. C. Park, J. Hun Lee, S.-W. Kim, S. Azizian, S. Hur*, H.-C. Song*",
@@ -452,6 +486,12 @@ window.PUBLICATIONS = {
  ],
  "pipeline": [
   {
+   "id": "xmwa69x9567qf",
+   "title": "Unraveling the discrepancy between indirect and direct electrocaloric measurements",
+   "status": "accepted",
+   "home": true
+  },
+  {
    "id": "p3",
    "status": "revision",
    "title": "Electrocaloric Cooling: Measurement Guidelines and Material Design Strategies"
@@ -460,11 +500,6 @@ window.PUBLICATIONS = {
    "id": "p4",
    "status": "revision",
    "title": "Ferroelectric Thermal Switch"
-  },
-  {
-   "id": "p5",
-   "status": "submitted",
-   "title": "Hydrovoltaic-Driven Self-Powered Sensors for IoT and Healthcare Applications"
   },
   {
    "id": "p6",
