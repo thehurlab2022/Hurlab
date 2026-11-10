@@ -31,7 +31,7 @@ window.NEWS = {
    "date": "2026-09-04",
    "kind": "Talk",
    "when": "",
-   "headline": "Invited talk at the Samsung Future Technology Forum — high-efficiency cooling for the power and heat problem of AI",
+   "headline": "Invited talk at the Future Technology Research Council — high-efficiency cooling for the power and heat problem of AI",
    "blurb": "",
    "tag": "",
    "source": "",
