@@ -585,7 +585,11 @@
     st.shots = [];
     if (!st.kind) st.kind = KINDS[st.id] || (st.items.length || st.doi ? "Press" : "Lab");
   });
+  var have = {};
+  S.forEach(function (st) { have[st.id] = 1; if (st.date) have["d" + st.date] = 1; });
   ACTIVITY.forEach(function (a) {
+    /* content/news.js 로 옮겨진 소식은 여기서 건너뜁니다 (중복 방지) */
+    if (have["a" + a.d.replace(/-/g, "")] || have["d" + a.d]) return;
     /* pictures are optional: upload images/news-YYYY-MM-DD.jpg (and -2, -3 … for
        more of them) and they appear by themselves. Nothing shows while they are not there. */
     S.push({ id: "a" + a.d.replace(/-/g, ""), date: a.d, kind: a.k, headline: a.h,

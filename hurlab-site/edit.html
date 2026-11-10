@@ -1177,6 +1177,35 @@ function halt() {
   $("tabs").innerHTML = "";
 }
 
+/* news.html 안에 들어 있던 지난 소식들을 뉴스 탭에서도 고칠 수 있게 가져옵니다.
+   코드 받기를 하면 그대로 content/news.js 에 저장되고, news.html 은 중복을 건너뜁니다. */
+function pullOldNews() {
+  if (!window.fetch) return;
+  fetch(SITE + "news.html").then(function (r) { return r.text(); }).then(function (t) {
+    var block = t.match(/var ACTIVITY = \[([\s\S]*?)\n  \];/);
+    if (!block) return;
+    var have = {};
+    (docs.news.stories || []).forEach(function (st) {
+      have[st.id] = 1; if (st.date) have["d" + st.date] = 1;
+    });
+    var re = /\{\s*d:\s*"(\d{4}-\d{2}-\d{2})",\s*k:\s*"([^"]*)",\s*h:\s*"((?:[^"\\]|\\.)*)"/g, m, added = 0;
+    while ((m = re.exec(block[1]))) {
+      var id = "a" + m[1].replace(/-/g, "");
+      if (have[id] || have["d" + m[1]]) continue;
+      var head; try { head = JSON.parse('"' + m[3] + '"'); } catch (e) { continue; }
+      docs.news.stories.push({ id: id, date: m[1], kind: m[2], when: "", headline: head,
+                               blurb: "", tag: "", source: "", items: [], home: false });
+      have[id] = 1; added++;
+    }
+    if (!added) return;
+    docs.news.stories.sort(function (x, y) {
+      return String(y.date || "").localeCompare(String(x.date || ""));
+    });
+    ORIG.news = JSON.parse(JSON.stringify(docs.news));   /* 가져온 것은 "사라짐"으로 치지 않습니다 */
+    render();
+  }, function () {});
+}
+
 /* 지금 어떤 내용을 들고 있는지 한 줄로 보여 줍니다 */
 function stampNote() {
   var el = document.getElementById("stamp");
@@ -1203,8 +1232,10 @@ function liveNote() {
   n.innerHTML = "Opened from your computer — reading the content that is live on <b>thehurlab.com</b>.";
   document.querySelector(".intro").appendChild(n);
 }
+var pulled = false;
 function render() {
   if (MISSING.length) return halt();
+  if (!pulled) { pulled = true; pullOldNews(); }
   liveNote();
   $("tabs").innerHTML = TABS.map(function (t) {
     return '<button class="tab" role="tab" data-tab="' + t[0] + '" aria-selected="' + (t[0] === tab) + '">' +
