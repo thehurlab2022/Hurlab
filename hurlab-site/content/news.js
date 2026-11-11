@@ -2,6 +2,18 @@
 window.NEWS = {
  "stories": [
   {
+   "id": "xmwc8pmedcca8",
+   "home": false,
+   "date": "2026-09-17",
+   "kind": "Funding",
+   "when": "",
+   "headline": "Our research proposal \"Development of TGG-Based Piezoelectric Actuators and Pilot Valves\" has been selected for 중소기업 기술혁신개발사업 funded by Korea Technology and information Promotion Agency (TIPA). Congratulations!",
+   "blurb": "",
+   "tag": "Energy",
+   "source": "",
+   "items": []
+  },
+  {
    "id": "xmwaa82ihqa82",
    "home": false,
    "date": "2026-11-06",
@@ -956,5 +968,5 @@ window.NEWS = {
    "kind": "Lab"
   }
  ],
- "updated": "2026-11-10"
+ "updated": "2026-11-11"
 };
