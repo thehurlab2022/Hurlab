@@ -503,7 +503,7 @@ window.PUBLICATIONS = {
   },
   {
    "id": "p6",
-   "status": "submitted",
+   "status": "revision",
    "title": "3D printing piezoelectric review"
   },
   {
@@ -513,11 +513,11 @@ window.PUBLICATIONS = {
   },
   {
    "id": "p8",
-   "status": "preparation",
+   "status": "submitted",
    "title": "Lead-free Ferroelectric thermal switch"
   }
  ],
- "updated": "2026-11-10",
+ "updated": "2026-11-11",
  "yearNotes": {
   "2021": "1 paper",
   "2022": "4 papers",
