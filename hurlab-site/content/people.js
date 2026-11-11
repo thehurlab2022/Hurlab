@@ -4,19 +4,19 @@ window.PEOPLE = {
   {
    "id": "a1",
    "name": "Somin Song",
-   "now": "",
+   "now": "Korea Research Institute of Standards and Science (KRISS)",
    "term": "M.S. · 2024–2026"
   },
   {
    "id": "a3",
    "name": "Joonchul Shin, Ph.D.",
-   "now": "Yonsei University",
+   "now": "Korea Institute of Materials Science (KIMS)",
    "term": "Post-doctoral fellow · 2020–2023"
   },
   {
    "id": "a4",
    "name": "Young Joon Ko, Ph.D.",
-   "now": "",
+   "now": "now at JHENG",
    "term": "Post-doctoral fellow · 2023–2024"
   },
   {
@@ -137,11 +137,11 @@ window.PEOPLE = {
    "group": "Post-doctoral researcher",
    "name": "Hyun-Soo Kim,Ph.D.",
    "since": "2023–",
-   "where": "",
+   "where": "Ph.D. in Physics, Inha University",
    "co": "",
    "mail": "",
    "photo": "images/hyun-soo-kim.jpg"
   }
  ],
- "updated": "2026-10-23"
+ "updated": "2026-11-11"
 };
