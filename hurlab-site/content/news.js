@@ -2,6 +2,19 @@
 window.NEWS = {
  "stories": [
   {
+   "id": "xmwg5zc7qpfy7",
+   "home": true,
+   "date": "2026-11-13",
+   "kind": "Conference",
+   "when": "",
+   "headline": "We attended the Fall Conference of the Korean Institute of Electrical and Electronic Material Engineers held in Yeosu. Minwoo Lee, Jeyeon Lee, Byeongjin Yoon, and Saebom Chun gave oral presentations, while the rest presented posters.",
+   "blurb": "",
+   "tag": "Energy",
+   "source": "",
+   "items": [],
+   "image": "images/news-we-attended-the-fall-conference-of-the.jpg"
+  },
+  {
    "id": "xmwc8pmedcca8",
    "home": false,
    "date": "2026-09-17",
@@ -140,7 +153,7 @@ window.NEWS = {
    "date": "2026-06-12",
    "kind": "Conference",
    "when": "",
-   "headline": "International Conference on Nanogenerators and Piezotronics, SKKU — Wiley Best Poster Award for Byeongjin Yoon",
+   "headline": "International Conference on Nanogenerators and Piezotronics(NGPT) 2026, SKKU — Wiley Best Poster Award for Byeongjin Yoon",
    "blurb": "",
    "tag": "",
    "source": "",
@@ -968,5 +981,5 @@ window.NEWS = {
    "kind": "Lab"
   }
  ],
- "updated": "2026-11-11"
+ "updated": "2026-11-14"
 };
