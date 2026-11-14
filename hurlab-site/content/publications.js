@@ -498,8 +498,9 @@ window.PUBLICATIONS = {
   },
   {
    "id": "p4",
-   "status": "revision",
-   "title": "Ferroelectric Thermal Switch"
+   "status": "accepted",
+   "title": "An electrically gated solid-state thermal transistor for energy-efficient thermal management",
+   "home": true
   },
   {
    "id": "p6",
@@ -517,7 +518,7 @@ window.PUBLICATIONS = {
    "title": "Lead-free Ferroelectric thermal switch"
   }
  ],
- "updated": "2026-11-11",
+ "updated": "2026-11-14",
  "yearNotes": {
   "2021": "1 paper",
   "2022": "4 papers",
